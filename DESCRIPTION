@@ -1,0 +1,11 @@
+Package: SDjoygret
+Type: Package
+Title: Testing R package
+Version: 0.1
+Date: 2016-03-08
+Author: person("Sylvain", "Dechaumet", role=c("aut", "cre"), email="mystilivia@gmail.com")
+Maintainer: S. Dechaumet <mystilivia@gmail.com>
+Description: Testing R packaging
+License: none
+LazyData: TRUE
+RoxygenNote: 5.0.1
