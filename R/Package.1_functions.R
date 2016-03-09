@@ -41,7 +41,14 @@ testing_function_01 <- function(x){
 #' xcms_orbi_GRT()
 #' @export
 
-xcms_orbi_GRT <- function(File_list, Results.dir.name="Default", bw_param=c(15, 8, 0.8), mzwid_param=0.005, minfrac_param=0.7, profStep_param=0.5, Sample.Metadata, Grouping.factor=1){
+xcms_orbi_GRT <- function(File_list,
+                          Results.dir.name="Default",
+                          bw_param=c(15, 8, 0.8),
+                          mzwid_param=0.005,
+                          minfrac_param=0.7,
+                          profStep_param=0.5,
+                          Sample.Metadata,
+                          Grouping.factor=1){
   ## Package requirement
   require("xcms")
   require("ropls")
@@ -65,10 +72,10 @@ xcms_orbi_GRT <- function(File_list, Results.dir.name="Default", bw_param=c(15, 
   dev.off()
   xset.group.4 <- xcms::group(xset.3, method="density", bw=bw_param[3], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.filled <- xcms::fillPeaks(xset.group.4)
-  return(xset.filled) ## Output results
+  print(xset.filled) ## Output results
 
   ## Generate Data.matrix, Samples and Variables metadata
-  write.table(peakTable(xset.default.4), file=paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names=NA)
+  write.table(peakTable(xset.filled), file=paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names=NA)
   Sample.Metadata.D <- data.frame(row.names=Sample.Metadata[,1], Sample.Metadata[2:ncol(Sample.Metadata)])
   Data <- list()
   Data[[1]] <- t(peakTable(xset.filled)[(ncol(peakTable(xset.filled))-nrow(xset.filled@phenoData)+1):ncol(peakTable(xset.filled))])
@@ -133,6 +140,7 @@ xcms_orbi_GRT <- function(File_list, Results.dir.name="Default", bw_param=c(15, 
     text(x,y,temp.factor.names)
   }
   dev.off()
+  return(xset.filled) ## Output results
 }
 
 
