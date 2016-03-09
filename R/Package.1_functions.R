@@ -94,13 +94,13 @@ xcms_orbi_GRT <- function(File_list,
                              rownames(subset(Data[[3]], Data[[3]][, "mz"] >= min(xcms:::ppmDev(179.0874, 5)) & Data[[3]][, "mz"] <= max(xcms:::ppmDev(179.0874, 5)))),
                              rownames(subset(Data[[3]], Data[[3]][, "mz"] >= min(xcms:::ppmDev(281.3265, 5)) & Data[[3]][, "mz"] <= max(xcms:::ppmDev(281.3265, 5))))))
 
-  temp.eic.r <- getEIC(xset.default.4, groupidx=group.id.p, rt="raw")
-  temp.eic.c <- getEIC(xset.default.4, groupidx=group.id.p, rt="corrected")
+  temp.eic.r <- getEIC(xset.filled, groupidx=group.id.p, rt="raw")
+  temp.eic.c <- getEIC(xset.filled, groupidx=group.id.p, rt="corrected")
   temp.n <- length(group.id.p)
   par(mfrow=c(temp.n,2))
   for (i in 1:length(group.id.p)){
-    plot(temp.eic.r, xset.default.4, groupidx=i, main="RAW")
-    plot(temp.eic.c, xset.default.4, groupidx=i, main="Corrected")
+    plot(temp.eic.r, xset.filled, groupidx=i, main="RAW")
+    plot(temp.eic.c, xset.filled, groupidx=i, main="Corrected")
   }
   dev.copy(png, paste0(Results.path.root, "EIC.STD.peaks.png"), h=1400, w=1000)
   dev.off()
