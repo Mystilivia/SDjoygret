@@ -39,7 +39,6 @@ testing_function_01 <- function(x){
 #' @keywords xcms, orbitrap
 #' @usage xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
 #' xcms_orbi_GRT()
-#' @export
 
 xcms_orbi_GRT <- function(File_list,
                           Results.dir.name="Default",
@@ -143,6 +142,52 @@ xcms_orbi_GRT <- function(File_list,
   dev.off()
   return(xset.filled) ## Output results
 }
+
+
+#' xcms_orbi_A
+#'
+#' This function perform the first steps of metabolomic analysis : xcmsSet and
+#' two iteration with group and retcor to end with fillpeaks. The resulting output
+#' is a xcms set object.
+#' @param File_list File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4
+#' @param xcmsSet_param xcmsSet parameters for centwave method : c(ppm, min_peakwidth, max_peakwidth, snthresh, prefilter_scan, prefilter_value, mzdiff, fitgauss, nSlaves)
+#' @param Results.dir.name Name of the subfolder to store results
+#' @param bw_param Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3)
+#' @param mzwid_param mzwid parameter to use.
+#' @param minfrac_param minfrac parameter to use
+#' @param profStep_param profStep parameter to use
+#' @keywords xcms, orbitrap
+#' @usage xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
+#' xcms_orbi_GRT()
+#' @export
+
+xcms_orbi_A <- function(File_list,
+                        xcmsSet_param=c(7, 4, 20, 10, 4, 1000, -0.001, "F", 4),
+                          Results.dir.name="Default",
+                          bw_param=c(15, 8, 0.8),
+                          mzwid_param=0.005,
+                          minfrac_param=0.7,
+                          profStep_param=0.5){
+  ## Package requirement
+  require("xcms")
+
+  ## Create directory and path
+  Results.path.root <- paste0("./",Results.dir.name,"/")
+  dir.create(Results.path.root, showWarnings = F)
+  xset.default <- xcmsSet(File_list, method = 'centWave', ppm=xcmsSet_param[1], peakwidth=c(xcmsSet_param[2],xcmsSet_param[3]), snthresh=xcmsSet_param[4], prefilter=c(xcmsSet_param[5],xcmsSet_param[6]), mzdiff=xcmsSet_param[7], fitgauss=xcmsSet_param[8], nSlaves = xcmsSet_param[9])
+  xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
+  xset.2 <- xcms::retcor(xset.group, method="obiwarp", profStep=profStep_param, plottype="deviation")
+  dev.copy(png, paste0(Results.path.rtgraph, "RetCor_01.png"), h=800, w=1600)
+  dev.off()
+  xset.group2 <- xcms::group(xset.2, method="density", bw=bw_param[2], mzwid=mzwid_param, minfrac=mzwid_param)
+  xset.3 <- xcms::retcor(xset.group2, method="obiwarp", profStep=profStep_param, plottype="deviation")
+  dev.copy(png, paste0(Results.path.rtgraph, "RetCor_02.png"), h=800, w=1600)
+  dev.off()
+  xset.group.4 <- xcms::group(xset.3, method="density", bw=bw_param[3], mzwid=mzwid_param, minfrac=mzwid_param)
+  xset.filled <- xcms::fillPeaks(xset.group.4)
+  return(xset.filled) ## Output results
+}
+
 
 
 
