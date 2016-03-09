@@ -7,7 +7,7 @@
 testing_function_01(x)
 }
 \arguments{
-\item{x}{Argument for [...]}
+\item{x}{Must be numeric}
 }
 \description{
 This function is just a test for R package creation.
