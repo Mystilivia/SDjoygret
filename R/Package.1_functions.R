@@ -162,12 +162,12 @@ xcms_orbi_GRT <- function(File_list,
 #' @export
 
 xcms_orbi_A <- function(File_list,
-                        xcmsSet_param=c(7, 4, 20, 10, 4, 1000, -0.001, "F", 4),
-                          Results.dir.name="Default",
-                          bw_param=c(15, 8, 0.8),
-                          mzwid_param=0.005,
-                          minfrac_param=0.7,
-                          profStep_param=0.5){
+                        xcmsSet_param=list(7, 4, 20, 10, 4, 1000, -0.001, FALSE, 4),
+                        Results.dir.name="Default",
+                        bw_param=c(15, 8, 0.8),
+                        mzwid_param=0.005,
+                        minfrac_param=0.7,
+                        profStep_param=0.5){
   ## Package requirement
   require("xcms")
 
@@ -175,13 +175,13 @@ xcms_orbi_A <- function(File_list,
   Results.path.root <- paste0("./",Results.dir.name,"/")
   dir.create(Results.path.root, showWarnings = F)
   xset.default <- xcmsSet(File_list, method = 'centWave',
-                          ppm=as.numeric(xcmsSet_param[1]),
-                          peakwidth=as.numeric(c(xcmsSet_param[2],xcmsSet_param[3])),
-                          snthresh=as.numeric(xcmsSet_param[4]),
-                          prefilter=as.numeric(c(xcmsSet_param[5],xcmsSet_param[6])),
-                          mzdiff=as.numeric(xcmsSet_param[7]),
-                          fitgauss=xcmsSet_param[8],
-                          nSlaves = as.numeric(xcmsSet_param[9]))
+                          ppm=xcmsSet_param[[1]],
+                          peakwidth=c(xcmsSet_param[[2]],xcmsSet_param[[3]]),
+                          snthresh=xcmsSet_param[[4]],
+                          prefilter=c(xcmsSet_param[[5]],xcmsSet_param[[6]]),
+                          mzdiff=xcmsSet_param[[7]],
+                          fitgauss=xcmsSet_param[[8]],
+                          nSlaves = xcmsSet_param[[9]])
   xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.2 <- xcms::retcor(xset.group, method="obiwarp", profStep=profStep_param, plottype="deviation")
   dev.copy(png, paste0(Results.path.rtgraph, "RetCor_01.png"), h=800, w=1600)
