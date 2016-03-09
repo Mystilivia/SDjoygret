@@ -14,7 +14,7 @@ xcms_orbi_GRT()
 
 \item{bw_param}{Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3)}
 
-\item{mzwid_param}{mzwid parameter to use}
+\item{mzwid_param}{mzwid parameter to use.}
 
 \item{minfrac_param}{minfrac parameter to use}
 

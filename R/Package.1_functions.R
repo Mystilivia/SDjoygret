@@ -31,7 +31,7 @@ testing_function_01 <- function(x){
 #' @param File_list File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4
 #' @param Results.dir.name Name of the subfolder to store results
 #' @param bw_param Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3)
-#' @param mzwid_param mzwid parameter to use
+#' @param mzwid_param mzwid parameter to use.
 #' @param minfrac_param minfrac parameter to use
 #' @param profStep_param profStep parameter to use
 #' @param Sample.Metadata Dataframe with samples names and metadata
