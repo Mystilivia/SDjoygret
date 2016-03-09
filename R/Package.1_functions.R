@@ -85,6 +85,7 @@ xcms_orbi_GRT <- function(File_list,
   Data[[3]] <- peakTable(xset.filled)[1:(ncol(peakTable(xset.filled))-nrow(xset.filled@phenoData))]
   names(Data[3]) <- "Variable.metadata"
 
+  print(summary(Data)) ## Debug
   ## internal STD 1 133.1062 rt 60  Leucine-5,5,5,-d3
   ## internal STD 2 206.1014 rt 151 L-tryptophan-2,3,3-d3
   ## internal STD 3 179.0874 rt 375 Indole-2,4,5,6,7-d5-3-acetic acid
