@@ -8,7 +8,7 @@ xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7),
 xcms_orbi_GRT()
 }
 \arguments{
-\item{xcms_set_obj}{xcmsset object (result of peak picking)}
+\item{File_list}{File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4}
 
 \item{Results.dir.name}{Name of the subfolder to store results}
 

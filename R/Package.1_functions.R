@@ -28,7 +28,7 @@ testing_function_01 <- function(x){
 #' to PCA analysis. Function will perform group -> retcor -> group -> retcor -> group
 #' and return EIC for standards across all samples and extract standards from peaks table,
 #' giving also ppm deviation for each std for diagnostic.
-#' @param xcms_set_obj xcmsset object (result of peak picking)
+#' @param File_list File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4
 #' @param Results.dir.name Name of the subfolder to store results
 #' @param bw_param Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3)
 #' @param mzwid_param mzwid parameter to use
@@ -41,7 +41,7 @@ testing_function_01 <- function(x){
 #' xcms_orbi_GRT()
 #' @export
 
-xcms_orbi_GRT <- function(xcms_set_obj, Results.dir.name="Default", bw_param=c(15, 8, 0.8), mzwid_param=0.005, minfrac_param=0.7, profStep_param=0.5, Sample.Metadata, Grouping.factor=1){
+xcms_orbi_GRT <- function(File_list, Results.dir.name="Default", bw_param=c(15, 8, 0.8), mzwid_param=0.005, minfrac_param=0.7, profStep_param=0.5, Sample.Metadata, Grouping.factor=1){
   ## Package requirement
   require("xcms")
   require("ropls")
@@ -54,6 +54,7 @@ xcms_orbi_GRT <- function(xcms_set_obj, Results.dir.name="Default", bw_param=c(1
   dir.create(Results.path.rtgraph, showWarnings = F)
   dir.create(Results.path.pca, showWarnings = F)
 
+  xset.default <- xcmsSet(File_list, method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4)
   xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.2 <- xcms::retcor(xset.group, method="obiwarp", profStep=profStep_param, plottype="deviation")
   dev.copy(png, paste0(Results.path.rtgraph, "RetCor_01.png"), h=800, w=1600)
