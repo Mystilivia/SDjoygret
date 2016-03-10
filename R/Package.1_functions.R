@@ -174,8 +174,8 @@ xcms_orbi_A <- function(File_list,
   ## Create directory and path
   Results.path.root <- paste0("./",Results.dir.name,"/")
   Results.path.rtgraph <- paste0(Results.path.root, "/RetCor_Dev/")
+  dir.create(Results.path.root, showWarnings = F, recursive = T)
   dir.create(Results.path.rtgraph, showWarnings = F)
-  dir.create(Results.path.root, showWarnings = F)
   xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
 
   xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
