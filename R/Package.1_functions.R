@@ -192,5 +192,23 @@ xcms_orbi_A <- function(File_list,
 }
 
 
+#' SD_mass_batch
+#'
+#' This function separate .mzXML file list by batch. Useful when you use directory for your classes
+#' and want to do separate xcms analysis by another grouping factor like batch sequences.
+#' @param Files.dir Path to your results from workdirectory.
+#' @param Batch.list A dataframe with rownames is files names (without extension) and first column is batch number (or other factor).
+#' @keywords xcms, orbitrap
+#' @export
+#'
+SD_mass_batch <- function(Files.dir="./",
+                          Batch.list=Batch.list){
+  Files <- list.files(Files.dir, recursive=T, full.names=T)
+  result.list <- list()
+  for (i in unique(Batch.list[,1])){
+    result.list[[i]] <- subset(Files, gsub("*.mzXML","", x=basename(Files)) %in% rownames(subset(Batch.list, Batch.list[1]==i)))
+  }
+  return(result.list)
+}
 
 
