@@ -162,7 +162,7 @@ xcms_orbi_GRT <- function(File_list,
 #' @export
 
 xcms_orbi_A <- function(File_list,
-                        xcmsSet_param=list(7, 4, 20, 10, 4, 1000, -0.001, FALSE, 4),
+                        xcmsSet_param=list(7, c(4, 20), 10, c(4, 1000), -0.001, FALSE, 4),
                         Results.dir.name="Default",
                         bw_param=c(15, 8, 0.8),
                         mzwid_param=0.005,
@@ -176,12 +176,12 @@ xcms_orbi_A <- function(File_list,
   dir.create(Results.path.root, showWarnings = F)
   xset.default <- xcmsSet(File_list, method = 'centWave',
                           ppm=xcmsSet_param[[1]],
-                          peakwidth=c(xcmsSet_param[[2]],xcmsSet_param[[3]]),
-                          snthresh=xcmsSet_param[[4]],
-                          prefilter=c(xcmsSet_param[[5]],xcmsSet_param[[6]]),
-                          mzdiff=xcmsSet_param[[7]],
-                          fitgauss=xcmsSet_param[[8]],
-                          nSlaves = xcmsSet_param[[9]])
+                          peakwidth=xcmsSet_param[[2]],
+                          snthresh=xcmsSet_param[[3]],
+                          prefilter=xcmsSet_param[[4]],
+                          mzdiff=xcmsSet_param[[5]],
+                          fitgauss=xcmsSet_param[[6]],
+                          nSlaves = xcmsSet_param[[7]])
   xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.2 <- xcms::retcor(xset.group, method="obiwarp", profStep=profStep_param, plottype="deviation")
   dev.copy(png, paste0(Results.path.rtgraph, "RetCor_01.png"), h=800, w=1600)
