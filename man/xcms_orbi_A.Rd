@@ -10,7 +10,7 @@ xcms_orbi_GRT()
 \arguments{
 \item{File_list}{File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4}
 
-\item{xcmsSet_param}{xcmsSet parameters for centwave method : c(ppm, min_peakwidth, max_peakwidth, snthresh, prefilter_scan, prefilter_value, mzdiff, fitgauss, nSlaves)}
+\item{xcmsSet_param}{xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7))}
 
 \item{Results.dir.name}{Name of the subfolder to store results}
 

@@ -150,7 +150,7 @@ xcms_orbi_GRT <- function(File_list,
 #' two iteration with group and retcor to end with fillpeaks. The resulting output
 #' is a xcms set object.
 #' @param File_list File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4
-#' @param xcmsSet_param xcmsSet parameters for centwave method : c(ppm, min_peakwidth, max_peakwidth, snthresh, prefilter_scan, prefilter_value, mzdiff, fitgauss, nSlaves)
+#' @param xcmsSet_param xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7))
 #' @param Results.dir.name Name of the subfolder to store results
 #' @param bw_param Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3)
 #' @param mzwid_param mzwid parameter to use.
@@ -162,26 +162,20 @@ xcms_orbi_GRT <- function(File_list,
 #' @export
 
 xcms_orbi_A <- function(File_list,
-                        xcmsSet_param=list(7, c(4, 20), 10, c(4, 1000), -0.001, FALSE, 4),
-                        Results.dir.name="Default",
-                        bw_param=c(15, 8, 0.8),
-                        mzwid_param=0.005,
-                        minfrac_param=0.7,
-                        profStep_param=0.5){
+                        xcmsSet_param    = list(method="centWave", ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,10000), mzdiff=-0.001, fitgauss=FALSE, nSlaves=4),
+                        Results.dir.name = "Default",
+                        bw_param         = c(15, 8, 0.8),
+                        mzwid_param      = 0.005,
+                        minfrac_param    = 0.7,
+                        profStep_param  = 0.5){
   ## Package requirement
   require("xcms")
 
   ## Create directory and path
   Results.path.root <- paste0("./",Results.dir.name,"/")
   dir.create(Results.path.root, showWarnings = F)
-  xset.default <- xcmsSet(File_list, method = 'centWave',
-                          ppm=xcmsSet_param[[1]],
-                          peakwidth=xcmsSet_param[[2]],
-                          snthresh=xcmsSet_param[[3]],
-                          prefilter=xcmsSet_param[[4]],
-                          mzdiff=xcmsSet_param[[5]],
-                          fitgauss=xcmsSet_param[[6]],
-                          nSlaves = xcmsSet_param[[7]])
+  xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
+
   xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.2 <- xcms::retcor(xset.group, method="obiwarp", profStep=profStep_param, plottype="deviation")
   dev.copy(png, paste0(Results.path.rtgraph, "RetCor_01.png"), h=800, w=1600)
