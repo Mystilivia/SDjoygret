@@ -212,7 +212,8 @@ xcms_orbi_Results <- function(filled_peak_object,
                               STDs_ppm=10,
                               perform_PCA=TRUE,
                               Sample.Metadata,
-                              PCA_group=c(1,2,3,4)){
+                              PCA_group=c(1,2,3,4)
+){
   ## Package requirement
   require("xcms")
   require("ropls")
@@ -241,23 +242,21 @@ xcms_orbi_Results <- function(filled_peak_object,
   Data[[3]] <- peakTable(filled_peak_object)[1:(ncol(peakTable(filled_peak_object))-nrow(filled_peak_object@phenoData))]
   names(Data[3]) <- "Variable.metadata"
 
-  # ## Return EICs of STDs
-  # group.id.p <- c()
-  # for (i in 1:length(STDs_mass)){
-  #   temp <- rownames(subset(Data[[3]], Data[[3]][, "mz"] >= min(xcms:::ppmDev(STDs_mass[i], STDs_ppm)) & Data[[3]][, "mz"] <= max(xcms:::ppmDev(STDs_mass[i], STDs_ppm))))
-  #   group.id.p <- union(group.id.p, temp)
-  # }
-  #
-  # temp.eic.r <- getEIC(filled_peak_object, groupidx=as.numeric(group.id.p), rt="raw")
-  # temp.eic.c <- getEIC(filled_peak_object, groupidx=as.numeric(group.id.p), rt="corrected")
-  # temp.n <- length(group.id.p)
-  # par(mfrow=c(temp.n,2))
-  # for (i in as.numeric(group.id.p)){
-  #   plot(temp.eic.r, filled_peak_object, groupidx=i, main="RAW")
-  #   plot(temp.eic.c, filled_peak_object, groupidx=i, main="Corrected")
-  # }
-  # dev.copy(png, paste0(Results.path.root, "EIC.STD.peaks.png"), h=1400, w=1000)
-  # dev.off()
+  group.id.p <- c()
+  for (i in 1:length(STDs_mass)){
+    temp <- rownames(subset(Data[[3]], Data[[3]][, "mz"] >= min(xcms:::ppmDev(STDs_mass[i], STDs_ppm)) & Data[[3]][, "mz"] <= max(xcms:::ppmDev(STDs_mass[i], STDs_ppm))))
+    group.id.p <- union(group.id.p, temp)
+  }
+  group.id.p <- as.numeric(group.id.p)
+  temp.eic.r <- getEIC(filled_peak_object, groupidx=group.id.p, rt="raw")
+  temp.eic.c <- getEIC(filled_peak_object, groupidx=group.id.p, rt="corrected")
+  for (i in 1:length(group.id.p)){
+    par(mfrow=c(1,2))
+    plot(temp.eic.r, filled_peak_object, groupidx=i, main="RAW")
+    plot(temp.eic.c, filled_peak_object, groupidx=i, main="Corrected")
+    dev.copy(png, paste0(Results.path.root, "STD.EIC/EIC.STD.peaks_",i, ".png"), h=1400, w=1000)
+    dev.off()
+  }
 
   ## Perform PCA
   if (perform_PCA==FALSE){
