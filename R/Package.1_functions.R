@@ -195,23 +195,24 @@ xcms_orbi_A <- function(File_list,
 #' xcms_orbi_Results
 #'
 #' This function generate peak_table, STDs EIC across samples, PCA (optional) and return a list with [1] datamatrix, [2] sample.metadata and [3] variable.metadata.
-#' @param filled_peak_object
-#' @param STDs_mass
-#' @param STDs_ppm
-#' @param perform_PCA
-#' @param Sample.Metadata
+#' @param filled_peak_object An xcmsSet object with filled peaks
+#' @param STDs_mass Vector of STDs exact mass
+#' @param STDs_ppm  Deviation for STDs in ppm (try to increase if your STDs are not found)
+#' @param perform_PCA Logical to do PCA analysis or not
+#' @param Sample.Metadata Dataframe with samples metadata
+#' @param PCA_group vector with samples metadata column to use for groups in ACP
 #' @keywords xcms, orbitrap
 #' @usage xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
 #' xcms_orbi_GRT()
 #' @export
 
 xcms_orbi_Results <- function(filled_peak_object,
-                              STDs_mass=c("133.1062", "206.1014", "179.0874", "281.3265"),
-                              STDs_ppm,
-                              perform_PCA=c("TRUE", "FALSE"),
+                              Results.dir.name=c("Default"),
+                              STDs_mass=c(133.1062, 206.1014, 179.0874, 281.3265),
+                              STDs_ppm=10,
+                              perform_PCA=TRUE,
                               Sample.Metadata,
-                              PCA_group=c(1,2,3,4)
-                              ){
+                              PCA_group=c(1,2,3,4)){
   ## Package requirement
   require("xcms")
   require("ropls")
@@ -223,7 +224,7 @@ xcms_orbi_Results <- function(filled_peak_object,
   dir.create(Results.path.pca, showWarnings = F)
 
   ## Get group metadata and sample data
-  write.table(peakTable(filled_peak_object), file=paste0(Results.path, "Peak_Table.csv"), sep=";", col.names=NA)
+  write.table(peakTable(filled_peak_object), file=paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names=NA)
   ## Generate files for opls analysis
   Data <- list()
   Data[[1]] <- t(peakTable(filled_peak_object)[(ncol(peakTable(filled_peak_object))-nrow(filled_peak_object@phenoData)+1):ncol(peakTable(filled_peak_object))])
@@ -240,56 +241,50 @@ xcms_orbi_Results <- function(filled_peak_object,
   Data[[3]] <- peakTable(filled_peak_object)[1:(ncol(peakTable(filled_peak_object))-nrow(filled_peak_object@phenoData))]
   names(Data[3]) <- "Variable.metadata"
 
-  ## Return EICs of STDs
-  group.id.p <- as.numeric(c(rownames(
-    for (i in length(STDs_mass)){
-      rownames(subset(Data[[3]],
-                      Data[[3]][, "mz"] >= min(xcms:::ppmDev(STDs_mass[i], STDs_ppm)) &
-                        Data[[3]][, "mz"] <= max(xcms:::ppmDev(STDs_mass[i], STDs_ppm))))
-    })))
-
-
-  temp.eic.r <- getEIC(xset.default.4, groupidx=group.id.p, rt="raw")
-  temp.eic.c <- getEIC(xset.default.4, groupidx=group.id.p, rt="corrected")
-  temp.n <- length(group.id.p)
-  par(mfrow=c(temp.n,2))
-  for (i in 1:length(group.id.p)){
-    plot(temp.eic.r, xset.default.4, groupidx=i, main="RAW")
-    plot(temp.eic.c, xset.default.4, groupidx=i, main="Corrected")
-  }
-  dev.copy(png, paste0(Results.path, "EIC.STD.peaks.png"), h=1400, w=1000)
-  dev.off()
-  par(mfrow=c(1,1))
-
-
+  # ## Return EICs of STDs
+  # group.id.p <- c()
+  # for (i in 1:length(STDs_mass)){
+  #   temp <- rownames(subset(Data[[3]], Data[[3]][, "mz"] >= min(xcms:::ppmDev(STDs_mass[i], STDs_ppm)) & Data[[3]][, "mz"] <= max(xcms:::ppmDev(STDs_mass[i], STDs_ppm))))
+  #   group.id.p <- union(group.id.p, temp)
+  # }
+  #
+  # temp.eic.r <- getEIC(filled_peak_object, groupidx=as.numeric(group.id.p), rt="raw")
+  # temp.eic.c <- getEIC(filled_peak_object, groupidx=as.numeric(group.id.p), rt="corrected")
+  # temp.n <- length(group.id.p)
+  # par(mfrow=c(temp.n,2))
+  # for (i in as.numeric(group.id.p)){
+  #   plot(temp.eic.r, filled_peak_object, groupidx=i, main="RAW")
+  #   plot(temp.eic.c, filled_peak_object, groupidx=i, main="Corrected")
+  # }
+  # dev.copy(png, paste0(Results.path.root, "EIC.STD.peaks.png"), h=1400, w=1000)
+  # dev.off()
 
   ## Perform PCA
-  ACP.results  <- opls(Data[[1]], predI=NA, plotL=F)
+  if (perform_PCA==FALSE){
+    break
+  } else {
+    ACP.results  <- opls(Data[[1]], predI=NA, plotL=F)
     png(filename=paste0(Results.path.pca,"ACP summary.png"), width=800, height=1200, units="px", res=150)
     par(mfrow=c(3,2))
-    plot(Data.pca, typeVc="overview", parDevNewL=F)
-    plot(Data.pca, typeVc="x-loading", parDevNewL=F)
-    plot(Data.pca, typeVc="x-score", parDevNewL=F)
-    plot(Data.pca, typeVc="outlier", parDevNewL=F)
-    plot(Data.pca, typeVc="correlation", parDevNewL=F)
+    plot(ACP.results, typeVc="overview", parDevNewL=F)
+    plot(ACP.results, typeVc="x-loading", parDevNewL=F)
+    plot(ACP.results, typeVc="x-score", parDevNewL=F)
+    plot(ACP.results, typeVc="outlier", parDevNewL=F)
+    plot(ACP.results, typeVc="correlation", parDevNewL=F)
     dev.off()
 
-  PCA_group
-  x <- -4 ## label position
-  y <- -7 ## label position
-  png(filename=paste0(Results.path, "ACP_Ellipses.png"), width=900, height=900, units="px", res=100)
-  par(mfrow=c(2,2))
-  for (i in Grouping.factor){
-    Data.pca <- ACP.results.list[[1]]
-    temp.factor <- Data[[2]][,i]
-    temp.factor.names <- names(Data[[2]][i])
-    plot(Data.pca, typeVc="x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses=F, parDevNewL=F)
-    text(x,y,temp.factor.names)
+    x <- -4 ## label position
+    y <- -7 ## label position
+    png(filename=paste0(Results.path.pca, "ACP_Ellipses.png"), width=900, height=900, units="px", res=100)
+    par(mfrow=c(2,2))
+    for (i in PCA_group){
+      temp.factor <- Data[[2]][,i]
+      temp.factor.names <- names(Data[[2]][i])
+      plot(ACP.results, typeVc="x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses=F, parDevNewL=F)
+      text(x,y,temp.factor.names)
+    }
+    dev.off()
   }
-  dev.off()
-
-
-
 }
 
 
