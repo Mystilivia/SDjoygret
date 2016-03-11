@@ -192,7 +192,110 @@ xcms_orbi_A <- function(File_list,
 }
 
 
-#' SD_mass_batch
+#' xcms_orbi_Results
+#'
+#' This function generate peak_table, STDs EIC across samples, PCA (optional) and return a list with [1] datamatrix, [2] sample.metadata and [3] variable.metadata.
+#' @param filled_peak_object
+#' @param STDs_mass
+#' @param STDs_ppm
+#' @param perform_PCA
+#' @param Sample.Metadata
+#' @keywords xcms, orbitrap
+#' @usage xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
+#' xcms_orbi_GRT()
+#' @export
+
+xcms_orbi_Results <- function(filled_peak_object,
+                              STDs_mass=c("133.1062", "206.1014", "179.0874", "281.3265"),
+                              STDs_ppm,
+                              perform_PCA=c("TRUE", "FALSE"),
+                              Sample.Metadata,
+                              PCA_group=c(1,2,3,4)
+                              ){
+  ## Package requirement
+  require("xcms")
+  require("ropls")
+
+  ## Create directory and path
+  Results.path.root <- paste0("./",Results.dir.name,"/")
+  Results.path.pca <- paste0(Results.path.root, "/PCA/")
+  dir.create(Results.path.root, showWarnings = F, recursive = T)
+  dir.create(Results.path.pca, showWarnings = F)
+
+  ## Get group metadata and sample data
+  write.table(peakTable(filled_peak_object), file=paste0(Results.path, "Peak_Table.csv"), sep=";", col.names=NA)
+  ## Generate files for opls analysis
+  Data <- list()
+  Data[[1]] <- t(peakTable(filled_peak_object)[(ncol(peakTable(filled_peak_object))-nrow(filled_peak_object@phenoData)+1):ncol(peakTable(filled_peak_object))])
+  names(Data[1]) <- "Datamatrix"
+  if (is.data.frame(Sample.Metadata)==T){
+    Sample.Metadata.D <- data.frame(row.names=Sample.Metadata[,1], Sample.Metadata[2:ncol(Sample.Metadata)])
+    Data[[2]] <- subset(Sample.Metadata.D, rownames(Sample.Metadata.D) %in% rownames(filled_peak_object@phenoData))
+    names(Data[2]) <- "Sample.metadata"
+  } else {
+    print("Sample.Metadata is not a data.frame, return empty list[[2]]")
+    Data[[2]] <- NULL
+    names(Data[2]) <- "Sample.metadata"
+  }
+  Data[[3]] <- peakTable(filled_peak_object)[1:(ncol(peakTable(filled_peak_object))-nrow(filled_peak_object@phenoData))]
+  names(Data[3]) <- "Variable.metadata"
+
+  ## Return EICs of STDs
+  group.id.p <- as.numeric(c(rownames(
+    for (i in length(STDs_mass)){
+      rownames(subset(Data[[3]],
+                      Data[[3]][, "mz"] >= min(xcms:::ppmDev(STDs_mass[i], STDs_ppm)) &
+                        Data[[3]][, "mz"] <= max(xcms:::ppmDev(STDs_mass[i], STDs_ppm))))
+    })))
+
+
+  temp.eic.r <- getEIC(xset.default.4, groupidx=group.id.p, rt="raw")
+  temp.eic.c <- getEIC(xset.default.4, groupidx=group.id.p, rt="corrected")
+  temp.n <- length(group.id.p)
+  par(mfrow=c(temp.n,2))
+  for (i in 1:length(group.id.p)){
+    plot(temp.eic.r, xset.default.4, groupidx=i, main="RAW")
+    plot(temp.eic.c, xset.default.4, groupidx=i, main="Corrected")
+  }
+  dev.copy(png, paste0(Results.path, "EIC.STD.peaks.png"), h=1400, w=1000)
+  dev.off()
+  par(mfrow=c(1,1))
+
+
+
+  ## Perform PCA
+  ACP.results  <- opls(Data[[1]], predI=NA, plotL=F)
+    png(filename=paste0(Results.path.pca,"ACP summary.png"), width=800, height=1200, units="px", res=150)
+    par(mfrow=c(3,2))
+    plot(Data.pca, typeVc="overview", parDevNewL=F)
+    plot(Data.pca, typeVc="x-loading", parDevNewL=F)
+    plot(Data.pca, typeVc="x-score", parDevNewL=F)
+    plot(Data.pca, typeVc="outlier", parDevNewL=F)
+    plot(Data.pca, typeVc="correlation", parDevNewL=F)
+    dev.off()
+
+  PCA_group
+  x <- -4 ## label position
+  y <- -7 ## label position
+  png(filename=paste0(Results.path, "ACP_Ellipses.png"), width=900, height=900, units="px", res=100)
+  par(mfrow=c(2,2))
+  for (i in Grouping.factor){
+    Data.pca <- ACP.results.list[[1]]
+    temp.factor <- Data[[2]][,i]
+    temp.factor.names <- names(Data[[2]][i])
+    plot(Data.pca, typeVc="x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses=F, parDevNewL=F)
+    text(x,y,temp.factor.names)
+  }
+  dev.off()
+
+
+
+}
+
+
+
+
+#' SD_batch_list
 #'
 #' This function separate .mzXML file list by batch. Useful when you use directory for your classes
 #' and want to do separate xcms analysis by another grouping factor like batch sequences.
@@ -201,7 +304,7 @@ xcms_orbi_A <- function(File_list,
 #' @keywords xcms, orbitrap
 #' @export
 #'
-SD_mass_batch <- function(Files.dir="./",
+SD_batch_list <- function(Files.dir="./",
                           Batch.list=Batch.list){
   Files <- list.files(Files.dir, recursive=T, full.names=T)
   result.list <- list()
@@ -210,5 +313,50 @@ SD_mass_batch <- function(Files.dir="./",
   }
   return(result.list)
 }
+
+
+#' SD_batch_set
+#'
+#' This function separate .mzXML file list by batch. Useful when you use directory for your classes
+#' and want to do separate xcms analysis by another grouping factor like batch sequences.
+#' @param Batch.files List returned by SD_mass_batch with files for each batch.
+#' @param xcmsSet_param xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7))
+#' @keywords xcms, orbitrap
+#' @export
+#'
+SD_batch_set <- function(Batch.files=Batch.files,
+                         xcmsSet_param = list(method="centWave", ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,10000), mzdiff=-0.001, fitgauss=FALSE, nSlaves=4)
+                         ){
+  Batch.xcmset.list <- list()
+  for (i in 1:length(Batch.files)){
+    a <- paste0("Batch.", i)
+    Batch.xcmset.list[[i]] <- SDjoygret::xcms_orbi_A(Batch.files[[i]], Results.dir.name = a, xcmsSet_param = xcmsSet_param)
+  }
+  return(Batch.xcmset.list)
+}
+
+#' SD_batch_Results
+#'
+#' This function separate .mzXML file list by batch. Useful when you use directory for your classes
+#' and want to do separate xcms analysis by another grouping factor like batch sequences.
+#' @param Batch.files List returned by SD_mass_batch with files for each batch.
+#' @param xcmsSet_param xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7))
+#' @keywords xcms, orbitrap
+#' @export
+#'
+SD_batch_Results <- function(Batch.files=Batch.files,
+                         xcmsSet_param = list(method="centWave", ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,10000), mzdiff=-0.001, fitgauss=FALSE, nSlaves=4)
+){
+  Batch.xcmset.list <- list()
+  for (i in 1:length(Batch.files)){
+    a <- paste0("Batch.", i)
+    Batch.xcmset.list[[i]] <- SDjoygret::xcms_orbi_A(Batch.files[[i]], Results.dir.name = a, xcmsSet_param = xcmsSet_param)
+  }
+  return(Batch.xcmset.list)
+}
+
+
+
+
 
 
