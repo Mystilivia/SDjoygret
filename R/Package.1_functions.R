@@ -221,8 +221,10 @@ xcms_orbi_Results <- function(filled_peak_object,
   ## Create directory and path
   Results.path.root <- paste0("./",Results.dir.name,"/")
   Results.path.pca <- paste0(Results.path.root, "/PCA/")
+  Results.path.std <- paste0(Results.path.root, "/STD/")
   dir.create(Results.path.root, showWarnings = F, recursive = T)
   dir.create(Results.path.pca, showWarnings = F)
+  dir.create(Results.path.std, showWarnings = F)
 
   ## Get group metadata and sample data
   write.table(peakTable(filled_peak_object), file=paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names=NA)
@@ -254,7 +256,7 @@ xcms_orbi_Results <- function(filled_peak_object,
     par(mfrow=c(1,2))
     plot(temp.eic.r, filled_peak_object, groupidx=i, main="RAW")
     plot(temp.eic.c, filled_peak_object, groupidx=i, main="Corrected")
-    dev.copy(png, paste0(Results.path.root, "STD.EIC/EIC.STD.peaks_",i, ".png"), h=1400, w=1000)
+    dev.copy(png, paste0(Results.path.std, "EIC.STD.peaks_", i, ".png"), h=1400, w=1000)
     dev.off()
   }
 
