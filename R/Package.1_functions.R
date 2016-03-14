@@ -214,40 +214,33 @@ xcms_orbi_Results <- function(filled_peak_object,
                               STDs_ppm = 10,
                               perform_PCA = c(TRUE, FALSE),
                               Sample.Metadata,
-                              PCA_group = c(1,2,3,4)
-){
+                              PCA_group = c(1,2,3,4)){
   ## Package requirement
   library("xcms")
 
   ## Create directory and path
   Results.path.root <- paste0("./", Results.dir.name, "/")
-  Results.path.pca <- paste0(Results.path.root, "PCA/")
-  Results.path.std <- paste0(Results.path.root, "STD/")
   dir.create(Results.path.root, showWarnings = F, recursive = T)
-  dir.create(Results.path.pca, showWarnings = F)
-  dir.create(Results.path.std, showWarnings = F)
 
   ## Get group metadata and sample data
   write.table(peakTable(filled_peak_object), file=paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names=NA)
   ## Generate files for opls analysis
   Data <- list()
   peak.table.temp <- peakTable(filled_peak_object)
-  Data[[1]] <- data.frame(t(peak.table.temp[(ncol(peak.table.temp)-nrow(filled_peak_object@phenoData)+1):ncol(peak.table.temp)]))
-  names(Data[1]) <- "Datamatrix"
+  Data$Datamatrix <- data.frame(t(peak.table.temp[(ncol(peak.table.temp)-nrow(filled_peak_object@phenoData)+1):ncol(peak.table.temp)]))
   if (is.data.frame(Sample.Metadata)==T){
-    Sample.Metadata.D <- data.frame(row.names=Sample.Metadata[,1], Sample.Metadata[2:ncol(Sample.Metadata)])
-    Data[[2]] <- subset(Sample.Metadata.D, rownames(Sample.Metadata.D) %in% rownames(filled_peak_object@phenoData))
-    names(Data[2]) <- "Sample.metadata"
+    Data$Sample.metadata <- subset(Sample.Metadata, rownames(Sample.Metadata) %in% rownames(filled_peak_object@phenoData))
   } else {
     print("Sample.Metadata is not a data.frame, return empty list[[2]]")
-    Data[[2]] <- NULL
-    names(Data[2]) <- "Sample.metadata"
+    Data$Sample.metadata <- NULL
   }
-  Data[[3]] <- peak.table.temp[1:(ncol(peak.table.temp)-nrow(filled_peak_object@phenoData))]
-  names(Data[3]) <- "Variable.metadata"
+  Data$Variable.metadata <- peak.table.temp[1:(ncol(peak.table.temp)-nrow(filled_peak_object@phenoData))]
 
   ## Extract Standards infos
   if (STD == TRUE) {
+    Results.path.std <- paste0(Results.path.root, "STD/")
+    dir.create(Results.path.std, showWarnings = F)
+    require(xcms)
     group.id.p <- c()
     for (i in 1:length(STDs_mass)){
       temp <- rownames(subset(Data[[3]], Data[[3]][, "mz"] >= min(xcms:::ppmDev(STDs_mass[i], STDs_ppm)) & Data[[3]][, "mz"] <= max(xcms:::ppmDev(STDs_mass[i], STDs_ppm))))
@@ -272,6 +265,8 @@ xcms_orbi_Results <- function(filled_peak_object,
 
   ## Perform PCA
   if (perform_PCA == TRUE) {
+    Results.path.pca <- paste0(Results.path.root, "PCA/")
+    dir.create(Results.path.pca, showWarnings = F)
     library("ropls")
     ACP.results  <- opls(Data[[1]], predI=NA, plotL=F)
     png(filename=paste0(Results.path.pca,"ACP summary.png"), width=800, height=1200, units="px", res=150)
@@ -284,6 +279,7 @@ xcms_orbi_Results <- function(filled_peak_object,
     dev.off()
 
     if (!is.null(PCA_group)) {
+      if(length(names(Sample.Metadata)) >= length(PCA_group)) {
       leg.x <- -4 ## label position
       leg.y <- -7 ## label position
 
@@ -305,6 +301,7 @@ xcms_orbi_Results <- function(filled_peak_object,
         text(leg.x, leg.y, temp.factor.names)
       }
       dev.off()
+      }
     }
   }
   return(Data)
