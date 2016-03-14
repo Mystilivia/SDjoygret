@@ -22,6 +22,7 @@ testing_function_01 <- function(x){
   }
 }
 
+
 #' xcms_orbi_GRT
 #'
 #' This function simplify workflow from peak grouping and retention time correction
@@ -49,8 +50,8 @@ xcms_orbi_GRT <- function(File_list,
                           Sample.Metadata,
                           Grouping.factor=1){
   ## Package requirement
-  require("xcms")
-  require("ropls")
+  devtools::use_package("xcms")
+  devtools::use_package("ropls")
 
   ## Create directory and path
   Results.path.root <- paste0("./",Results.dir.name,"/")
@@ -169,7 +170,7 @@ xcms_orbi_A <- function(File_list,
                         minfrac_param    = 0.7,
                         profStep_param  = 0.5){
   ## Package requirement
-  require("xcms")
+  devtools::use_package("xcms")
 
   ## Create directory and path
   Results.path.root <- paste0("./",Results.dir.name,"/")
@@ -207,21 +208,21 @@ xcms_orbi_A <- function(File_list,
 #' @export
 
 xcms_orbi_Results <- function(filled_peak_object,
-                              Results.dir.name=c("Default"),
-                              STDs_mass=c(133.1062, 206.1014, 179.0874, 281.3265),
-                              STDs_ppm=10,
-                              perform_PCA=TRUE,
+                              Results.dir.name = "Default",
+                              STD = c(TRUE, FALSE),
+                              STDs_mass = c(133.1062, 206.1014, 179.0874, 281.3265),
+                              STDs_ppm = 10,
+                              perform_PCA = c(TRUE, FALSE),
                               Sample.Metadata,
-                              PCA_group=c(1,2,3,4)
+                              PCA_group = c(1,2,3,4)
 ){
   ## Package requirement
-  require("xcms")
-  require("ropls")
+  library("xcms")
 
   ## Create directory and path
-  Results.path.root <- paste0("./",Results.dir.name,"/")
-  Results.path.pca <- paste0(Results.path.root, "/PCA/")
-  Results.path.std <- paste0(Results.path.root, "/STD/")
+  Results.path.root <- paste0("./", Results.dir.name, "/")
+  Results.path.pca <- paste0(Results.path.root, "PCA/")
+  Results.path.std <- paste0(Results.path.root, "STD/")
   dir.create(Results.path.root, showWarnings = F, recursive = T)
   dir.create(Results.path.pca, showWarnings = F)
   dir.create(Results.path.std, showWarnings = F)
@@ -230,7 +231,8 @@ xcms_orbi_Results <- function(filled_peak_object,
   write.table(peakTable(filled_peak_object), file=paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names=NA)
   ## Generate files for opls analysis
   Data <- list()
-  Data[[1]] <- t(peakTable(filled_peak_object)[(ncol(peakTable(filled_peak_object))-nrow(filled_peak_object@phenoData)+1):ncol(peakTable(filled_peak_object))])
+  peak.table.temp <- peakTable(filled_peak_object)
+  Data[[1]] <- data.frame(t(peak.table.temp[(ncol(peak.table.temp)-nrow(filled_peak_object@phenoData)+1):ncol(peak.table.temp)]))
   names(Data[1]) <- "Datamatrix"
   if (is.data.frame(Sample.Metadata)==T){
     Sample.Metadata.D <- data.frame(row.names=Sample.Metadata[,1], Sample.Metadata[2:ncol(Sample.Metadata)])
@@ -241,29 +243,36 @@ xcms_orbi_Results <- function(filled_peak_object,
     Data[[2]] <- NULL
     names(Data[2]) <- "Sample.metadata"
   }
-  Data[[3]] <- peakTable(filled_peak_object)[1:(ncol(peakTable(filled_peak_object))-nrow(filled_peak_object@phenoData))]
+  Data[[3]] <- peak.table.temp[1:(ncol(peak.table.temp)-nrow(filled_peak_object@phenoData))]
   names(Data[3]) <- "Variable.metadata"
 
-  group.id.p <- c()
-  for (i in 1:length(STDs_mass)){
-    temp <- rownames(subset(Data[[3]], Data[[3]][, "mz"] >= min(xcms:::ppmDev(STDs_mass[i], STDs_ppm)) & Data[[3]][, "mz"] <= max(xcms:::ppmDev(STDs_mass[i], STDs_ppm))))
-    group.id.p <- union(group.id.p, temp)
-  }
-  group.id.p <- as.numeric(group.id.p)
-  temp.eic.r <- getEIC(filled_peak_object, groupidx=group.id.p, rt="raw")
-  temp.eic.c <- getEIC(filled_peak_object, groupidx=group.id.p, rt="corrected")
-  for (i in 1:length(group.id.p)){
-    par(mfrow=c(1,2))
-    plot(temp.eic.r, filled_peak_object, groupidx=i, main="RAW")
-    plot(temp.eic.c, filled_peak_object, groupidx=i, main="Corrected")
-    dev.copy(png, paste0(Results.path.std, "EIC.STD.peaks_", i, ".png"), h=1400, w=1000)
+  ## Extract Standards infos
+  if (STD == TRUE) {
+    group.id.p <- c()
+    for (i in 1:length(STDs_mass)){
+      temp <- rownames(subset(Data[[3]], Data[[3]][, "mz"] >= min(xcms:::ppmDev(STDs_mass[i], STDs_ppm)) & Data[[3]][, "mz"] <= max(xcms:::ppmDev(STDs_mass[i], STDs_ppm))))
+      group.id.p <- union(group.id.p, temp)
+    }
+    group.id.p <- as.numeric(group.id.p)
+    temp.eic.r <- getEIC(filled_peak_object, groupidx=group.id.p, rt="raw")
+    temp.eic.c <- getEIC(filled_peak_object, groupidx=group.id.p, rt="corrected")
+    png(filename=paste0(Results.path.std, "EIC.STD.peaks_", ".png"), width=800, height=1080, units="px", res=100)
+    par(mfrow=c(length(group.id.p),2))
+    for (i in 1:length(group.id.p)){
+      plot(temp.eic.r, filled_peak_object, groupidx=i, main="RAW")
+      plot(temp.eic.c, filled_peak_object, groupidx=i, main="Corrected")
+    }
     dev.off()
+
+    STDs.results <- subset(Data[[3]], rownames(Data[[3]]) %in% group.id.p)
+    STDs.results$ppm <- (STDs.results$mzmax - STDs.results$mzmin)/(STDs.results$mz/1000000)
+    write.table(STDs.results, file=paste0(Results.path.std, "Results_STDs.csv"), sep=";", col.names = NA)
+    print(STDs.results)
   }
 
   ## Perform PCA
-  if (perform_PCA==FALSE){
-    break
-  } else {
+  if (perform_PCA == TRUE) {
+    library("ropls")
     ACP.results  <- opls(Data[[1]], predI=NA, plotL=F)
     png(filename=paste0(Results.path.pca,"ACP summary.png"), width=800, height=1200, units="px", res=150)
     par(mfrow=c(3,2))
@@ -274,21 +283,32 @@ xcms_orbi_Results <- function(filled_peak_object,
     plot(ACP.results, typeVc="correlation", parDevNewL=F)
     dev.off()
 
-    x <- -4 ## label position
-    y <- -7 ## label position
-    png(filename=paste0(Results.path.pca, "ACP_Ellipses.png"), width=900, height=900, units="px", res=100)
-    par(mfrow=c(2,2))
-    for (i in PCA_group){
-      temp.factor <- Data[[2]][,i]
-      temp.factor.names <- names(Data[[2]][i])
-      plot(ACP.results, typeVc="x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses=F, parDevNewL=F)
-      text(x,y,temp.factor.names)
+    if (!is.null(PCA_group)) {
+      leg.x <- -4 ## label position
+      leg.y <- -7 ## label position
+
+      sqrt.group <- sqrt(length(PCA_group))
+      if (sqrt.group==round(sqrt.group)){
+        x <- sqrt.group
+        y <- sqrt.group
+      } else {
+        x <- round(sqrt.group,0)
+        y <- ceiling(sqrt.group)
+      }
+
+      png(filename=paste0(Results.path.pca, "ACP_Ellipses.png"), width=x*300, height=y*300, units="px", res=100)
+      par(mfrow=c(x, y))
+      for (i in PCA_group){
+        temp.factor <- Data[[2]][, i]
+        temp.factor.names <- names(Data[[2]][i])
+        plot(ACP.results, typeVc="x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses=F, parDevNewL=F)
+        text(leg.x, leg.y, temp.factor.names)
+      }
+      dev.off()
     }
-    dev.off()
   }
+  return(Data)
 }
-
-
 
 
 #' SD_batch_list
@@ -330,27 +350,6 @@ SD_batch_set <- function(Batch.files=Batch.files,
   }
   return(Batch.xcmset.list)
 }
-
-#' SD_batch_Results
-#'
-#' This function separate .mzXML file list by batch. Useful when you use directory for your classes
-#' and want to do separate xcms analysis by another grouping factor like batch sequences.
-#' @param Batch.files List returned by SD_mass_batch with files for each batch.
-#' @param xcmsSet_param xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7))
-#' @keywords xcms, orbitrap
-#' @export
-#'
-SD_batch_Results <- function(Batch.files=Batch.files,
-                         xcmsSet_param = list(method="centWave", ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,10000), mzdiff=-0.001, fitgauss=FALSE, nSlaves=4)
-){
-  Batch.xcmset.list <- list()
-  for (i in 1:length(Batch.files)){
-    a <- paste0("Batch.", i)
-    Batch.xcmset.list[[i]] <- SDjoygret::xcms_orbi_A(Batch.files[[i]], Results.dir.name = a, xcmsSet_param = xcmsSet_param)
-  }
-  return(Batch.xcmset.list)
-}
-
 
 
 
