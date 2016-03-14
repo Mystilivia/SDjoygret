@@ -349,6 +349,27 @@ SD_batch_set <- function(Batch.files=Batch.files,
 }
 
 
+#' SD_files_class
+#'
+#' This function get multiple files path and name, and then parse the information into a dataframe,
+#' making files grouping by directory path easy.
+#' @param dir_path Origin directory pathway.
+#' @keywords Files, info
+#' @examples
+#' SD_files_class(dir_path = "./")
+#' @export
+#'
+SD_files_class <- function(dir_path) {
+  Files <- list.files("dir_path", recursive=T, full.names=T)
+  Files.str <- as.data.frame(read.table(textConnection(sub("*.mzXML","", x=Files)), sep="/"))
+  return(Files.str)
+}
+
+
+
+
+
+
 
 
 

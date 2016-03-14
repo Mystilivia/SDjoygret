@@ -2,6 +2,7 @@
 
 export(SD_batch_list)
 export(SD_batch_set)
+export(SD_files_class)
 export(testing_function_01)
 export(xcms_orbi_A)
 export(xcms_orbi_Results)
