@@ -50,8 +50,8 @@ xcms_orbi_GRT <- function(File_list,
                           Sample.Metadata,
                           Grouping.factor=1){
   ## Package requirement
-  devtools::use_package("xcms")
-  devtools::use_package("ropls")
+  require("xcms")
+  require("ropls")
 
   ## Create directory and path
   Results.path.root <- paste0("./",Results.dir.name,"/")
@@ -170,7 +170,7 @@ xcms_orbi_A <- function(File_list,
                         minfrac_param    = 0.7,
                         profStep_param  = 0.5){
   ## Package requirement
-  devtools::use_package("xcms")
+  require("xcms")
 
   ## Create directory and path
   Results.path.root <- paste0("./",Results.dir.name,"/")
