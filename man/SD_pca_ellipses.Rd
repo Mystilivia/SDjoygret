@@ -4,15 +4,15 @@
 \alias{SD_pca_ellipses}
 \title{SD_pca_ellipses}
 \usage{
-SD_pca_ellipses(Data, Results.path.root = "Default",
+SD_pca_ellipses(Data_pca, Results.path.root = "Default",
   ropls_param = list(predI = 2, plotL = F), factor_group = NULL)
 }
 \arguments{
-\item{Data}{Dataframe (rownames = samples ; colnames = measures)}
-
 \item{Results.path.root}{Name for the results folder}
 
 \item{ropls_param}{Parameters to pass to ropls::opls function}
+
+\item{Data}{Dataframe (rownames = samples ; colnames = measures)}
 }
 \description{
 Perform pca according to ropls method and save results in folder.

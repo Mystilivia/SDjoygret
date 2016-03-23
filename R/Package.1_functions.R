@@ -380,7 +380,7 @@ SD_pca <- function(Data,
                    ropls_param=list(predI=2, plotL=F),
                    factor_color=NULL
                    ){
-  Results.path <- paste0(Results.path.root)
+  Results.path <- paste0("./", Results.path.root, "/")
   dir.create(Results.path, showWarnings = F)
   require(ropls)
   data.pca <- do.call(ropls::opls, append(Data, ropls_param))
@@ -409,31 +409,31 @@ SD_pca <- function(Data,
 #' @examples
 #' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F))
 
-SD_pca_ellipses <- function(Data,
+SD_pca_ellipses <- function(Data_pca,
                    Results.path.root = "Default",
                    ropls_param = list(predI = 2, plotL = F),
                    factor_group = NULL
 ){
-  Results.path <- paste0(Results.path.root)
+  Results.path <- paste0("./", Results.path.root, "/")
   dir.create(Results.path, showWarnings = F)
   require(ropls)
-  data.pca <- do.call(ropls::opls, append(Data, ropls_param))
-  return(data.pca)
+  pca_result <- do.call(ropls::opls, append(Data_pca, ropls_param))
+  return(pca_result)
   par(mfrow=c(3,2))
-  plot(data.pca, typeVc = "overview", parDevNewL = F)
-  plot(data.pca, typeVc = "x-loading", parDevNewL = F)
-  plot(data.pca, typeVc = "x-score", parDevNewL = F)
-  plot(data.pca, typeVc = "outlier", parDevNewL = F)
-  plot(data.pca, typeVc = "correlation", parDevNewL = F)
+  plot(pca_result, typeVc = "overview", parDevNewL = F)
+  plot(pca_result, typeVc = "x-loading", parDevNewL = F)
+  plot(pca_result, typeVc = "x-score", parDevNewL = F)
+  plot(pca_result, typeVc = "outlier", parDevNewL = F)
+  plot(pca_result, typeVc = "correlation", parDevNewL = F)
   dev.copy(png, filename = paste0(Results.path, "ACP_result.png"), height = 3 * 400, width = 2 * 400, units = "px", res = 100)
   dev.off()
 
-  if (!is.null(factor_group)){
+  if (!is.null(factor_group) & is.data.frame(Data_pca[[2]])){
   par(mfrow=c(1,1))
   for (i in factor_group){
-    temp.factor <- Data[[2]][,i]
-    temp.factor.names <- names(Data[[2]][i])
-    plot(Data.pca, typeVc = "x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses = F, parDevNewL = F)
+    temp.factor <- Data_pca[[2]][,i]
+    temp.factor.names <- names(Data_pca[[2]][i])
+    plot(pca_result, typeVc = "x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses = F, parDevNewL = F)
     text(par()$usr[1]/1.2, par()$usr[3]/1.1, temp.factor.names)
     dev.copy(png, filename=paste0(Results.path, "ACP_Ellipses_", temp.factor.names, ".png"), height = 500, width = 1000, units = "px", res = 100)
     dev.off()
