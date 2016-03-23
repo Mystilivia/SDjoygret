@@ -363,44 +363,10 @@ SD_files_class <- function(dir_path) {
 }
 
 
-#' SD_pca
-#'
-#' Perform pca according to ropls method and save results in folder.
-#' @param Data Dataframe (rownames = samples ; colnames = measures)
-#' @param Results.path.root Name for the results folder
-#' @param ropls_param Parameters to pass to ropls::opls function
-#' @param factor_color Factor list to use for grouping
-#' @keywords pca
-#' @export
-#' @examples
-#' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F))
-
-SD_pca <- function(Data,
-                   Results.path.root="Default",
-                   ropls_param=list(predI=2, plotL=F),
-                   factor_color=NULL
-                   ){
-  Results.path <- paste0("./", Results.path.root, "/")
-  dir.create(Results.path, showWarnings = F)
-  require(ropls)
-  data.pca <- do.call(ropls::opls, append(Data, ropls_param))
-  return(data.pca)
-  par(mfrow=c(3,2))
-  plot(data.pca, typeVc="overview", parDevNewL=F)
-  plot(data.pca, typeVc="x-loading", parDevNewL=F)
-  plot(data.pca, typeVc="x-score", parDevNewL=F)
-  plot(data.pca, typeVc="outlier", parDevNewL=F)
-  plot(data.pca, typeVc="correlation", parDevNewL=F)
-  dev.copy(png, filename=paste0(Results.path, "ACP_result.png"), height=3*400, width=2*400, units="px", res=100)
-  dev.off()
-}
-
-
-
 #' SD_pca_ellipses
 #'
 #' Perform pca according to ropls method and save results in folder.
-#' @param Data Dataframe (rownames = samples ; colnames = measures)
+#' @param Data list with [[1]] Datamatrix [[2]] samples metadata
 #' @param Results.path.root Name for the results folder
 #' @param ropls_param Parameters to pass to ropls::opls function
 #' @☺param factor_group numeric vector of metadata column to use for grouping corcircles
@@ -412,12 +378,12 @@ SD_pca <- function(Data,
 SD_pca_ellipses <- function(Data_pca,
                    Results.path.root = "Default",
                    ropls_param = list(predI = 2, plotL = F),
-                   factor_group = NULL
-){
+                   factor_group = NULL)
+  {
   Results.path <- paste0("./", Results.path.root, "/")
   dir.create(Results.path, showWarnings = F)
   require(ropls)
-  pca_result <- do.call(ropls::opls, append(Data_pca, ropls_param))
+  pca_result <- do.call(ropls::opls, append(Data_pca[[1]], ropls_param))
   return(pca_result)
   par(mfrow=c(3,2))
   plot(pca_result, typeVc = "overview", parDevNewL = F)

@@ -12,7 +12,7 @@ SD_pca_ellipses(Data_pca, Results.path.root = "Default",
 
 \item{ropls_param}{Parameters to pass to ropls::opls function}
 
-\item{Data}{Dataframe (rownames = samples ; colnames = measures)}
+\item{Data}{list with [[1]] Datamatrix [[2]] samples metadata}
 }
 \description{
 Perform pca according to ropls method and save results in folder.
