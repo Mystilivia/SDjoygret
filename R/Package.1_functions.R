@@ -383,7 +383,7 @@ SD_pca_ellipses <- function(Data_pca,
   Results.path <- paste0("./", Results.path.root, "/")
   dir.create(Results.path, showWarnings = F)
   require(ropls)
-  pca_result <- do.call(ropls::opls, append(Data_pca[[1]], ropls_param))
+  pca_result <- do.call(ropls::opls, append(list(x=(Data[[1]])), ropls_param))
   return(pca_result)
   par(mfrow=c(3,2))
   plot(pca_result, typeVc = "overview", parDevNewL = F)
