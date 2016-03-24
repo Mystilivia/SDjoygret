@@ -5,7 +5,7 @@
 \title{SD_pca}
 \usage{
 SD_pca(Data_pca, Folder_name = "Default", ropls_param = list(predI = 2,
-  plotL = F), factor_group = NULL)
+  plotL = F), factor_group = NULL, res_val = 100)
 }
 \arguments{
 \item{ropls_param}{Parameters to pass to ropls::opls function}

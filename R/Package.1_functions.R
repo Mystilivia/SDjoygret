@@ -371,6 +371,7 @@ SD_files_class <- function(dir_path) {
 #' @param Results.path.root Name for the results folder
 #' @param ropls_param Parameters to pass to ropls::opls function
 #' @☺param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
+#' @☺param res_val Resolution value for saving plots
 #' @keywords pca
 #' @export
 #' @examples
@@ -379,14 +380,15 @@ SD_files_class <- function(dir_path) {
 SD_pca <- function(Data_pca,
                    Folder_name = "Default",
                    ropls_param = list(predI = 2, plotL = F),
-                   factor_group = NULL)
+                   factor_group = NULL,
+                   res_val = 100)
 {
   Results.path <- paste0("./", Folder_name, "/")
   dir.create(Results.path, showWarnings = F)
   require(ropls)
   pca_result <- do.call(ropls::opls, append(list(x=(Data[[1]])), ropls_param))
 
-  png(filename = paste0(Results.path, "ACP_result.png"), height = 3 * 400, width = 2 * 400, units = "px", res = 100)
+  png(filename = paste0(Results.path, "ACP_result.png"), height = 3 * 400, width = 2 * 400, units = "px", res = res_val)
   par(mfrow=c(3,2))
   plot(pca_result, typeVc = "overview", parDevNewL = F)
   plot(pca_result, typeVc = "x-loading", parDevNewL = F)
@@ -396,7 +398,7 @@ SD_pca <- function(Data_pca,
   dev.off()
   if (!is.null(factor_group) & is.data.frame(Data_pca[[2]])){
     for (i in factor_group){
-      png(filename=paste0(Results.path, "ACP_Ellipses_", temp.factor.names, ".png"), height = 400, width = 400, units = "px", res = 100)
+      png(filename=paste0(Results.path, "ACP_Ellipses_", temp.factor.names, ".png"), height = 400, width = 400, units = "px", res = res_val * 2)
       temp.factor <- Data_pca[[2]][,i]
       temp.factor.names <- names(Data_pca[[2]][i])
       plot(pca_result, typeVc = "x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses = F, parDevNewL = F)
