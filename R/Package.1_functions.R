@@ -398,7 +398,7 @@ SD_pca <- function(Data_pca,
   dev.off()
   if (!is.null(factor_group) & is.data.frame(Data_pca[[2]])){
     for (i in factor_group){
-      png(filename=paste0(Results.path, "ACP_Ellipses_", temp.factor.names, ".png"), height = 400, width = 400, units = "px", res = res_val * 2)
+      png(filename=paste0(Results.path, "ACP_Ellipses_", temp.factor.names, ".png"), height = 400, width = 400, units = "px", res = res_val / 2)
       temp.factor <- Data_pca[[2]][,i]
       temp.factor.names <- names(Data_pca[[2]][i])
       plot(pca_result, typeVc = "x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses = F, parDevNewL = F)
