@@ -27,6 +27,14 @@ knitr::opts_chunk$set(echo = TRUE)
 - In Rstudio you can now push or pull your commit (version/revision)
 - in the Git window (right). And you can check/load your package in the Build window.
 
+## To sync with ssh key (no credentials needes to push)
+- Create a ssh key with Rstudio
+- Add it to your repository in github
+- Change authentication method of git :
+  - Git/Config/Shell, type : git config remote.origin.url git@github.com:Mystilivia/SDjoygret.git
+  - Try to push something, soft will ask you to confirm the use of ssh key : answer "yes"
+  - Done
+
 ## To install the package
 - devtools::install_github("Mystilivia/SDjoygret")
 
