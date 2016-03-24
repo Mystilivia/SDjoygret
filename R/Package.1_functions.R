@@ -363,22 +363,23 @@ SD_files_class <- function(dir_path) {
 }
 
 
-#' SD_pca_ellipses
+#' SD_pca
 #'
-#' Perform pca according to ropls method and save results in folder.
+#' Perform pca according to ropls method and save results in a folder.
+#' You can choose to color samples by factor or value contained in a sample metadata table.
 #' @param Data list with [[1]] Datamatrix [[2]] samples metadata
 #' @param Results.path.root Name for the results folder
 #' @param ropls_param Parameters to pass to ropls::opls function
-#' @☺param factor_group numeric vector of metadata column to use for grouping corcircles
+#' @☺param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
 #' @keywords pca
 #' @export
 #' @examples
-#' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F))
+#' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F), factor_group = NULL)
 
-SD_pca_ellipses <- function(Data_pca,
-                                 Folder_name = "Default",
-                                 ropls_param = list(predI = 2, plotL = F),
-                                 factor_group = NULL)
+SD_pca <- function(Data_pca,
+                   Folder_name = "Default",
+                   ropls_param = list(predI = 2, plotL = F),
+                   factor_group = NULL)
 {
   Results.path <- paste0("./", Folder_name, "/")
   dir.create(Results.path, showWarnings = F)
@@ -395,7 +396,7 @@ SD_pca_ellipses <- function(Data_pca,
   dev.off()
   if (!is.null(factor_group) & is.data.frame(Data_pca[[2]])){
     for (i in factor_group){
-      png(filename=paste0(Results.path, "ACP_Ellipses_", temp.factor.names, ".png"), height = 500, width = 1000, units = "px", res = 100)
+      png(filename=paste0(Results.path, "ACP_Ellipses_", temp.factor.names, ".png"), height = 400, width = 400, units = "px", res = 100)
       temp.factor <- Data_pca[[2]][,i]
       temp.factor.names <- names(Data_pca[[2]][i])
       plot(pca_result, typeVc = "x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses = F, parDevNewL = F)

@@ -3,7 +3,7 @@
 export(SD_batch_list)
 export(SD_batch_set)
 export(SD_files_class)
-export(SD_pca_ellipses)
+export(SD_pca)
 export(testing_function_01)
 export(xcms_orbi_A)
 export(xcms_orbi_Results)
