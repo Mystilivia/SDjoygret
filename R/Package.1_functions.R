@@ -409,9 +409,58 @@ SD_pca <- function(Data_pca,
 }
 
 
+#' SD_subset_zero
+#'
+#' Subset a dataframe containing numeric value by selecting column which have less than
+#' Z.Seuil percents of zero values.
+#' @param x Dataframe (a datamatrix) with only numeric values
+#' @param Z.Seuil Percentage threshold of zero values to accept for each variable
+#' @keywords pca
+#' @export
+#' @examples
+#' SD_subset_zero(Data[[1]], Z.Seuil = 50)
+
+SD_subset_zero <- function(x, Z.Seuil = 80) {
+  Zero.perc <- apply(x, 2, function(x) round(length(which(x==0))*100/length(x), 3))
+  Zer.perc.var <- subset(data.frame(Zero.perc), Zero.perc <= Z.Seuil)
+  return(Zer.perc.var)
+}
 
 
+#' SD_data_sub
+#'
+#' Subset a list of three dataframes : [[1]] Datamatrix, [[2]] Samples.Metadata [[3]] Variable.Metadata.
+#' [[1]] With samples ids as rownames and variables ids as column names
+#' [[2]] Metadata of sample in column and samples ids as rownames (same order than rows in [[1]])
+#' [[3]] Variables metadata in column and variable ids as rownames (same order than columns in [[1]])
+#' @param Data list with [[1]] Datamatrix [[2]] samples metadata
+#' @param Results.path.root Name for the results folder
+#' @param ropls_param Parameters to pass to ropls::opls function
+#' @☺param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
+#' @keywords pca
+#' @examples
+#' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F), factor_group = NULL)
 
+Data_sub <- function(Data, col_select, ...)
+{
+  ## Check entry file
+  if (missing(Data)) stop("arg. Data is missing.")
+  if (!is.list(Data)) stop("arg. Data must be a list of two to three dataframe")
+  if (length(Data) < 2) stop("arg. Data must be a list of two to three dataframe")
+  if (length(Data) > 3) stop("arg. Data must be a list of two to three dataframe")
+  invisible(lapply(Data, function(x) if(!is.data.frame(x)) stop("arg. Data must be a list of dataframe")))
+  invisible(lapply(Data[[1]], function(x) if(!is.numeric(x)) stop("Data[[1]] need to be a matrix with numeric value")))
+
+  ## Filter by sample metadata
+  temp.choice <- c("A", "B")
+  col_name <-
+
+  Data.subset <- list()
+  Data.subset[[2]] <- subset(Data[[2]], colnames(Data[[2]]) %in% temp.choice)
+  Data.subset[[1]] <- subset(Data[[1]], rownames(Data[[1]]) %in% rownames(Data.subset[[2]]))
+  ## Filter by variable metadata
+  ## Filter by datamatrix values
+}
 
 
 
