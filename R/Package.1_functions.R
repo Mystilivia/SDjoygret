@@ -421,12 +421,19 @@ SD_pca <- function(Data_pca,
 #' SD_subset_zero(Data[[1]], Z.Seuil = 50)
 
 SD_subset_zero <- function(x, Z.Seuil = 80) {
+  require(ggplot2)
   Zero.perc <- apply(x, 2, function(x) round(length(which(x==0))*100/length(x), 3))
   Zer.perc.var <- subset(data.frame(Zero.perc), Zero.perc <= Z.Seuil)
   data.subset <- subset(x, select = rownames(Zer.perc.var))
-  return(list(data.subset, Zer.perc.var))
-}
 
+  Variable.Zero.Percentage.Plot <- ggplot(Zer.perc.var, aes(x = reorder(rownames(Zer.perc.var), Zero.perc), y = Zero.perc)) +
+    geom_point() +
+    geom_hline(yintercept = Z.Seuil, color = "black", alpha = 0.5) +
+    ylim(0,100) +
+    coord_flip()
+
+  return(invisible(list("Data.Subset" = data.subset, "Zer.Perc.Var" = Zer.perc.var, "Plot" = Variable.Zero.Percentage.Plot, "Zero.Threshold" = Z.Seuil)))
+}
 
 
 
