@@ -422,17 +422,32 @@ SD_pca <- function(Data_pca,
 
 SD_subset_zero <- function(x, Z.Seuil = 80) {
   require(ggplot2)
-  Zero.perc <- apply(x, 2, function(x) round(length(which(x == 0))*100/length(x), 3))
+
+  ## Calculate percentage of zero value in each column
+  Zero.perc <- apply(x, 2, function(x) round(length(which(x == 0)) * 100 / length(x), 3))
+  Zero.perc.2 <- data.frame(Zero.perc)
+
+  ## Subset the selected column in the datamatrix
   Zer.perc.var <- subset(data.frame(Zero.perc), Zero.perc <= Z.Seuil)
   data.subset <- subset(x, select = rownames(Zer.perc.var))
 
-  Variable.Zero.Percentage.Plot <- ggplot(Zero.perc, aes(x = reorder(rownames(Zero.perc), Zero.perc), y = Zero.perc)) +
+  ## Plot graph of results and selected thresold
+  Variable.Zero.Percentage.Plot <- ggplot(Zero.perc.2,
+                                          aes(x = reorder(rownames(Zero.perc.2), Zero.perc),
+                                              y = Zero.perc)) +
     geom_point() +
     geom_hline(yintercept = Z.Seuil, color = "black", alpha = 0.5) +
     ylim(0,100) +
     coord_flip()
 
-  return(invisible(list("Data.Subset" = data.subset, "Zer.Perc" = Zero.perc, "Plot" = Variable.Zero.Percentage.Plot, "Zero.Threshold" = Z.Seuil)))
+  ## Print results
+  print(paste0("Variable(s) selected : ", length(rownames(Zer.perc.var)), " on ", length(rownames(x))))
+  print(summary(Data.raw.zero.subset))
+
+  return(invisible(list("Data.Subset" = data.subset,
+                        "Zer.Perc" = Zero.perc,
+                        "Plot" = Variable.Zero.Percentage.Plot,
+                        "Zero.Threshold" = Z.Seuil)))
 }
 
 
