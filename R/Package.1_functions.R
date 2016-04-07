@@ -432,12 +432,11 @@ SD_subset_zero <- function(x, Z.Seuil = 80) {
   data.subset <- subset(x, select = rownames(Zer.perc.var))
 
   ## Plot graph of results and selected thresold
-  Variable.Zero.Percentage.Plot <- ggplot(Zero.perc.2,
-                                          aes(x = reorder(rownames(Zero.perc.2), Zero.perc),
-                                              y = Zero.perc)) +
-    geom_point() +
+  Variable.Zero.Percentage.Plot <- ggplot(Zero.perc.2, aes(x = reorder(rownames(Zero.perc.2), Zero.perc))) +
+    geom_point(aes(y = Zero.perc, color = rownames(Zero.perc.2) %in% rownames(Zer.perc.var)), size = 3, shape=21, fill = "white") +
     geom_hline(yintercept = Z.Seuil, color = "black", alpha = 0.5) +
     ylim(0,100) +
+    theme(legend.position = 0) +
     coord_flip()
 
   ## Print results
