@@ -426,7 +426,7 @@ SD_subset_zero <- function(x, Z.Seuil = 80) {
   Zer.perc.var <- subset(data.frame(Zero.perc), Zero.perc <= Z.Seuil)
   data.subset <- subset(x, select = rownames(Zer.perc.var))
 
-  Variable.Zero.Percentage.Plot <- ggplot(Zer.perc.var, aes(x = reorder(rownames(Zer.perc.var), Zero.perc), y = Zero.perc)) +
+  Variable.Zero.Percentage.Plot <- ggplot(Zero.perc, aes(x = reorder(rownames(Zero.perc), Zero.perc), y = Zero.perc)) +
     geom_point() +
     geom_hline(yintercept = Z.Seuil, color = "black", alpha = 0.5) +
     ylim(0,100) +
