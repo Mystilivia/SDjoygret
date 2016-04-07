@@ -423,8 +423,13 @@ SD_pca <- function(Data_pca,
 SD_subset_zero <- function(x, Z.Seuil = 80) {
   Zero.perc <- apply(x, 2, function(x) round(length(which(x==0))*100/length(x), 3))
   Zer.perc.var <- subset(data.frame(Zero.perc), Zero.perc <= Z.Seuil)
-  return(Zer.perc.var)
+  data.subset <- subset(x, select = rownames(Zer.perc.var))
+  return(list(data.subset, Zer.perc.var))
 }
+
+
+
+
 
 
 #' SD_data_sub
