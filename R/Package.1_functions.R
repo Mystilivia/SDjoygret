@@ -208,7 +208,7 @@ xcms_orbi_A <- function(File_list,
   xset.filled <- xcms::fillPeaks(xset.group.4)
 
   ## Save peaks table
-  Peak_Table_func <- peakTable(Object.xcms.grp1)
+  Peak_Table_func <- peakTable(xset.filled)
   write.table(Peak_Table_func, file = paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names = NA)
 
   ## Increment table with parameters and results
@@ -244,10 +244,10 @@ xcms_orbi_A <- function(File_list,
 
   if(is.data.frame(STDs_data) & !is.null(STDs_data$mz)) {
     STD.subset <- subset(Peak_Table_func, round(mz, 2) %in% round(STDs_data$mz, 2))
-    temp.plot <- melt(STD.subset, id.vars = c(1:7+length(unique(xcms.object@phenoData$class))))
+    temp.plot <- melt(STD.subset, id.vars = c(1:(7+length(unique(xcms.object@phenoData$class)))))
     temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
 
-    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,4)), y = value, fill = variable, color = batch)) +
+    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
       geom_bar(stat="identity", position = "dodge") +
       ylab("") +
       xlab("") +
