@@ -199,18 +199,17 @@ xcms_orbi_A <- function(File_list,
   xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.2 <- xcms::retcor(xset.group, method="obiwarp", profStep=profStep_param, plottype="deviation")
   dev.copy(png, paste0(Results.path.root, "RetCor_01.png"), h=800, w=1600)
-  dev.off()
+  graphics.off()
   xset.group2 <- xcms::group(xset.2, method="density", bw=bw_param[2], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.3 <- xcms::retcor(xset.group2, method="obiwarp", profStep=profStep_param, plottype="deviation")
   dev.copy(png, paste0(Results.path.root, "RetCor_02.png"), h=800, w=1600)
-  dev.off()
+  graphics.off()
   xset.group.4 <- xcms::group(xset.3, method="density", bw=bw_param[3], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.filled <- xcms::fillPeaks(xset.group.4)
 
   ## Save peaks table
-  Peak.Table <- peakTable(Object.xcms.grp1)
-  str(Peak.Table)
-  write.table(Peak.Table, file = paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names = NA)
+  Peak_Table_func <- peakTable(Object.xcms.grp1)
+  write.table(Peak_Table_func, file = paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names = NA)
 
   ## Increment table with parameters and results
   Parameters.Summary.temp <- data.frame(Groups = paste0(unique(xset.filled@phenoData$class), sep="", collapse = ", "),
@@ -240,15 +239,14 @@ xcms_orbi_A <- function(File_list,
     plotQC(xset.filled, what="mzdevtime")
     plotQC(xset.filled, what="mzdevsample")
     plotQC(xset.filled, what="rtdevsample")
-    dev.off()
+    graphics.off()
   }
 
   if(is.data.frame(STDs_data) & !is.null(STDs_data$mz)) {
-    STD.subset <- subset(Peak.Table, round(mz, 2) %in% round(STDs_data$mz, 2))
-    temp.plot <- melt(STD.subset, id.vars = c(1:8))
+    STD.subset <- subset(Peak_Table_func, round(mz, 2) %in% round(STDs_data$mz, 2))
+    temp.plot <- melt(STD.subset, id.vars = c(1:7+length(unique(xcms.object@phenoData$class))))
     temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
 
-    dev.copy(png, paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
     ggplot(temp.plot2, aes(x = as.factor(round(mz,4)), y = value, fill = variable, color = batch)) +
       geom_bar(stat="identity", position = "dodge") +
       ylab("") +
@@ -257,7 +255,8 @@ xcms_orbi_A <- function(File_list,
       theme_bw() +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
       scale_fill_grey(start = 0, end = 1)
-    dev.off()
+    dev.copy(png, paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
+    graphics.off()
   } else { print("Need a dataframe to analyse specifc ions") }
   return(xset.filled) ## Output results
 }
@@ -297,15 +296,15 @@ xcms_orbi_Results <- function(filled_peak_object,
   write.table(peakTable(filled_peak_object), file=paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names=NA)
   ## Generate files for opls analysis
   Data <- list()
-  peak.table.temp <- peakTable(filled_peak_object)
-  Data$Datamatrix <- data.frame(t(peak.table.temp[(ncol(peak.table.temp)-nrow(filled_peak_object@phenoData)+1):ncol(peak.table.temp)]))
+  Peak_Table_func.temp <- peakTable(filled_peak_object)
+  Data$Datamatrix <- data.frame(t(Peak_Table_func.temp[(ncol(Peak_Table_func.temp)-nrow(filled_peak_object@phenoData)+1):ncol(Peak_Table_func.temp)]))
   if (is.data.frame(Sample.Metadata)==T){
     Data$Sample.metadata <- subset(Sample.Metadata, rownames(Sample.Metadata) %in% rownames(filled_peak_object@phenoData))
   } else {
     print("Sample.Metadata is not a data.frame, return empty list[[2]]")
     Data$Sample.metadata <- NULL
   }
-  Data$Variable.metadata <- peak.table.temp[1:(ncol(peak.table.temp)-nrow(filled_peak_object@phenoData))]
+  Data$Variable.metadata <- Peak_Table_func.temp[1:(ncol(Peak_Table_func.temp)-nrow(filled_peak_object@phenoData))]
 
   ## Extract Standards infos
   if (STD == TRUE) {
