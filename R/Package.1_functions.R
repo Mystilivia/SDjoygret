@@ -231,7 +231,6 @@ xcms_orbi_A <- function(File_list,
     }
 
   if (QCs_Graph == TRUE) {
-    dev.copy(png, paste0(Results.path.root, "QCs.png"), h=800, w=1600)
     par(mfrow=c(2,3))
     plotQC(xset.filled, what="mzdevhist")
     plotQC(xset.filled, what="rtdevhist")
@@ -239,6 +238,7 @@ xcms_orbi_A <- function(File_list,
     plotQC(xset.filled, what="mzdevtime")
     plotQC(xset.filled, what="mzdevsample")
     plotQC(xset.filled, what="rtdevsample")
+    dev.copy(png, paste0(Results.path.root, "QCs.png"), h=950, w=1600)
     graphics.off()
   }
 
