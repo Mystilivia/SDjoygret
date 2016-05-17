@@ -216,6 +216,7 @@ xcms_orbi_A <- function(File_list,
                                         Sple.Nb = length(xset.filled@filepaths),
                                         Peak.Nb = nrow(xset.filled@peaks),
                                         Peak.Spl = round(nrow(xset.filled@peaks)/length(xset.filled@filepaths), 0),
+                                        Pks.Grp.Nb = length(xcms.object@groupidx),
                                         Prof.Meth = xset.filled@profinfo[[1]],
                                         Prof.Step = xset.filled@profinfo[[2]],
                                         as.data.frame(t(unlist(xcmsSet_param[1:8]))))
