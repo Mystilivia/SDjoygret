@@ -206,7 +206,6 @@ xcms_orbi_A <- function(File_list,
   dev.off()
   xset.group.4 <- xcms::group(xset.3, method="density", bw=bw_param[3], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.filled <- xcms::fillPeaks(xset.group.4)
-  return(xset.filled) ## Output results
 
   ## Save peaks table
   Peak.Table <- peakTable(Object.xcms.grp1)
@@ -261,6 +260,7 @@ xcms_orbi_A <- function(File_list,
       scale_fill_grey(start = 0, end = 1)
     dev.off()
   } else { print("Need a dataframe to analyse specifc ions") }
+  return(xset.filled) ## Output results
 }
 
 
