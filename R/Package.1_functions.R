@@ -170,13 +170,13 @@ xcms_orbi_A <- function(File_list,
                                                 peakwidth=c(4,20),
                                                 snthresh=10,
                                                 prefilter=c(4,10000),
-                                                mzdiff=-0.001,
+                                                mzdiff=-0.015,
                                                 fitgauss=FALSE,
                                                 nSlaves=4,
                                                 phenoData = Sample.Metadata),
                         Results.dir.name = Results.path,
                         bw_param         = c(15, 8, 0.8),
-                        mzwid_param      = 0.005,
+                        mzwid_param      = 0.015,
                         minfrac_param    = 0.7,
                         profStep_param   = 0.5,
                         STDs_data        = NULL,
@@ -225,10 +225,10 @@ xcms_orbi_A <- function(File_list,
     Parameters.Summary <- read.csv(file = paste0(Results.path, "Parameters.Summary.csv"), sep=";")
     Parameters.Summary <- rbind(Parameters.Summary, Parameters.Summary.temp)
     rm(Parameters.Summary.temp)
-    write.table(Peak.Table, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
+    write.table(Parameters.Summary, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
   } else {
     Parameters.Summary <- Parameters.Summary.temp
-    write.table(Peak.Table, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
+    write.table(Parameters.Summary, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
     }
 
   if (QCs_Graph == TRUE) {
@@ -243,7 +243,7 @@ xcms_orbi_A <- function(File_list,
     dev.off()
   }
 
-  if(is.data.frame(STDs_data) & STDs_data$mz) {
+  if(is.data.frame(STDs_data) & !is.null(STDs_data$mz)) {
     STD.subset <- subset(Peak.Table, round(mz, 2) %in% round(STDs_data$mz, 2))
     temp.plot <- melt(STD.subset, id.vars = c(1:8))
     temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
