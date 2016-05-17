@@ -48,9 +48,7 @@ xcms_orbi_GRT <- function(File_list,
                           minfrac_param = 0.7,
                           profStep_param = 0.5,
                           Sample.Metadata,
-                          Grouping.factor = 1,
-                          QC_graph = FALSE,
-                          Ref_Comp,){
+                          Grouping.factor = 1){
   ## Package requirement
   require("xcms")
   require("ropls")

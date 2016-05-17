@@ -25,7 +25,7 @@ xcms_orbi_GRT()
 \description{
 This function perform the first steps of metabolomic analysis : xcmsSet and
 two iteration with group and retcor to end with fillpeaks. The resulting output
-is a xcms set object.
+is a xcms set object. Parameters are saved in a table.
 }
 \keyword{orbitrap}
 \keyword{xcms,}
