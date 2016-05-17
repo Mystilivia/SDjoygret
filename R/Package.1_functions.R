@@ -42,13 +42,15 @@ testing_function_01 <- function(x){
 #' xcms_orbi_GRT()
 
 xcms_orbi_GRT <- function(File_list,
-                          Results.dir.name="Default",
-                          bw_param=c(15, 8, 0.8),
-                          mzwid_param=0.005,
-                          minfrac_param=0.7,
-                          profStep_param=0.5,
+                          Results.dir.name = "Default",
+                          bw_param = c(15, 8, 0.8),
+                          mzwid_param = 0.005,
+                          minfrac_param = 0.7,
+                          profStep_param = 0.5,
                           Sample.Metadata,
-                          Grouping.factor=1){
+                          Grouping.factor = 1,
+                          QC_graph = FALSE,
+                          Ref_Comp,){
   ## Package requirement
   require("xcms")
   require("ropls")
@@ -149,7 +151,7 @@ xcms_orbi_GRT <- function(File_list,
 #'
 #' This function perform the first steps of metabolomic analysis : xcmsSet and
 #' two iteration with group and retcor to end with fillpeaks. The resulting output
-#' is a xcms set object.
+#' is a xcms set object. Parameters are saved in a table.
 #' @param File_list File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4
 #' @param xcmsSet_param xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7))
 #' @param Results.dir.name Name of the subfolder to store results
@@ -163,8 +165,8 @@ xcms_orbi_GRT <- function(File_list,
 #' @export
 
 xcms_orbi_A <- function(File_list,
-                        xcmsSet_param    = list(method="centWave", ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,10000), mzdiff=-0.001, fitgauss=FALSE, nSlaves=4),
-                        Results.dir.name = "Default",
+                        xcmsSet_param    = list(method="centWave", ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,10000), mzdiff=-0.001, fitgauss=FALSE, nSlaves=4, phenoData = Sample.Metadata),
+                        Results.dir.name = Results.path,
                         bw_param         = c(15, 8, 0.8),
                         mzwid_param      = 0.005,
                         minfrac_param    = 0.7,
@@ -173,8 +175,8 @@ xcms_orbi_A <- function(File_list,
   require("xcms")
 
   ## Create directory and path
-  Results.path.root <- paste0("./",Results.dir.name,"/")
-  Results.path.rtgraph <- paste0(Results.path.root, "/RetCor_Dev/")
+  Results.path.root <- Results.dir.name
+  Results.path.rtgraph <- paste0(Results.path.root, "RetCor_Dev/")
   dir.create(Results.path.root, showWarnings = F, recursive = T)
   dir.create(Results.path.rtgraph, showWarnings = F)
   xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
@@ -190,6 +192,23 @@ xcms_orbi_A <- function(File_list,
   xset.group.4 <- xcms::group(xset.3, method="density", bw=bw_param[3], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.filled <- xcms::fillPeaks(xset.group.4)
   return(xset.filled) ## Output results
+
+  ## Increment table with parameters and results
+  Parameters.Summary.temp <- data.frame(Groups = paste0(unique(Sample.Metadata$class), sep="", collapse = ", "),
+                                        Sple.Nb = length(xset.filled@filepaths),
+                                        Peak.Nb = nrow(xset.filled@peaks),
+                                        Peak.Spl = round(nrow(xset.filled@peaks)/length(xset.filled@filepaths), 0),
+                                        Prof.Meth = xset.filled@profinfo[[1]],
+                                        Prof.Step = xset.filled@profinfo[[2]],
+                                        as.data.frame(t(unlist(xcmsSet_param[1:8])))
+  )
+  if (exists("Parameters.Summary")) {
+    Parameters.Summary <- rbind(Parameters.Summary, Parameters.Summary.temp)
+    rm(Parameters.Summary.temp)
+  } else {
+    Parameters.Summary <- Parameters.Summary.temp
+    rm(Parameters.Summary.temp)
+  }
 }
 
 
