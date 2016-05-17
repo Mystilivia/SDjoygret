@@ -222,7 +222,7 @@ xcms_orbi_A <- function(File_list,
                                         as.data.frame(t(unlist(xcmsSet_param[1:8]))))
 
   if (file.exists(paste0(Results.path, "Parameters.Summary.csv"))) {
-    Parameters.Summary <- read.csv(file = paste0(Results.path, "Parameters.Summary.csv"), sep=";")
+    Parameters.Summary <- read.csv(file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", row.names = 1)
     Parameters.Summary <- rbind(Parameters.Summary, Parameters.Summary.temp)
     rm(Parameters.Summary.temp)
     write.table(Parameters.Summary, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
