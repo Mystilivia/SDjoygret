@@ -247,7 +247,7 @@ xcms_orbi_A <- function(File_list,
     temp.plot <- melt(STD.subset, id.vars = c(1:7+length(unique(xcms.object@phenoData$class))))
     temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
 
-    ggplot(temp.plot2, aes(x = as.factor(round(mz,4)), y = value, fill = variable, color = batch)) +
+    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,4)), y = value, fill = variable, color = batch)) +
       geom_bar(stat="identity", position = "dodge") +
       ylab("") +
       xlab("") +
@@ -255,6 +255,7 @@ xcms_orbi_A <- function(File_list,
       theme_bw() +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
       scale_fill_grey(start = 0, end = 1)
+    print(temp_plot)
     dev.copy(png, paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
     graphics.off()
   } else { print("Need a dataframe to analyse specifc ions") }
