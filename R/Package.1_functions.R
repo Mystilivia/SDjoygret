@@ -219,7 +219,7 @@ xcms_orbi_A <- function(File_list,
                                         Peak.Spl = round(nrow(xset.filled@peaks)/length(xset.filled@filepaths), 0),
                                         Prof.Meth = xset.filled@profinfo[[1]],
                                         Prof.Step = xset.filled@profinfo[[2]],
-                                        as.data.frame(t(unlist(xcmsSet_param[1:8])))
+                                        as.data.frame(t(unlist(xcmsSet_param[1:8]))))
   )
 
   if (file.exists(paste0(Results.path, "Parameters.Summary.csv"))) {
