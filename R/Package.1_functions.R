@@ -150,49 +150,71 @@ xcms_orbi_GRT <- function(File_list,
 #' This function perform the first steps of metabolomic analysis : xcmsSet and
 #' two iteration with group and retcor to end with fillpeaks. The resulting output
 #' is a xcms set object. Parameters are saved in a table.
-#' @param File_list File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4
-#' @param xcmsSet_param xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7))
-#' @param Results.dir.name Name of the subfolder to store results
-#' @param bw_param Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3)
+#' @param File_list File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4.
+#' @param xcmsSet_param xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7)).
+#' @param Results.dir.name Name of the subfolder to store results.
+#' @param bw_param Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3).
 #' @param mzwid_param mzwid parameter to use.
-#' @param minfrac_param minfrac parameter to use
-#' @param profStep_param profStep parameter to use
+#' @param minfrac_param minfrac parameter to use.
+#' @param profStep_param profStep parameter to use.
+#' @param STDs_data A dataframe of m/z to plot with at least one "mz" named column.
+#' @param QCs_Graph Logical to determine of QCs graphs needs to be saved.
 #' @keywords xcms, orbitrap
 #' @usage xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
 #' xcms_orbi_GRT()
 #' @export
 
 xcms_orbi_A <- function(File_list,
-                        xcmsSet_param    = list(method="centWave", ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,10000), mzdiff=-0.001, fitgauss=FALSE, nSlaves=4, phenoData = Sample.Metadata),
+                        xcmsSet_param    = list(method="centWave",
+                                                ppm=7,
+                                                peakwidth=c(4,20),
+                                                snthresh=10,
+                                                prefilter=c(4,10000),
+                                                mzdiff=-0.001,
+                                                fitgauss=FALSE,
+                                                nSlaves=4,
+                                                phenoData = Sample.Metadata),
                         Results.dir.name = Results.path,
                         bw_param         = c(15, 8, 0.8),
                         mzwid_param      = 0.005,
                         minfrac_param    = 0.7,
-                        profStep_param  = 0.5){
+                        profStep_param  = 0.5,
+                        STDs_data = NULL,
+                        QCs_Graph = FALSE){
   ## Package requirement
   require("xcms")
 
   ## Create directory and path
-  Results.path.root <- Results.dir.name
-  Results.path.rtgraph <- paste0(Results.path.root, "RetCor_Dev/")
-  dir.create(Results.path.root, showWarnings = F, recursive = T)
-  dir.create(Results.path.rtgraph, showWarnings = F)
+
+  i <- 1
+  Results.path.root <- paste0(Results.path, "XCMS_Result_", i, "/")
+  while (dir.exists(Results.path.root)==TRUE) {
+    i <- i+1
+    Results.path.root <- paste0(Results.path, "XCMS_Result_", i, "/")
+  }
+  dir.create(path = Results.path.root, recursive = T, showWarnings = F)
+
   xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
 
   xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.2 <- xcms::retcor(xset.group, method="obiwarp", profStep=profStep_param, plottype="deviation")
-  dev.copy(png, paste0(Results.path.rtgraph, "RetCor_01.png"), h=800, w=1600)
+  dev.copy(png, paste0(Results.path.root, "RetCor_01.png"), h=800, w=1600)
   dev.off()
   xset.group2 <- xcms::group(xset.2, method="density", bw=bw_param[2], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.3 <- xcms::retcor(xset.group2, method="obiwarp", profStep=profStep_param, plottype="deviation")
-  dev.copy(png, paste0(Results.path.rtgraph, "RetCor_02.png"), h=800, w=1600)
+  dev.copy(png, paste0(Results.path.root, "RetCor_02.png"), h=800, w=1600)
   dev.off()
   xset.group.4 <- xcms::group(xset.3, method="density", bw=bw_param[3], mzwid=mzwid_param, minfrac=mzwid_param)
   xset.filled <- xcms::fillPeaks(xset.group.4)
   return(xset.filled) ## Output results
 
+  ## Save peaks table
+  Peak.Table <- peakTable(Object.xcms.grp1)
+  str(Peak.Table)
+  write.table(Peak.Table, file = paste0(Results.path.root, "Peak.Table.csv"), sep=";", col.names = NA)
+
   ## Increment table with parameters and results
-  Parameters.Summary.temp <- data.frame(Groups = paste0(unique(Sample.Metadata$class), sep="", collapse = ", "),
+  Parameters.Summary.temp <- data.frame(Groups = paste0(unique(xset.filled@phenoData$class), sep="", collapse = ", "),
                                         Sple.Nb = length(xset.filled@filepaths),
                                         Peak.Nb = nrow(xset.filled@peaks),
                                         Peak.Spl = round(nrow(xset.filled@peaks)/length(xset.filled@filepaths), 0),
@@ -200,14 +222,47 @@ xcms_orbi_A <- function(File_list,
                                         Prof.Step = xset.filled@profinfo[[2]],
                                         as.data.frame(t(unlist(xcmsSet_param[1:8])))
   )
-  if (exists("Parameters.Summary")) {
+
+  if (file.exists(paste0(Results.path, "Parameters.Summary.csv"))) {
+    Parameters.Summary <- read.csv(file = paste0(Results.path, "Parameters.Summary.csv"), sep=";")
     Parameters.Summary <- rbind(Parameters.Summary, Parameters.Summary.temp)
     rm(Parameters.Summary.temp)
+    write.table(Peak.Table, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
   } else {
     Parameters.Summary <- Parameters.Summary.temp
-    rm(Parameters.Summary.temp)
+    write.table(Peak.Table, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
+    }
+
+  if (QCs_Graph == TRUE) {
+    dev.copy(png, paste0(Results.path.root, "QCs.png"), h=800, w=1600)
+    par(mfrow=c(2,3))
+    plotQC(xset.filled, what="mzdevhist")
+    plotQC(xset.filled, what="rtdevhist")
+    plotQC(xset.filled, what="mzdevmass")
+    plotQC(xset.filled, what="mzdevtime")
+    plotQC(xset.filled, what="mzdevsample")
+    plotQC(xset.filled, what="rtdevsample")
+    dev.off()
   }
+
+  if(is.data.frame(STDs_data) & STDs_data$mz) {
+    STD.subset <- subset(Peak.Table, round(mz, 2) %in% round(STDs_data$mz, 2))
+    temp.plot <- melt(STD.subset, id.vars = c(1:8))
+    temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
+
+    dev.copy(png, paste0(Results.path.root, "STDs.png"), h=800, w=1600)
+    ggplot(temp.plot2, aes(x = as.factor(round(mz,4)), y = value, fill = variable, color = batch)) +
+      geom_bar(stat="identity", position = "dodge") +
+      ylab("") +
+      xlab("") +
+      ggtitle("") +
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      scale_fill_grey(start = 0, end = 1)
+    dev.off()
+  } else { print("Need a dataframe to analyse specifc ions") }
 }
+
 
 
 #' xcms_orbi_Results

@@ -8,19 +8,23 @@ xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7),
 xcms_orbi_GRT()
 }
 \arguments{
-\item{File_list}{File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4}
+\item{File_list}{File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4.}
 
-\item{xcmsSet_param}{xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7))}
+\item{xcmsSet_param}{xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7)).}
 
-\item{Results.dir.name}{Name of the subfolder to store results}
+\item{Results.dir.name}{Name of the subfolder to store results.}
 
-\item{bw_param}{Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3)}
+\item{bw_param}{Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3).}
 
 \item{mzwid_param}{mzwid parameter to use.}
 
-\item{minfrac_param}{minfrac parameter to use}
+\item{minfrac_param}{minfrac parameter to use.}
 
-\item{profStep_param}{profStep parameter to use}
+\item{profStep_param}{profStep parameter to use.}
+
+\item{STDs_data}{A dataframe of m/z to plot with at least one "mz" named column.}
+
+\item{QCs_Graph}{Logical to determine of QCs graphs needs to be saved.}
 }
 \description{
 This function perform the first steps of metabolomic analysis : xcmsSet and
