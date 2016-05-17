@@ -12,6 +12,8 @@ Data_sub(Data, col_select, ...)
 \item{Results.path.root}{Name for the results folder}
 
 \item{ropls_param}{Parameters to pass to ropls::opls function}
+
+\item{factor_group}{vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles}
 }
 \description{
 Subset a list of three dataframes : [[1]] Datamatrix, [[2]] Samples.Metadata [[3]] Variable.Metadata.

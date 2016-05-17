@@ -10,6 +10,8 @@ SD_pca(Data_pca, Folder_name = "Default", ropls_param = list(predI = 2,
 \arguments{
 \item{ropls_param}{Parameters to pass to ropls::opls function}
 
+\item{factor_group}{vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles}
+
 \item{Data}{list with [[1]] Datamatrix [[2]] samples metadata}
 
 \item{Results.path.root}{Name for the results folder}

@@ -160,8 +160,8 @@ xcms_orbi_GRT <- function(File_list,
 #' @param STDs_data A dataframe of m/z to plot with at least one "mz" named column.
 #' @param QCs_Graph Logical to determine of QCs graphs needs to be saved.
 #' @keywords xcms, orbitrap
-#' @usage xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
-#' xcms_orbi_GRT()
+#' @usage xcms_orbi_A(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
+#' xcms_orbi_A()
 #' @export
 
 xcms_orbi_A <- function(File_list,
@@ -178,9 +178,9 @@ xcms_orbi_A <- function(File_list,
                         bw_param         = c(15, 8, 0.8),
                         mzwid_param      = 0.005,
                         minfrac_param    = 0.7,
-                        profStep_param  = 0.5,
-                        STDs_data = NULL,
-                        QCs_Graph = FALSE){
+                        profStep_param   = 0.5,
+                        STDs_data        = NULL,
+                        QCs_Graph        = FALSE){
   ## Package requirement
   require("xcms")
 
@@ -442,7 +442,7 @@ SD_files_class <- function(dir_path) {
 #' @param Data list with [[1]] Datamatrix [[2]] samples metadata
 #' @param Results.path.root Name for the results folder
 #' @param ropls_param Parameters to pass to ropls::opls function
-#' @☺param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
+#' @param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
 #' @keywords pca
 #' @export
 #' @examples
@@ -534,7 +534,7 @@ SD_subset_zero <- function(x, Z.Seuil = 80) {
 #' @param Data list with [[1]] Datamatrix [[2]] samples metadata
 #' @param Results.path.root Name for the results folder
 #' @param ropls_param Parameters to pass to ropls::opls function
-#' @☺param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
+#' @param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
 #' @keywords pca
 #' @examples
 #' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F), factor_group = NULL)

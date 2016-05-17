@@ -4,8 +4,8 @@
 \alias{xcms_orbi_A}
 \title{xcms_orbi_A}
 \usage{
-xcms_orbi_GRT(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
-xcms_orbi_GRT()
+xcms_orbi_A(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
+xcms_orbi_A()
 }
 \arguments{
 \item{File_list}{File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4.}
