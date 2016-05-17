@@ -210,7 +210,7 @@ xcms_orbi_A <- function(File_list,
   ## Save peaks table
   Peak.Table <- peakTable(Object.xcms.grp1)
   str(Peak.Table)
-  write.table(Peak.Table, file = paste0(Results.path.root, "Peak.Table.csv"), sep=";", col.names = NA)
+  write.table(Peak.Table, file = paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names = NA)
 
   ## Increment table with parameters and results
   Parameters.Summary.temp <- data.frame(Groups = paste0(unique(xset.filled@phenoData$class), sep="", collapse = ", "),
@@ -220,7 +220,6 @@ xcms_orbi_A <- function(File_list,
                                         Prof.Meth = xset.filled@profinfo[[1]],
                                         Prof.Step = xset.filled@profinfo[[2]],
                                         as.data.frame(t(unlist(xcmsSet_param[1:8]))))
-  )
 
   if (file.exists(paste0(Results.path, "Parameters.Summary.csv"))) {
     Parameters.Summary <- read.csv(file = paste0(Results.path, "Parameters.Summary.csv"), sep=";")
@@ -249,7 +248,7 @@ xcms_orbi_A <- function(File_list,
     temp.plot <- melt(STD.subset, id.vars = c(1:8))
     temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
 
-    dev.copy(png, paste0(Results.path.root, "STDs.png"), h=800, w=1600)
+    dev.copy(png, paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
     ggplot(temp.plot2, aes(x = as.factor(round(mz,4)), y = value, fill = variable, color = batch)) +
       geom_bar(stat="identity", position = "dodge") +
       ylab("") +
