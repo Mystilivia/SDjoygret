@@ -449,6 +449,8 @@ xcms_orbi_A2 <- function(File_list,
     print(temp_plot)
     graphics.off()
 
+    print(STD.subset)
+
     if(STDs_EIC == TRUE & length(nrow(STD.subset))>0) {
       nrow_val <- nrow(STD.subset)
       h_param <- if (nrow_val < 0) { as.numeric(300 * nrow_val) } else { 300 }
