@@ -460,6 +460,8 @@ xcms_orbi_A2 <- function(File_list,
       }
     } else { print("No Specific ions found with given parameters.") }
   } else { print("Need a dataframe with 'mz' and 'ppm' column to analyse specifc ions") }
+
+  return(xset.filled)
 }
 
 
