@@ -362,20 +362,17 @@ xcms_orbi_A2 <- function(File_list,
   ## Workflow analysis
   xset.1 <- do.call(xcms::xcmsSet, append(list(File_list), xcmsSet_param))
   xset.group.1   <- do.call(xcms::group, append(append(alist(xset.1), group_param), list(bw = group_bw[1])))
+  png(filename = paste0(Results.path.root, "RetCor.png"), h=1080, w=1080)
+  par(mfrow=c(2,1))
   xset.2       <- do.call(xcms::retcor, append(alist(xset.group.1), retcor_param))
   xset.group.2 <- do.call(xcms::group, append(append(alist(xset.2), group_param), list(bw = group_bw[2])))
   xset.3       <- do.call(xcms::retcor, append(alist(xset.group.2), retcor_param))
+  graphics.off()
   xset.group.3 <- do.call(xcms::group, append(append(alist(xset.3), group_param), list(bw = group_bw[3])))
   xset.filled  <- xcms::fillPeaks(xset.group.3)
-
-  ## Graph retcorrection
-  png(filename = paste0(Results.path.root, "RetCor.png"), h=1080, w=1080)
-  par(mfrow=c(2,1))
-  plotrt(xset.2, densplit = F)
-  plotrt(xset.3, densplit = F)
-  graphics.off()
   rm(xset.1, xset.group.1, xset.2, xset.group.2, xset.3, xset.group.3)
-  ## Save peaks table
+
+    ## Save peaks table
   Peak_Table_func <- peakTable(xset.filled)
   write.table(Peak_Table_func, file = paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names = NA)
 
