@@ -424,7 +424,6 @@ xcms_orbi_A2 <- function(File_list,
   }
 
   if(is.data.frame(STDs_data) & !is.null(STDs_data$mz) & !is.null(STDs_data$ppm)) {
-
     Mz_ranges <- apply(STDs_data, 1, function(x) range(xcms:::ppmDev(as.numeric(x["mz"]), as.numeric(x["ppm"]))))
     for (i in ncol(Mz_ranges)){
       mz_range <- seq(Mz_ranges[1,i], Mz_ranges[2,i], by = 0.0001)
@@ -463,7 +462,7 @@ xcms_orbi_A2 <- function(File_list,
 
 
 
-  return(xset.filled) ## Output results
+  return(list("xcms.object" = xset.filled, "STD_subset" = STD.subset) ## Output results
 }
 
 
