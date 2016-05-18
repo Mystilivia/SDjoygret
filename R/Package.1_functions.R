@@ -426,8 +426,7 @@ xcms_orbi_A2 <- function(File_list,
   if(is.data.frame(STDs_data) & !is.null(STDs_data$mz) & !is.null(STDs_data$ppm)) {
     Mz_ranges <- apply(STDs_data, 1, function(x) range(xcms:::ppmDev(as.numeric(x["mz"]), as.numeric(x["ppm"]))))
     for (i in ncol(Mz_ranges)){
-      mz_range <- seq(Mz_ranges[1,i], Mz_ranges[2,i], by = 0.0001)
-      temp <- subset(Peak_Table_func, round(mz, 4) %in% mz_range)
+      temp <- subset(Peak_Table_func, mz > Mz_ranges[1,i] & mz < Mz_ranges[2,i])
       if(exists("STD.subset")) { STD.subset <- rbind(STD.subset, temp) } else { STD.subset <- temp }
     }
     if(nrow(STD.subset) > 0) {
