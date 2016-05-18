@@ -234,7 +234,7 @@ xcms_orbi_A <- function(File_list,
     }
 
   if (QCs_Graph == TRUE) {
-    png(filename = paste0(Results.path.root, "QCs.png"), h=950, w=1600)
+    png(filename = paste0(Results.path.root, "QCs.png"), h=1680, w=2400)
     par(mfrow=c(2,3))
     plotQC(xset.filled, what="mzdevhist")
     plotQC(xset.filled, what="rtdevhist")
@@ -251,13 +251,13 @@ xcms_orbi_A <- function(File_list,
     for (i in ncol(Mz_ranges)){
       mz_range <- seq(Mz_ranges[1,i], Mz_ranges[2,i], by = 0.0001)
       temp <- subset(Peak_Table_func, round(mz, 4) %in% mz_range)
-      if(exists("STD.subset")) {  STD.subset <- rbind(STD.subset, temp) } else { STD.subset <- temp }
+      if(exists("STD.subset")) { STD.subset <- rbind(STD.subset, temp) } else { STD.subset <- temp }
     }
 
     temp.plot <- melt(STD.subset, id.vars = c(1:(7+length(unique(xset.filled@phenoData$class)))))
     temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
-    write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
-
+    write.table(STD.subset, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
+    write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset_Metadata.csv"), sep=";", col.names = NA)
 
     temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
       geom_bar(stat="identity", position = "dodge") +
@@ -274,7 +274,8 @@ xcms_orbi_A <- function(File_list,
 
     if(STDs_EIC == TRUE) {
       nrow_val <- nrow(STD.subset)
-      png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=(300*nrow_val), w=600)
+      h <- 300*nrow_val
+      png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=h, w=600)
       par(mfrow=c(nrow_val,1))
       plot(getEIC(xcms.object, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xcms.object)
       graphics.off()
