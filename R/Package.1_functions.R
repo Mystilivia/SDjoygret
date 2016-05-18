@@ -180,6 +180,7 @@ xcms_orbi_A <- function(File_list,
                         minfrac_param    = 0.7,
                         profStep_param   = 0.5,
                         STDs_data        = NULL,
+                        STDs_EIC         = FALSE,
                         QCs_Graph        = FALSE){
   ## Package requirement
   require("xcms")
@@ -259,7 +260,18 @@ xcms_orbi_A <- function(File_list,
     print(temp_plot)
     dev.copy(png, paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
     graphics.off()
-  } else { print("Need a dataframe to analyse specifc ions") }
+
+    if(STDs_EIC == TRUE) {
+      nrow_val <- nrow(STDs_data)
+      par(mfrow=c(nrow_val,1))
+      plot(getEIC(xcms.object, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xcms.object)
+      dev.copy(png, paste0(Results.path.root, "EIC_Ions_selection.png"), h=(300*nrow_val), w=600)
+      graphics.off()
+    }
+  } else { print("Need a dataframe with 'mz' column to analyse specifc ions") }
+
+
+
   return(xset.filled) ## Output results
 }
 
