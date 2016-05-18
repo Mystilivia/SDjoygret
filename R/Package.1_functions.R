@@ -158,6 +158,7 @@ xcms_orbi_GRT <- function(File_list,
 #' @param minfrac_param minfrac parameter to use.
 #' @param profStep_param profStep parameter to use.
 #' @param STDs_data A dataframe of m/z to plot with at least one "mz" named column.
+#' @param STDs_EIC  Should EIC of ions list be plotted.
 #' @param QCs_Graph Logical to determine of QCs graphs needs to be saved.
 #' @keywords xcms, orbitrap
 #' @usage xcms_orbi_A(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
@@ -181,7 +182,7 @@ xcms_orbi_A <- function(File_list,
                         profStep_param   = 0.5,
                         STDs_data        = NULL,
                         STDs_EIC         = FALSE,
-                        QCs_Graph        = FALSE){
+                        QCs_Graph        = FALSE) {
   ## Package requirement
   require("xcms")
 
@@ -244,10 +245,19 @@ xcms_orbi_A <- function(File_list,
     graphics.off()
   }
 
-  if(is.data.frame(STDs_data) & !is.null(STDs_data$mz)) {
-    STD.subset <- subset(Peak_Table_func, round(mz, 2) %in% round(STDs_data$mz, 2))
-    temp.plot <- melt(STD.subset, id.vars = c(1:(7+length(unique(xcms.object@phenoData$class)))))
+  if(is.data.frame(STDs_data) & !is.null(STDs_data$mz) & !is.null(STDs_data$ppm)) {
+
+    Mz_ranges <- apply(STDs_data, 1, function(x) range(xcms:::ppmDev(as.numeric(x["mz"]), as.numeric(x["ppm"]))))
+    for (i in ncol(Mz_ranges)){
+      mz_range <- seq(Mz_ranges[1,i], Mz_ranges[2,i], by = 0.0001)
+      temp <- subset(Peak_Table_func, round(mz, 4) %in% mz_range)
+      if(exists("STD.subset")) {  STD.subset <- rbind(STD.subset, temp) } else { STD.subset <- temp }
+    }
+
+    temp.plot <- melt(STD.subset, id.vars = c(1:(7+length(unique(xset.filled@phenoData$class)))))
     temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
+    write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
+
 
     temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
       geom_bar(stat="identity", position = "dodge") +
