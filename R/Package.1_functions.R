@@ -370,7 +370,7 @@ xcms_orbi_A2 <- function(File_list,
 
   ## Graph retcorrection
   png(filename = paste0(Results.path.root, "RetCor.png"), h=1080, w=1080)
-  par(mfrow=c(1,2))
+  par(mfrow=c(2,1))
   plotrt(xset.2, densplit = F)
   plotrt(xset.3, densplit = F)
   graphics.off()
@@ -384,7 +384,7 @@ xcms_orbi_A2 <- function(File_list,
                                         Sple.Nb = length(xset.filled@filepaths),
                                         Peak.Nb = nrow(xset.filled@peaks),
                                         Peak.Spl = round(nrow(xset.filled@peaks)/length(xset.filled@filepaths), 0),
-                                        Pks.Grp.Nb = length(xcms.object@groupidx),
+                                        Pks.Grp.Nb = length(xset.filled@groupidx),
                                         Prof.Meth = xset.filled@profinfo[[1]],
                                         Prof.Step = xset.filled@profinfo[[2]],
                                         as.data.frame(t(unlist(xcmsSet_param[1:8]))))
@@ -412,7 +412,7 @@ xcms_orbi_A2 <- function(File_list,
       plotQC(xset.filled, what="rtdevsample", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
       graphics.off()
     } else {
-      Ordered_data <- xcms.object@phenoData[order(xcms.object@phenoData$injectionOrder),]
+      Ordered_data <- xset.filled@phenoData[order(xset.filled@phenoData$injectionOrder),]
       plotQC(xset.filled, what="mzdevhist")
       plotQC(xset.filled, what="rtdevhist")
       plotQC(xset.filled, what="mzdevmass")
@@ -455,7 +455,7 @@ xcms_orbi_A2 <- function(File_list,
       h <- 300*nrow_val
       png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=h, w=600)
       par(mfrow=c(nrow_val,1))
-      plot(getEIC(xcms.object, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xcms.object)
+      plot(getEIC(xset.filled, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xset.filled)
       graphics.off()
     }
 
