@@ -350,7 +350,7 @@ xcms_orbi_A2 <- function(File_list,
   ## Package requirement
   require("xcms")
 
-    ## Create directory and path
+  ## Create directory and path
   i <- 1
   Results.path.root <- paste0(Results.path, "XCMS_Result_", i, "/")
   while (dir.exists(Results.path.root)==TRUE) {
@@ -361,11 +361,11 @@ xcms_orbi_A2 <- function(File_list,
 
   ## Workflow analysis
   xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
-  xset.group <- do.call(xcms::group, append(append(alist(xset.default), group_param), group_bw[1]))
+  xset.group <- do.call(xcms::group, append(append(alist(xset.default), group_param), list(bw = group_bw[1])))
   xset.2 <- do.call(xcms::retcor, append(alist(xset.group), retcor_param))
-  xset.group2 <- do.call(xcms::group, append(append(alist(xset.2), group_param), group_bw[2]))
+  xset.group2 <- do.call(xcms::group, append(append(alist(xset.2), group_param), list(bw = group_bw[2])))
   xset.3 <- do.call(xcms::retcor, append(alist(xset.group2), retcor_param))
-  xset.group.3 <- do.call(xcms::group, append(append(alist(xset.3), group_param), group_bw[3]))
+  xset.group.3 <- do.call(xcms::group, append(append(alist(xset.3), group_param), list(bw = group_bw[3])))
   xset.filled <- xcms::fillPeaks(xset.group.3)
 
   ## Graph retcorrection
@@ -428,14 +428,12 @@ xcms_orbi_A2 <- function(File_list,
     for (i in 1:ncol(Mz_ranges)){
       temp <- subset(Peak_Table_func, mz > Mz_ranges[1,i] & mz < Mz_ranges[2,i])
       if(exists("STD.subset")) { STD.subset <- rbind(STD.subset, temp) } else { STD.subset <- temp }
-      rm(temp)
     }
 
     if(nrow(STD.subset) > 0) {
-
+      write.table(STD.subset, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
       temp.plot <- melt(STD.subset, id.vars = c(1:(7+length(unique(xset.filled@phenoData$class)))))
       temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
-      write.table(STD.subset, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
       write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset_Metadata.csv"), sep=";", col.names = NA)
 
       temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
@@ -455,7 +453,7 @@ xcms_orbi_A2 <- function(File_list,
         nrow_val <- nrow(STD.subset)
         h_param <- as.numeric(300 * nrow_val)
         png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h = h_param, w=600)
-        par(mfrow=c(nrow_val,1))
+        par(mfrow=c(nrow_val, 1))
         plot(getEIC(xset.filled, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xset.filled)
         graphics.off()
       }
