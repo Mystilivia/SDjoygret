@@ -361,11 +361,11 @@ xcms_orbi_A2 <- function(File_list,
 
   ## Workflow analysis
   xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
-  xset.group <- do.call(xcms::group, append(append(xset.default, group_param), group_bw[1]))
-  xset.2 <- do.call(xcms::retcor, append(xset.group, retcor_param))
-  xset.group2 <- do.call(xcms::group, append(append(xset.2, group_param), group_bw[2]))
-  xset.3 <- do.call(xcms::retcor, append(xset.group2, retcor_param))
-  xset.group.3 <- do.call(xcms::group, append(append(xset.3, group_param), group_bw[3]))
+  xset.group <- do.call(xcms::group, append(append(alist(xset.default), group_param), group_bw[1]))
+  xset.2 <- do.call(xcms::retcor, append(alist(xset.group), retcor_param))
+  xset.group2 <- do.call(xcms::group, append(append(alist(xset.2), group_param), group_bw[2]))
+  xset.3 <- do.call(xcms::retcor, append(alist(xset.group2), retcor_param))
+  xset.group.3 <- do.call(xcms::group, append(append(alist(xset.3), group_param), group_bw[3]))
   xset.filled <- xcms::fillPeaks(xset.group.3)
 
   ## Graph retcorrection
