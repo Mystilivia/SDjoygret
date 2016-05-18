@@ -197,15 +197,15 @@ xcms_orbi_A <- function(File_list,
 
   xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
 
-  xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=mzwid_param)
+  xset.group <- xcms::group(xset.default, method="density", bw=bw_param[1], mzwid=mzwid_param, minfrac=minfrac_param)
   xset.2 <- xcms::retcor(xset.group, method="obiwarp", profStep=profStep_param, plottype="deviation")
   dev.copy(png, paste0(Results.path.root, "RetCor_01.png"), h=800, w=1600)
   graphics.off()
-  xset.group2 <- xcms::group(xset.2, method="density", bw=bw_param[2], mzwid=mzwid_param, minfrac=mzwid_param)
+  xset.group2 <- xcms::group(xset.2, method="density", bw=bw_param[2], mzwid=mzwid_param, minfrac=minfrac_param)
   xset.3 <- xcms::retcor(xset.group2, method="obiwarp", profStep=profStep_param, plottype="deviation")
   dev.copy(png, paste0(Results.path.root, "RetCor_02.png"), h=800, w=1600)
   graphics.off()
-  xset.group.4 <- xcms::group(xset.3, method="density", bw=bw_param[3], mzwid=mzwid_param, minfrac=mzwid_param)
+  xset.group.4 <- xcms::group(xset.3, method="density", bw=bw_param[3], mzwid=mzwid_param, minfrac=minfrac_param)
   xset.filled <- xcms::fillPeaks(xset.group.4)
 
   ## Save peaks table
