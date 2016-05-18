@@ -462,7 +462,7 @@ xcms_orbi_A2 <- function(File_list,
 
 
 
-  return(list("xcms.object" = xset.filled, "STD_subset" = STD.subset) ## Output results
+  return(list("xcms.object" = xset.filled, "STD_subset" = STD.subset)) ## Output results
 }
 
 
