@@ -303,6 +303,170 @@ xcms_orbi_A <- function(File_list,
 }
 
 
+#' xcms_orbi_A2
+#'
+#' This function perform the first steps of metabolomic analysis : xcmsSet and
+#' two iteration with group and retcor to end with fillpeaks. The resulting output
+#' is a xcms set object. Parameters are saved in a table.
+#' @param File_list        File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=0.015, fitgauss=F, nSlaves = 4, phenoData = Sample.Metadata)
+#' If phenoData is a dataframe with at lest a 'class' column. Could be any number of columns but in files sample order. If 'injectionorder' and 'batch" columns are
+#' presents, those will be use to order en color QCs plot.
+#' @param xcmsSet_param    xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7)).
+#' @param Results.dir.name Name of the subfolder to store results.
+#' @param bw_param         Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3).
+#' @param mzwid_param      mzwid parameter to use.
+#' @param minfrac_param    minfrac parameter to use.
+#' @param profStep_param   profStep parameter to use.
+#' @param STDs_data        A dataframe of m/z to plot with at least one "mz" named column.
+#' @param STDs_EIC         Should EIC of ions list be plotted.
+#' @param QCs_Graph        Logical to determine of QCs graphs needs to be saved.
+#' @keywords xcms, orbitrap
+#' @usage xcms_orbi_A2()
+#' xcms_orbi_A2()
+#' @export
+
+xcms_orbi_A2 <- function(File_list,
+                        xcmsSet_param    = list(method="centWave",
+                                                ppm=7,
+                                                peakwidth=c(4,20),
+                                                snthresh=10,
+                                                prefilter=c(4,10000),
+                                                mzdiff=-0.015,
+                                                fitgauss=FALSE,
+                                                nSlaves=4,
+                                                phenoData = Sample.Metadata),
+                        group_param      = list(method = "density",
+                                                mzwid = 0.015,
+                                                minfrac = 0.7),
+                        group_bw         = c(15, 8, 0.8),
+                        retcor_param     = list(method = "obiwarp",
+                                                profStep = 1,
+                                                plottype = "none"),
+                        Results.dir.name = Results.path,
+                        STDs_data        = NULL,
+                        STDs_EIC         = FALSE,
+                        QCs_Graph        = FALSE) {
+
+  ## Package requirement
+  require("xcms")
+
+    ## Create directory and path
+  i <- 1
+  Results.path.root <- paste0(Results.path, "XCMS_Result_", i, "/")
+  while (dir.exists(Results.path.root)==TRUE) {
+    i <- i+1
+    Results.path.root <- paste0(Results.path, "XCMS_Result_", i, "/")
+  }
+  dir.create(path = Results.path.root, recursive = T, showWarnings = F)
+
+  ## Workflow analysis
+  xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
+  xset.group <- do.call(xcms::group, append(append(xset.default, group_param), group_bw[1]))
+  xset.2 <- do.call(xcms::retcor, append(xset.group, retcor_param))
+  xset.group2 <- do.call(xcms::group, append(append(xset.2, group_param), group_bw[2]))
+  xset.3 <- do.call(xcms::retcor, append(xset.group2, retcor_param))
+  xset.group.3 <- do.call(xcms::group, append(append(xset.3, group_param), group_bw[3]))
+  xset.filled <- xcms::fillPeaks(xset.group.3)
+
+  ## Graph retcorrection
+  png(filename = paste0(Results.path.root, "RetCor.png"), h=1080, w=1080)
+  par(mfrow=c(1,2))
+  plotrt(xset.2, densplit = T)
+  plotrt(xset.3, densplit = T)
+  graphic.off()
+
+  ## Save peaks table
+  Peak_Table_func <- peakTable(xset.filled)
+  write.table(Peak_Table_func, file = paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names = NA)
+
+  ## Increment table with parameters and results
+  Parameters.Summary.temp <- data.frame(Groups = paste0(unique(xset.filled@phenoData$class), sep="", collapse = ", "),
+                                        Sple.Nb = length(xset.filled@filepaths),
+                                        Peak.Nb = nrow(xset.filled@peaks),
+                                        Peak.Spl = round(nrow(xset.filled@peaks)/length(xset.filled@filepaths), 0),
+                                        Pks.Grp.Nb = length(xcms.object@groupidx),
+                                        Prof.Meth = xset.filled@profinfo[[1]],
+                                        Prof.Step = xset.filled@profinfo[[2]],
+                                        as.data.frame(t(unlist(xcmsSet_param[1:8]))))
+
+  if (file.exists(paste0(Results.path, "Parameters.Summary.csv"))) {
+    Parameters.Summary <- read.csv(file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", row.names = 1)
+    Parameters.Summary <- rbind(Parameters.Summary, Parameters.Summary.temp)
+    rm(Parameters.Summary.temp)
+    write.table(Parameters.Summary, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
+  } else {
+    Parameters.Summary <- Parameters.Summary.temp
+    write.table(Parameters.Summary, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
+  }
+
+  if (QCs_Graph == TRUE) {
+    png(filename = paste0(Results.path.root, "QCs.png"), h=1680, w=2400)
+    par(mfrow=c(2,3))
+    if(!is.null(xset.filled@phenoData$injectionOrder) & !is.null(xset.filled@phenoData$batch)) {
+      Ordered_data <- xset.filled@phenoData[order(xset.filled@phenoData$injectionOrder),]
+      plotQC(xset.filled, what="mzdevhist", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+      plotQC(xset.filled, what="rtdevhist",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+      plotQC(xset.filled, what="mzdevmass",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+      plotQC(xset.filled, what="mzdevtime",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+      plotQC(xset.filled, what="mzdevsample", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+      plotQC(xset.filled, what="rtdevsample", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+      graphics.off()
+    } else {
+      Ordered_data <- xcms.object@phenoData[order(xcms.object@phenoData$injectionOrder),]
+      plotQC(xset.filled, what="mzdevhist")
+      plotQC(xset.filled, what="rtdevhist")
+      plotQC(xset.filled, what="mzdevmass")
+      plotQC(xset.filled, what="mzdevtime")
+      plotQC(xset.filled, what="mzdevsample")
+      plotQC(xset.filled, what="rtdevsample")
+      graphics.off()
+    }
+  }
+
+  if(is.data.frame(STDs_data) & !is.null(STDs_data$mz) & !is.null(STDs_data$ppm)) {
+
+    Mz_ranges <- apply(STDs_data, 1, function(x) range(xcms:::ppmDev(as.numeric(x["mz"]), as.numeric(x["ppm"]))))
+    for (i in ncol(Mz_ranges)){
+      mz_range <- seq(Mz_ranges[1,i], Mz_ranges[2,i], by = 0.0001)
+      temp <- subset(Peak_Table_func, round(mz, 4) %in% mz_range)
+      if(exists("STD.subset")) { STD.subset <- rbind(STD.subset, temp) } else { STD.subset <- temp }
+    }
+
+    temp.plot <- melt(STD.subset, id.vars = c(1:(7+length(unique(xset.filled@phenoData$class)))))
+    temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
+    write.table(STD.subset, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
+    write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset_Metadata.csv"), sep=";", col.names = NA)
+
+    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
+      geom_bar(stat="identity", position = "dodge") +
+      ylab("") +
+      xlab("") +
+      ggtitle("") +
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      scale_fill_grey(start = 0, end = 1)
+
+    png(filename = paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
+    print(temp_plot)
+    graphics.off()
+
+    if(STDs_EIC == TRUE) {
+      nrow_val <- nrow(STD.subset)
+      h <- 300*nrow_val
+      png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=h, w=600)
+      par(mfrow=c(nrow_val,1))
+      plot(getEIC(xcms.object, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xcms.object)
+      graphics.off()
+    }
+
+  } else { print("Need a dataframe with 'mz' column to analyse specifc ions") }
+
+
+
+  return(xset.filled) ## Output results
+}
+
+
 
 #' xcms_orbi_Results
 #'
