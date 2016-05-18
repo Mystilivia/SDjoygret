@@ -430,43 +430,36 @@ xcms_orbi_A2 <- function(File_list,
       temp <- subset(Peak_Table_func, round(mz, 4) %in% mz_range)
       if(exists("STD.subset")) { STD.subset <- rbind(STD.subset, temp) } else { STD.subset <- temp }
     }
+    if(nrow(STD.subset) > 0) {
 
-    temp.plot <- melt(STD.subset, id.vars = c(1:(7+length(unique(xset.filled@phenoData$class)))))
-    temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
-    write.table(STD.subset, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
-    write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset_Metadata.csv"), sep=";", col.names = NA)
+      temp.plot <- melt(STD.subset, id.vars = c(1:(7+length(unique(xset.filled@phenoData$class)))))
+      temp.plot2 <- merge(temp.plot, xset.filled@phenoData, by = "variable", all.x = T)
+      write.table(STD.subset, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
+      write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset_Metadata.csv"), sep=";", col.names = NA)
 
-    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
-      geom_bar(stat="identity", position = "dodge") +
-      ylab("") +
-      xlab("") +
-      ggtitle("") +
-      theme_bw() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-      scale_fill_grey(start = 0, end = 1)
+      temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
+        geom_bar(stat="identity", position = "dodge") +
+        ylab("") +
+        xlab("") +
+        ggtitle("") +
+        theme_bw() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+        scale_fill_grey(start = 0, end = 1)
 
-    png(filename = paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
-    print(temp_plot)
-    graphics.off()
-
-    print(STD.subset)
-    print(nrow(STD.subset))
-    print((STDs_EIC == TRUE && nrow(STD.subset) > 0))
-
-    if(STDs_EIC == TRUE && nrow(STD.subset) > 0) {
-      nrow_val <- nrow(STD.subset)
-      h_param <- as.numeric(300 * nrow_val)
-      png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h = h_param, w=600)
-      par(mfrow=c(nrow_val,1))
-      plot(getEIC(xset.filled, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xset.filled)
+      png(filename = paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
+      print(temp_plot)
       graphics.off()
-    }
 
+      if(STDs_EIC == TRUE) {
+        nrow_val <- nrow(STD.subset)
+        h_param <- as.numeric(300 * nrow_val)
+        png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h = h_param, w=600)
+        par(mfrow=c(nrow_val,1))
+        plot(getEIC(xset.filled, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xset.filled)
+        graphics.off()
+      }
+    } else { print("No Specific ions found with given parameters.") }
   } else { print("Need a dataframe with 'mz' and 'ppm' column to analyse specifc ions") }
-
-
-
-  return(list("xcms.object" = xset.filled, "STD_subset" = STD.subset)) ## Output results
 }
 
 
