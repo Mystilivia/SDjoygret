@@ -450,11 +450,13 @@ xcms_orbi_A2 <- function(File_list,
     graphics.off()
 
     print(STD.subset)
+    print(nrow(STD.subset))
+    print((STDs_EIC == TRUE && nrow(STD.subset) > 0))
 
-    if(STDs_EIC == TRUE & nrow(STD.subset) > 0) {
+    if(STDs_EIC == TRUE && nrow(STD.subset) > 0) {
       nrow_val <- nrow(STD.subset)
-      h_param <- if (nrow_val < 0) { as.numeric(300 * nrow_val) } else { 300 }
-      png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=h_param, w=600)
+      h_param <- as.numeric(300 * nrow_val)
+      png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h = h_param, w=600)
       par(mfrow=c(nrow_val,1))
       plot(getEIC(xset.filled, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xset.filled)
       graphics.off()
