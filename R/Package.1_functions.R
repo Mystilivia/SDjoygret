@@ -150,18 +150,18 @@ xcms_orbi_GRT <- function(File_list,
 #' This function perform the first steps of metabolomic analysis : xcmsSet and
 #' two iteration with group and retcor to end with fillpeaks. The resulting output
 #' is a xcms set object. Parameters are saved in a table.
-#' @param File_list File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4.
-#' @param xcmsSet_param xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7)).
+#' @param File_list        File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4.
+#' @param xcmsSet_param    xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7)).
 #' @param Results.dir.name Name of the subfolder to store results.
-#' @param bw_param Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3).
-#' @param mzwid_param mzwid parameter to use.
-#' @param minfrac_param minfrac parameter to use.
-#' @param profStep_param profStep parameter to use.
-#' @param STDs_data A dataframe of m/z to plot with at least one "mz" named column.
-#' @param STDs_EIC  Should EIC of ions list be plotted.
-#' @param QCs_Graph Logical to determine of QCs graphs needs to be saved.
+#' @param bw_param         Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3).
+#' @param mzwid_param      mzwid parameter to use.
+#' @param minfrac_param    minfrac parameter to use.
+#' @param profStep_param   profStep parameter to use.
+#' @param STDs_data        A dataframe of m/z to plot with at least one "mz" named column.
+#' @param STDs_EIC        Should EIC of ions list be plotted.
+#' @param QCs_Graph       Logical to determine of QCs graphs needs to be saved.
 #' @keywords xcms, orbitrap
-#' @usage xcms_orbi_A(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
+#' @usage xcms_orbi_A()
 #' xcms_orbi_A()
 #' @export
 

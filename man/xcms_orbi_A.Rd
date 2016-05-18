@@ -4,7 +4,7 @@
 \alias{xcms_orbi_A}
 \title{xcms_orbi_A}
 \usage{
-xcms_orbi_A(xcms_set_obj, Results.dir.name="Default", bw_param=c(25, 10, 0.7), mzwid_param=0.005, minfrac_param=0.25, profStep_param=0.8)
+xcms_orbi_A()
 xcms_orbi_A()
 }
 \arguments{
@@ -23,6 +23,8 @@ xcms_orbi_A()
 \item{profStep_param}{profStep parameter to use.}
 
 \item{STDs_data}{A dataframe of m/z to plot with at least one "mz" named column.}
+
+\item{STDs_EIC}{Should EIC of ions list be plotted.}
 
 \item{QCs_Graph}{Logical to determine of QCs graphs needs to be saved.}
 }
