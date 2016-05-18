@@ -371,8 +371,8 @@ xcms_orbi_A2 <- function(File_list,
   ## Graph retcorrection
   png(filename = paste0(Results.path.root, "RetCor.png"), h=1080, w=1080)
   par(mfrow=c(1,2))
-  plotrt(xset.2, densplit = T)
-  plotrt(xset.3, densplit = T)
+  plotrt(xset.2, densplit = F)
+  plotrt(xset.3, densplit = F)
   graphic.off()
 
   ## Save peaks table
