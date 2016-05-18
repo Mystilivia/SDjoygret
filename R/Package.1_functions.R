@@ -263,7 +263,7 @@ xcms_orbi_A <- function(File_list,
     graphics.off()
 
     if(STDs_EIC == TRUE) {
-      nrow_val <- nrow(STDs_data)
+      nrow_val <- nrow(STD.subset)
       png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=(300*nrow_val), w=600)
       par(mfrow=c(nrow_val,1))
       plot(getEIC(xcms.object, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xcms.object)
