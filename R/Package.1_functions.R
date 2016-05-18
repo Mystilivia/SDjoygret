@@ -240,7 +240,7 @@ xcms_orbi_A <- function(File_list,
     par(mfrow=c(2,3))
     if(!is.null(xset.filled@phenoData$injectionOrder) & !is.null(xset.filled@phenoData$batch)) {
     Ordered_data <- xcms.object@phenoData[order(xcms.object@phenoData$injectionOrder),]
-    plotQC(xset.filled, what="mzdevsample", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+    plotQC(xset.filled, what="mzdevhist", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
     plotQC(xset.filled, what="rtdevhist",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
     plotQC(xset.filled, what="mzdevmass",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
     plotQC(xset.filled, what="mzdevtime",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
@@ -249,7 +249,7 @@ xcms_orbi_A <- function(File_list,
     graphics.off()
     } else {
       Ordered_data <- xcms.object@phenoData[order(xcms.object@phenoData$injectionOrder),]
-      plotQC(xset.filled, what="mzdevsample")
+      plotQC(xset.filled, what="mzdevhist")
       plotQC(xset.filled, what="rtdevhist")
       plotQC(xset.filled, what="mzdevmass")
       plotQC(xset.filled, what="mzdevtime")
@@ -273,7 +273,7 @@ xcms_orbi_A <- function(File_list,
     write.table(STD.subset, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
     write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset_Metadata.csv"), sep=";", col.names = NA)
 
-    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = batch)) +
+    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
       geom_bar(stat="identity", position = "dodge") +
       ylab("") +
       xlab("") +
