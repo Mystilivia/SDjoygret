@@ -449,16 +449,16 @@ xcms_orbi_A2 <- function(File_list,
     print(temp_plot)
     graphics.off()
 
-    if(STDs_EIC == TRUE) {
+    if(STDs_EIC == TRUE & length(nrow(STD.subset))>0) {
       nrow_val <- nrow(STD.subset)
-      h_param <- as.numeric(300*nrow_val)
+      h_param <- if (nrow_val < 0) { as.numeric(300 * nrow_val) } else { 300 }
       png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=h_param, w=600)
       par(mfrow=c(nrow_val,1))
       plot(getEIC(xset.filled, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xset.filled)
       graphics.off()
     }
 
-  } else { print("Need a dataframe with 'mz' column to analyse specifc ions") }
+  } else { print("Need a dataframe with 'mz' and 'ppm' column to analyse specifc ions") }
 
 
 
