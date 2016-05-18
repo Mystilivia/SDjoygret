@@ -360,13 +360,13 @@ xcms_orbi_A2 <- function(File_list,
   dir.create(path = Results.path.root, recursive = T, showWarnings = F)
 
   ## Workflow analysis
-  xset.default <- do.call(xcmsSet, append(list(File_list), xcmsSet_param))
-  xset.group <- do.call(xcms::group, append(append(alist(xset.default), group_param), list(bw = group_bw[1])))
-  xset.2 <- do.call(xcms::retcor, append(alist(xset.group), retcor_param))
-  xset.group2 <- do.call(xcms::group, append(append(alist(xset.2), group_param), list(bw = group_bw[2])))
-  xset.3 <- do.call(xcms::retcor, append(alist(xset.group2), retcor_param))
+  xset.1 <- do.call(xcms::xcmsSet, append(list(File_list), xcmsSet_param))
+  xset.group.1   <- do.call(xcms::group, append(append(alist(xset.1), group_param), list(bw = group_bw[1])))
+  xset.2       <- do.call(xcms::retcor, append(alist(xset.group.1), retcor_param))
+  xset.group.2 <- do.call(xcms::group, append(append(alist(xset.2), group_param), list(bw = group_bw[2])))
+  xset.3       <- do.call(xcms::retcor, append(alist(xset.group.2), retcor_param))
   xset.group.3 <- do.call(xcms::group, append(append(alist(xset.3), group_param), list(bw = group_bw[3])))
-  xset.filled <- xcms::fillPeaks(xset.group.3)
+  xset.filled  <- xcms::fillPeaks(xset.group.3)
 
   ## Graph retcorrection
   png(filename = paste0(Results.path.root, "RetCor.png"), h=1080, w=1080)
@@ -374,7 +374,7 @@ xcms_orbi_A2 <- function(File_list,
   plotrt(xset.2, densplit = F)
   plotrt(xset.3, densplit = F)
   graphics.off()
-
+  rm(xset.1, xset.group.1, xset.2, xset.group.2, xset.3, xset.group.3)
   ## Save peaks table
   Peak_Table_func <- peakTable(xset.filled)
   write.table(Peak_Table_func, file = paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names = NA)
@@ -389,6 +389,7 @@ xcms_orbi_A2 <- function(File_list,
                                         Prof.Step = xset.filled@profinfo[[2]],
                                         as.data.frame(t(unlist(xcmsSet_param[1:8]))))
 
+  ## Save parameters in dataframe
   if (file.exists(paste0(Results.path, "Parameters.Summary.csv"))) {
     Parameters.Summary <- read.csv(file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", row.names = 1)
     Parameters.Summary <- rbind(Parameters.Summary, Parameters.Summary.temp)
@@ -399,6 +400,7 @@ xcms_orbi_A2 <- function(File_list,
     write.table(Parameters.Summary, file = paste0(Results.path, "Parameters.Summary.csv"), sep=";", col.names = NA)
   }
 
+  ## Generate QCs graph
   if (QCs_Graph == TRUE) {
     png(filename = paste0(Results.path.root, "QCs.png"), h=1680, w=2400)
     par(mfrow=c(2,3))
@@ -423,6 +425,7 @@ xcms_orbi_A2 <- function(File_list,
     }
   }
 
+  ## Filter data with specific mz
   if(is.data.frame(STDs_data) & is.numeric(STDs_data$mz) & is.numeric(STDs_data$ppm)) {
     Mz_ranges <- apply(STDs_data, 1, function(x) range(xcms:::ppmDev(as.numeric(x["mz"]), as.numeric(x["ppm"]))))
     for (i in 1:ncol(Mz_ranges)){
