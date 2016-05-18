@@ -451,7 +451,7 @@ xcms_orbi_A2 <- function(File_list,
 
     print(STD.subset)
 
-    if(STDs_EIC == TRUE & length(nrow(STD.subset))>0) {
+    if(STDs_EIC == TRUE & nrow(STD.subset) > 0) {
       nrow_val <- nrow(STD.subset)
       h_param <- if (nrow_val < 0) { as.numeric(300 * nrow_val) } else { 300 }
       png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=h_param, w=600)
