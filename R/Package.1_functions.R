@@ -239,7 +239,7 @@ xcms_orbi_A <- function(File_list,
     png(filename = paste0(Results.path.root, "QCs.png"), h=1680, w=2400)
     par(mfrow=c(2,3))
     if(!is.null(xset.filled@phenoData$injectionOrder) & !is.null(xset.filled@phenoData$batch)) {
-    Ordered_data <- xcms.object@phenoData[order(xcms.object@phenoData$injectionOrder),]
+    Ordered_data <- xset.filled@phenoData[order(xset.filled@phenoData$injectionOrder),]
     plotQC(xset.filled, what="mzdevhist", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
     plotQC(xset.filled, what="rtdevhist",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
     plotQC(xset.filled, what="mzdevmass",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
