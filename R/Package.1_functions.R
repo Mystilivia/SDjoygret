@@ -150,7 +150,9 @@ xcms_orbi_GRT <- function(File_list,
 #' This function perform the first steps of metabolomic analysis : xcmsSet and
 #' two iteration with group and retcor to end with fillpeaks. The resulting output
 #' is a xcms set object. Parameters are saved in a table.
-#' @param File_list        File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4.
+#' @param File_list        File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=0.015, fitgauss=F, nSlaves = 4, phenoData = Sample.Metadata)
+#' If phenoData is a dataframe with at lest a 'class' column. Could be any number of columns but in files sample order. If 'injectionorder' and 'batch" columns are
+#' presents, those will be use to order en color QCs plot.
 #' @param xcmsSet_param    xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7)).
 #' @param Results.dir.name Name of the subfolder to store results.
 #' @param bw_param         Vector for bw settings to use in 1, 2 and 3 iteration : c(1, 2, 3).
@@ -158,8 +160,8 @@ xcms_orbi_GRT <- function(File_list,
 #' @param minfrac_param    minfrac parameter to use.
 #' @param profStep_param   profStep parameter to use.
 #' @param STDs_data        A dataframe of m/z to plot with at least one "mz" named column.
-#' @param STDs_EIC        Should EIC of ions list be plotted.
-#' @param QCs_Graph       Logical to determine of QCs graphs needs to be saved.
+#' @param STDs_EIC         Should EIC of ions list be plotted.
+#' @param QCs_Graph        Logical to determine of QCs graphs needs to be saved.
 #' @keywords xcms, orbitrap
 #' @usage xcms_orbi_A()
 #' xcms_orbi_A()
@@ -236,13 +238,25 @@ xcms_orbi_A <- function(File_list,
   if (QCs_Graph == TRUE) {
     png(filename = paste0(Results.path.root, "QCs.png"), h=1680, w=2400)
     par(mfrow=c(2,3))
-    plotQC(xset.filled, what="mzdevhist")
-    plotQC(xset.filled, what="rtdevhist")
-    plotQC(xset.filled, what="mzdevmass")
-    plotQC(xset.filled, what="mzdevtime")
-    plotQC(xset.filled, what="mzdevsample")
-    plotQC(xset.filled, what="rtdevsample")
+    if(!is.null(xset.filled@phenoData$injectionOrder) & !is.null(xset.filled@phenoData$batch)) {
+    Ordered_data <- xcms.object@phenoData[order(xcms.object@phenoData$injectionOrder),]
+    plotQC(xset.filled, what="mzdevsample", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+    plotQC(xset.filled, what="rtdevhist",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+    plotQC(xset.filled, what="mzdevmass",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+    plotQC(xset.filled, what="mzdevtime",   sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+    plotQC(xset.filled, what="mzdevsample", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
+    plotQC(xset.filled, what="rtdevsample", sampNames = Ordered_data$injectionOrder, sampColors = Ordered_data$batch, sampOrder = order(xset.filled@phenoData$injectionOrder))
     graphics.off()
+    } else {
+      Ordered_data <- xcms.object@phenoData[order(xcms.object@phenoData$injectionOrder),]
+      plotQC(xset.filled, what="mzdevsample")
+      plotQC(xset.filled, what="rtdevhist")
+      plotQC(xset.filled, what="mzdevmass")
+      plotQC(xset.filled, what="mzdevtime")
+      plotQC(xset.filled, what="mzdevsample")
+      plotQC(xset.filled, what="rtdevsample")
+      graphics.off()
+    }
   }
 
   if(is.data.frame(STDs_data) & !is.null(STDs_data$mz) & !is.null(STDs_data$ppm)) {
@@ -259,7 +273,7 @@ xcms_orbi_A <- function(File_list,
     write.table(STD.subset, file = paste0(Results.path.root, "Ions_Subset.csv"), sep=";", col.names = NA)
     write.table(temp.plot2, file = paste0(Results.path.root, "Ions_Subset_Metadata.csv"), sep=";", col.names = NA)
 
-    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = variable, color = batch)) +
+    temp_plot <- ggplot(temp.plot2, aes(x = as.factor(round(mz,2)), y = value, fill = batch)) +
       geom_bar(stat="identity", position = "dodge") +
       ylab("") +
       xlab("") +

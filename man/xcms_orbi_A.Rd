@@ -8,7 +8,9 @@ xcms_orbi_A()
 xcms_orbi_A()
 }
 \arguments{
-\item{File_list}{File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=-0.001, fitgauss=F, nSlaves = 4.}
+\item{File_list}{File list to pass to xcmsSet method = 'centWave', ppm=7, peakwidth=c(4,20), snthresh=10, prefilter=c(4,1000), mzdiff=0.015, fitgauss=F, nSlaves = 4, phenoData = Sample.Metadata)
+If phenoData is a dataframe with at lest a 'class' column. Could be any number of columns but in files sample order. If 'injectionorder' and 'batch" columns are
+presents, those will be use to order en color QCs plot.}
 
 \item{xcmsSet_param}{xcmsSet parameters (can be any parameters formated like this : c(method="centWave", "ppm=7)).}
 
