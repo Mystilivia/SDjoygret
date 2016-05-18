@@ -233,6 +233,7 @@ xcms_orbi_A <- function(File_list,
     }
 
   if (QCs_Graph == TRUE) {
+    png(filename = paste0(Results.path.root, "QCs.png"), h=950, w=1600)
     par(mfrow=c(2,3))
     plotQC(xset.filled, what="mzdevhist")
     plotQC(xset.filled, what="rtdevhist")
@@ -240,7 +241,6 @@ xcms_orbi_A <- function(File_list,
     plotQC(xset.filled, what="mzdevtime")
     plotQC(xset.filled, what="mzdevsample")
     plotQC(xset.filled, what="rtdevsample")
-    dev.copy(png, paste0(Results.path.root, "QCs.png"), h=950, w=1600)
     graphics.off()
   }
 
@@ -257,17 +257,19 @@ xcms_orbi_A <- function(File_list,
       theme_bw() +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
       scale_fill_grey(start = 0, end = 1)
+
+    png(filename = paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
     print(temp_plot)
-    dev.copy(png, paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
     graphics.off()
 
     if(STDs_EIC == TRUE) {
       nrow_val <- nrow(STDs_data)
+      png(filename = paste0(Results.path.root, "EIC_Ions_selection.png"), h=(300*nrow_val), w=600)
       par(mfrow=c(nrow_val,1))
       plot(getEIC(xcms.object, groupidx = as.numeric(rownames(STD.subset)), rt = "corrected"), xcms.object)
-      dev.copy(png, paste0(Results.path.root, "EIC_Ions_selection.png"), h=(300*nrow_val), w=600)
       graphics.off()
     }
+
   } else { print("Need a dataframe with 'mz' column to analyse specifc ions") }
 
 
