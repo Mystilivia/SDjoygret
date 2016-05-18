@@ -373,7 +373,7 @@ xcms_orbi_A2 <- function(File_list,
   par(mfrow=c(1,2))
   plotrt(xset.2, densplit = F)
   plotrt(xset.3, densplit = F)
-  graphic.off()
+  graphics.off()
 
   ## Save peaks table
   Peak_Table_func <- peakTable(xset.filled)
