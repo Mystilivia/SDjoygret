@@ -387,7 +387,7 @@ xcms_orbi_A2 <- function(File_list,
                                         "XcmsSet" = paste(unlist(xcmsSet_param[1:8]), collapse = " "),
                                         "Group" = paste(unlist(group_param[1:8]), collapse = " "),
                                         "Group_bw" = paste(unlist(group_bw[1:8]), collapse = " "),
-                                        "RetCor" = paste(unlist(retcor_param[1:8]), collapse = " "),
+                                        "RetCor" = paste(unlist(retcor_param[1:8]), collapse = " ")
                                         )
 
   ## Save parameters in dataframe
