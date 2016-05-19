@@ -348,7 +348,7 @@ xcms_orbi_A2 <- function(File_list,
                         QCs_Graph        = FALSE) {
 
   ## Package requirement
-  require("xcms")
+  require("xcms") ; require("reshape2") ; require("ggplot2")
 
   ## Create directory and path
   i <- 1
