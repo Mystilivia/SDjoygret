@@ -442,7 +442,7 @@ xcms_orbi_A2 <- function(File_list,
         xlab("") +
         ggtitle("") +
         theme_bw() +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none") +
         scale_fill_grey(start = 0, end = 1)
 
       png(filename = paste0(Results.path.root, "Ions_selection.png"), h=800, w=1600)
