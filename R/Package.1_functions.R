@@ -465,6 +465,28 @@ xcms_orbi_A2 <- function(File_list,
 
 
 
+
+#' splitdf
+#'
+#' Split a dataframe in two.
+#' @param dataframe a dataframe to subset.
+#' @param p the proportion of data to keep in trainset
+#' @param seed the seed number for repetability (same seed will generate same subset for a given dataframe).
+#' @keywords dataframe, training, subset
+#' @return A list with [1] trainset dataframe, [2] testset dataframe.
+#' @usage splitdf(cars, p = 0.5, seed = 95687)
+#' @export
+
+splitdf <- function(dataframe, p = 0.5, seed = 95687) {
+  if (!is.null(seed)) set.seed(seed)
+  index <- 1:nrow(dataframe)
+  trainindex <- sample(index, trunc(length(index)*p))
+  trainset <- dataframe[trainindex, ]
+  testset <- dataframe[-trainindex, ]
+  return(list(trainset=trainset,testset=testset))
+}
+
+
 #' xcms_orbi_Results
 #'
 #' This function generate peak_table, STDs EIC across samples, PCA (optional) and return a list with [1] datamatrix, [2] sample.metadata and [3] variable.metadata.
