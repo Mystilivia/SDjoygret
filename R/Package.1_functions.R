@@ -384,10 +384,10 @@ xcms_orbi_A2 <- function(File_list,
                                         "Pks.Grp.Nb" = length(xset.filled@groupidx),
                                         "Prof.Meth" = xset.filled@profinfo[[1]],
                                         "Prof.Step" = xset.filled@profinfo[[2]],
-                                        "XcmsSet" = paste(unlist(xcmsSet_param[1:8]), collapse = " "),
-                                        "Group" = paste(unlist(group_param[1:8]), collapse = " "),
-                                        "Group_bw" = paste(unlist(group_bw[1:8]), collapse = " "),
-                                        "RetCor" = paste(unlist(retcor_param[1:8]), collapse = " ")
+                                        "XcmsSet" = paste(unlist(xcmsSet_param), collapse = " "),
+                                        "Group" = paste(unlist(group_param), collapse = " "),
+                                        "Group_bw" = paste(unlist(group_bw), collapse = " "),
+                                        "RetCor" = paste(unlist(retcor_param), collapse = " ")
                                         )
 
   ## Save parameters in dataframe
