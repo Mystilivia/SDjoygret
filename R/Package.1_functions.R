@@ -377,14 +377,18 @@ xcms_orbi_A2 <- function(File_list,
   write.table(Peak_Table_func, file = paste0(Results.path.root, "Peak_Table.csv"), sep=";", col.names = NA)
 
   ## Increment table with parameters and results
-  Parameters.Summary.temp <- data.frame(Groups = paste0(unique(xset.filled@phenoData$class), sep="", collapse = ", "),
-                                        Sple.Nb = length(xset.filled@filepaths),
-                                        Peak.Nb = nrow(xset.filled@peaks),
-                                        Peak.Spl = round(nrow(xset.filled@peaks)/length(xset.filled@filepaths), 0),
-                                        Pks.Grp.Nb = length(xset.filled@groupidx),
-                                        Prof.Meth = xset.filled@profinfo[[1]],
-                                        Prof.Step = xset.filled@profinfo[[2]],
-                                        as.data.frame(t(unlist(xcmsSet_param[1:8]))))
+  Parameters.Summary.temp <- data.frame("Groups" = paste0(unique(xset.filled@phenoData$class), sep="", collapse = ", "),
+                                        "Sple.Nb" = length(xset.filled@filepaths),
+                                        "Peak.Nb" = nrow(xset.filled@peaks),
+                                        "Peak.Spl" = round(nrow(xset.filled@peaks)/length(xset.filled@filepaths), 0),
+                                        "Pks.Grp.Nb" = length(xset.filled@groupidx),
+                                        "Prof.Meth" = xset.filled@profinfo[[1]],
+                                        "Prof.Step" = xset.filled@profinfo[[2]],
+                                        "XcmsSet" = paste(unlist(xcmsSet_param[1:8]), collapse = " "),
+                                        "Group" = paste(unlist(group_param[1:8]), collapse = " "),
+                                        "Group_bw" = paste(unlist(group_bw[1:8]), collapse = " "),
+                                        "RetCor" = paste(unlist(retcor_param[1:8]), collapse = " "),
+                                        )
 
   ## Save parameters in dataframe
   if (file.exists(paste0(Results.path, "Parameters.Summary.csv"))) {
