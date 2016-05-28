@@ -787,6 +787,19 @@ Data_sub <- function(Data, col_select, ...)
 }
 
 
+#' get_sign
+#'
+#' Get the theoritical significance glm model.
+#' This function come from WinVector (Nina Zumel, http://winvector.github.io/VariableSignal/VariableSignal.html).
+#' @param a model generated with glm (use of $null.deviance, $deviance, df.null and df.residual)
+#' @keywords glm, significance
+#' @examples
+#' get_sign(model)
 
+get_sign = function(model) {
+  delta_deviance = model$null.deviance - model$deviance
+  df = model$df.null - model$df.residual
+  sig = pchisq(delta_deviance, df, lower.tail=FALSE)
+}
 
 
