@@ -848,11 +848,11 @@ importWorksheets.2 <- function(Data.path) {
 #' check.list.format()
 
 check.list.format <- function (data) {
-  if(!is.list(List.Result)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
-  if(FALSE %in% c(lapply(List.Result, class) == "data.frame")){stop("List levels should be data.frame")}
-  if(!identical(colnames(List.Result[[1]]), rownames(List.Result[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
-  if(!identical(rownames(List.Result[[1]]), rownames(List.Result[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-  dim.temp <- lapply(List.Result, dim)
+  if(!is.list(data)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
+  if(FALSE %in% c(lapply(data, class) == "data.frame")){stop("List levels should be data.frame")}
+  if(!identical(colnames(data[[1]]), rownames(data[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+  if(!identical(rownames(data[[1]]), rownames(data[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
+  dim.temp <- lapply(data, dim)
   if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
   if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
   print("Data seems OK")
@@ -861,10 +861,7 @@ check.list.format <- function (data) {
 
 #' Subset list
 #'
-#' Subset a list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
-#' [[1]] samples.ID x variables.ID
-#' [[2]] samples.ID x sample.metadata (same order than rows in [[1]])
-#' [[3]] variables.ID x variable.metadata (same order than columns in [[1]])
+#' Subset a three level list by variables and/or samples.
 #' @param data list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
 #' @param Var.sel vector of variable to subset (rownames) from [[3]]
 #' @param Samples.sel vector of samples to subset (rownames) from [[2]]

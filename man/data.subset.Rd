@@ -14,10 +14,7 @@ data.subset(data, Var.sel = NULL, Samples.sel = NULL)
 \item{Samples.sel}{vector of samples to subset (rownames) from [[2]]}
 }
 \description{
-Subset a list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
-[[1]] samples.ID x variables.ID
-[[2]] samples.ID x sample.metadata (same order than rows in [[1]])
-[[3]] variables.ID x variable.metadata (same order than columns in [[1]])
+Subset a three level list by variables and/or samples.
 }
 \examples{
 data.subset()
