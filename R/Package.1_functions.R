@@ -1006,7 +1006,7 @@ find.limits <- function(x,y) {
 #' @examples
 #' plot.theme.1()
 plot.theme.1 <- function(Samples.grp = NULL, Variables.grp = NULL, limits = NULL, Legend.L = T, colorL = F, labels = list(title = "", x = "", y = ""), geom_path = F, labelsL = F) {
-  opls.ggplot_theme <- list(
+  opls.ggplot.theme <- list(
     if(!is.null(Samples.grp) & geom_path == T){geom_path(alpha = 0.4)},
     if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
     if(!is.null(Samples.grp)){aes(group = as.factor(get(Samples.grp)), color = as.factor(get(Samples.grp)))},
@@ -1023,7 +1023,7 @@ plot.theme.1 <- function(Samples.grp = NULL, Variables.grp = NULL, limits = NULL
     if(labelsL == T){geom_text(vjust = -0.8)},
     if(Legend.L == F){theme(legend.position = 0)} else {theme(legend.position = c(0,0), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
   )
-  return(opls.ggplot_theme)
+  return(opls.ggplot.theme)
 }
 
 
@@ -1083,6 +1083,15 @@ datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
 }
 
 
+require(ggplot2)
+ggplot_labels_90 <- theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 0.95))
+ggplot_labels_strip_0 <-   theme(strip.text.y = element_text(angle=0))
+ggplot_nox_labels <- theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+ggplot_noy_labels <- theme(axis.text.y = element_blank(), axis.ticks = element_blank())
+ggplot_no_labels <- ggplot_nox_labels + ggplot_noy_labels
+ggplot_theme_sly <- theme_classic() +  theme(axis.line.x = element_line(), axis.line.y = element_line())
+ggplot_theme <- theme_bw() + theme(panel.grid.minor = element_blank(),
+                                   panel.grid.major = element_blank())
 
 
 
