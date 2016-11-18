@@ -814,10 +814,7 @@ get_sign = function(model) {
 
 #' Check format of 3 levels list
 #'
-#' Check the format of 3 levels list :
-#' [[1]] samples.ID x variables.ID
-#' [[2]] samples.ID x sample.metadata (same order than rows in [[1]])
-#' [[3]] variables.ID x variable.metadata (same order than columns in [[1]])
+#' Check the format of 3 levels list.
 #' @param data Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
 #' @keywords list, check
 #' @export
