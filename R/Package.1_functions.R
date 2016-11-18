@@ -788,7 +788,32 @@ get_sign = function(model) {
 
 
 
+#' Import Excel file to list
+#'
+#' Import excel spreadsheet to a 3 levels list. This function doesn't work for big files because of memory issue with Java.
+#' @param filename Path to the excel file to import
+#' @return A 3 levels list
+#' @keywords list, import, excel
+#' @export
+#' @examples
+#' importWorksheets()
 
+importWorksheets <- function(filename) {
+  ## Sources : http://stackoverflow.com/questions/12945687/how-to-read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frame-e
+  require(XLConnect)
+  # filename: name of Excel file
+  workbook <- loadWorkbook(filename)
+  setMissingValue(workbook,  value = c("NA"))
+  sheet_names <- getSheets(workbook)
+  names(sheet_names) <- sheet_names
+  sheet_list <- lapply(sheet_names, function(.sheet){
+    readWorksheet(object=workbook, .sheet)})
+  sheet_list <- lapply(sheet_list, function(x) {
+    rownames(x) <- x[,1]
+    x <- x[-1]
+  })
+  return(sheet_list)
+}
 
 
 
@@ -801,7 +826,6 @@ get_sign = function(model) {
 #' @export
 #' @examples
 #' check.list.format()
-#'
 
 check.list.format <- function (data) {
   if(!is.list(List.Result)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}

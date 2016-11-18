@@ -14,7 +14,6 @@ Check the format of 3 levels list.
 }
 \examples{
 check.list.format()
-
 }
 \keyword{check}
 \keyword{list,}
