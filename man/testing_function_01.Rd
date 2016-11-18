@@ -13,4 +13,5 @@ testing_function_01(x)
 This function is just a test for R package creation.
 }
 \keyword{Test}
+\keyword{testing_function_01()}
 

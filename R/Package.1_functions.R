@@ -3,9 +3,8 @@
 #' This function is just a test for R package creation.
 #' @param x Must be numeric
 #' @keywords Test
-#' @export
 #' testing_function_01()
-
+#' @export
 testing_function_01 <- function(x){
   if (is.numeric(x)==FALSE){
     stop("Please give me numeric to eat !")
