@@ -470,25 +470,7 @@ xcms_orbi_A2 <- function(File_list,
 
 
 
-#' splitdf
-#'
-#' Split a dataframe in two.
-#' @param dataframe a dataframe to subset.
-#' @param p the proportion of data to keep in trainset
-#' @param seed the seed number for repetability (same seed will generate same subset for a given dataframe).
-#' @keywords dataframe, training, subset
-#' @return A list with [1] trainset dataframe, [2] testset dataframe.
-#' @usage splitdf(cars, p = 0.5, seed = 95687)
-#' @export
 
-splitdf <- function(dataframe, p = 0.5, seed = 95687) {
-  if (!is.null(seed)) set.seed(seed)
-  index <- 1:nrow(dataframe)
-  trainindex <- sample(index, trunc(length(index)*p))
-  trainset <- dataframe[trainindex, ]
-  testset <- dataframe[-trainindex, ]
-  return(list(trainset=trainset,testset=testset))
-}
 
 
 #' xcms_orbi_Results
@@ -865,10 +847,66 @@ data.subset <- function(data, Var.sel = NULL, Samples.sel = NULL) {
 }
 
 
+#' Split a dataframe
+#'
+#' Split a dataframe in two.
+#' @param dataframe a dataframe to subset.
+#' @param p the proportion of data to keep in trainset
+#' @param seed the seed number for repetability (same seed will generate same subset for a given dataframe).
+#' @keywords dataframe, training, subset
+#' @return A list with [1] trainset dataframe, [2] testset dataframe.
+#' @usage splitdf(cars, p = 0.5, seed = 95687)
+#' @export
+#' @example
+#' splitdf()
+
+splitdf <- function(dataframe, p = 0.5, seed = 95687) {
+  if (!is.null(seed)) set.seed(seed)
+  index <- 1:nrow(dataframe)
+  trainindex <- sample(index, trunc(length(index)*p))
+  trainset <- dataframe[trainindex, ]
+  testset <- dataframe[-trainindex, ]
+  return(list(trainset=trainset,testset=testset))
+}
 
 
+#' Write CSV for Excel Fr
+#'
+#' Write a csv directly sees as a table by excel
+#' @param data Dataframe to save
+#' @param file File path and name
+#' @keywords dataframe, excel, save
+#' @return Write a csv file
+#' @usage write.csv3(data, file = "./Results/Table_x.csv")
+#' @export
+#' @example
+#' write.csv3()
+write.csv3 <- function(data, file) {
+  write.table(data, file = file,
+              sep = ";",
+              dec = ".",
+              append = F,
+              qmethod = "double",
+              row.names = FALSE)
+}
 
 
-
-
+#' Save file for GALAXY
+#'
+#' Write 3 csv files from a three levels list to import in GALAXY
+#' @param x 3 levels list
+#' @param pref Prefix to add
+#' @keywords list, galaxy, export
+#' @return Write 3 csv file on disk
+#' @usage galaxy.save.list(data.list)
+#' @export
+#' @example
+#' galaxy.save.list()
+galaxy.save.list <- function(x, pref = "GALAXY-"){
+  List.format.check(x)
+  temp <- t(x[[1]])
+  write.table(data.frame("dataMatrix" = rownames(temp), temp), file = paste0(Results.path, pref, "Datamatrix.csv"), sep = "\t", quote = F, row.names = F)
+  write.table(data.frame("sampleMetadata" = rownames(x[[2]]), x[[2]]), file = paste0(Results.path, pref, "SampleMetadata.csv"), sep = "\t", quote = F, row.names = F)
+  write.table(data.frame("variableMetadata" = rownames(x[[3]]), x[[3]]), file = paste0(Results.path, pref, "VariableMetadata.csv"), sep = "\t", quote = F, row.names = F)
+}
 
