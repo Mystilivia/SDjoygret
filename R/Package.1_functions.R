@@ -934,3 +934,125 @@ galaxy.save.list <- function(x, Results.path = "./", pref = "GALAXY-"){
   write.table(data.frame("variableMetadata" = rownames(x[[3]]), x[[3]]), file = paste0(Results.path, pref, "VariableMetadata.csv"), sep = "\t", quote = F, row.names = F)
 }
 
+
+#' Get legend of a ggplot
+#'
+#' Get the legend of a ggplot to draw it externaly & draw it as grob.
+#' @param a.gplot A ggplot
+#' @keywords legend, ggplot
+#' @return Write 3 csv file on disk
+#' @usage galaxy.save.list(data.list)
+#' @export
+#' @examples
+#' g_legend()
+g_legend <- function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  legend
+}
+
+
+#' Find scales for plots
+#'
+#' Return the limits of two vectors centered on 0 and with a 10 % margin.
+#' @param x Values on the x axis
+#' @param y Values on the y axis
+#' @keywords scales, ggplot
+#' @return 4 numerics with max and min value for x and y
+#' @usage find.limits(x,y)
+#' @export
+#' @examples
+#' find.limits()
+find.limits <- function(x,y) {
+  temp.list <- rbind(c(max(abs(x))*-1.1, max(abs(x))*1.1),
+                     c(max(abs(y))*-1.1, max(abs(y))*1.1))
+  return(temp.list)
+}
+
+
+#' Semi-automatic ggplot theme
+#'
+#' Returns the ploting parameters according to input, with working default for missing ones.
+#' Used for custom ggplot of multivariate results (pca, pls, opls)
+#' @param Samples.grp Name of the grouping factor for samples
+#' @param Variables.grp Name of the grouping factor for variables
+#' @param limits Limits of the axis (returned by find.limits)
+#' @param Legend.L Logical to draw legend
+#' @param colorL Logical to use color or grey scale
+#' @param labels list for titles (title, x, y)
+#' @param geom_path Logical for drawing path
+#' @param labelsL Add labels to points
+#' @keywords scales, ggplot
+#' @return ggplot list of aestethic
+#' @export
+#' @examples
+#' plot.theme.1()
+plot.theme.1 <- function(Samples.grp = NULL, Variables.grp = NULL, limits = NULL, Legend.L = T, colorL = F, labels = list(title = "", x = "", y = ""), geom_path = F, labelsL = F) {
+  opls.ggplot_theme <- list(
+    if(!is.null(Samples.grp) & geom_path == T){geom_path(alpha = 0.4)},
+    if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
+    if(!is.null(Samples.grp)){aes(group = as.factor(get(Samples.grp)), color = as.factor(get(Samples.grp)))},
+    if(!is.null(Variables.grp)){aes(color = as.factor(get(Variables.grp)))},
+    if(!is.null(Variables.grp)){labs(color = Variables.grp)},
+    if(colorL == F) {scale_colour_grey()},
+    geom_hline(yintercept = 0, linetype = 2, color = "grey"),
+    geom_vline(xintercept = 0, linetype = 2, color = "grey"),
+    geom_point(alpha = 0.8),
+    if(!is.null(limits)){xlim(limits[1,1], limits[1,2])},
+    if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
+    ggplot_theme,
+    labs(labels),
+    if(labelsL == T){geom_text(vjust = -0.8)},
+    if(Legend.L == F){theme(legend.position = 0)} else {theme(legend.position = c(0,0), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
+  )
+  return(opls.ggplot_theme)
+}
+
+
+#' Perform PCA and custom plot
+#'
+#' Perform a PCA analysis on a 3 levels list and create custom plot.
+#' @param Data.list A 3 levels list with the data
+#' @param Samples.grp Factor name used for grouping samples (affect plot only)
+#' @param Variables.grp Factor name used for grouping variables (affect plot only)
+#' @param Legend.L Logical for drawing legends
+#' @param colorL Logical for using color or greyscale
+#' @param Samp.lab.L Logical for drawing Sample labels
+#' @param Var.lab.L Logical for drawing Variable labels
+#' @keywords pca, ggplot
+#' @return A list with [1] pca results, [2] plot as grobs.
+#' @export
+#' @examples
+#' datamatrix.pca()
+datamatrix.pca <- function (Data.list, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F, colorL = F, Samp.lab.L = F, Var.lab.L = T) {
+  require(ropls) ; require(ggplot2) ; require(gridExtra)
+  temp.pca <- opls(Data.list[[1]], predI = 2, plotL = F)
+  temp.scores <- merge(Data.list[[2]], data.frame(temp.pca$scoreMN), by.x = 0, by.y = 0)
+  limits1 <- find.limits(temp.scores$p1,temp.scores$p2)
+  temp.loadings <- merge(Data.list[[3]], data.frame(temp.pca$loadingMN), by.x = 0, by.y = 0)
+  limits2 <- find.limits(temp.loadings$p1,temp.loadings$p2)
+  ## plot variables
+  labels1 <- list(title = paste0("Scores plot ", temp.pca$descriptionMC[1], " samples\n(", temp.pca$descriptionMC[4], " missing values)"),
+                  x = paste0("p1 (", temp.pca$modelDF$R2X[1]*100, " %)"),
+                  y = paste0("p2 (", temp.pca$modelDF$R2X[2]*100, " %)"))
+  labels2 <- list(title = paste0("Loadings plot\n", temp.pca$descriptionMC[2], " variables (", temp.pca$descriptionMC[3], " excluded)"),
+                  x = paste0("p1 (", temp.pca$modelDF$R2X[1]*100, " %)"),
+                  y = paste0("p2 (", temp.pca$modelDF$R2X[2]*100, " %)"))
+  ## plots
+  plot1 <- ggplot(temp.scores, aes(p1, p2)) +
+    plot.theme.1(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = Samp.lab.L)
+  plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
+    plot.theme.1(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
+  ## Result
+  return(list("PCA" = temp.pca, "Plot" = grid.arrange(plot1, plot2, nrow = 1 )))
+}
+
+
+
+
+
+
+
+
+
