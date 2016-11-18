@@ -4,7 +4,7 @@
 #' @param x Must be numeric
 #' @keywords Test
 #' @export
-#' testing_function_01(1)
+#' testing_function_01()
 
 testing_function_01 <- function(x){
   if (is.numeric(x)==FALSE){
