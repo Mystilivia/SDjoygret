@@ -803,3 +803,64 @@ get_sign = function(model) {
 }
 
 
+###############################
+
+#' check.list.format
+#'
+#' Check the format of 3 levels list :
+#' [[1]] samples.ID x variables.ID
+#' [[2]] samples.ID x sample.metadata (same order than rows in [[1]])
+#' [[3]] variables.ID x variable.metadata (same order than columns in [[1]])
+#' @param data Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
+#' @keywords list, check
+#' @examples
+#' check.list.format(Data.list)
+
+check.list.format <- function (data) {
+  if(!is.list(List.Result)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
+  if(FALSE %in% c(lapply(List.Result, class) == "data.frame")){stop("List levels should be data.frame")}
+  if(!identical(colnames(List.Result[[1]]), rownames(List.Result[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+  if(!identical(rownames(List.Result[[1]]), rownames(List.Result[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
+  dim.temp <- lapply(List.Result, dim)
+  if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
+  if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
+  print("Data seems OK")
+}
+
+
+#' data.subset
+#'
+#' Subset a list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
+#' [[1]] samples.ID x variables.ID
+#' [[2]] samples.ID x sample.metadata (same order than rows in [[1]])
+#' [[3]] variables.ID x variable.metadata (same order than columns in [[1]])
+#' @param data list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
+#' @param Var.sel vector of variable to subset (rownames) from [[3]]
+#' @param Samples.sel vector of samples to subset (rownames) from [[2]]
+#' @keywords subset, list
+#' @examples
+#' data.subset(data, Var.sel = c(1,4,5,8), Samples.sel = c(1,8,9,15))
+
+data.subset <- function(data, Var.sel = NULL, Samples.sel = NULL) {
+  check.list.format(data)
+  temp.data <- data
+  if(!is.null(Samples.sel)){
+    temp.data[[2]] <- subset(temp.data[[2]], rownames(temp.data[[2]]) %in% Samples.sel)}
+  if(!is.null(Var.sel)){
+    temp.data[[3]] <- subset(temp.data[[3]], rownames(temp.data[[3]]) %in% Var.sel)}
+  if(length(data)==3){
+    temp.data[[1]] <- subset(temp.data[[1]], rownames(temp.data[[1]]) %in% rownames(temp.data[[2]]), select = rownames(temp.data[[3]]))
+    return(temp.data)} else {
+      warning("No Variable metadata")
+      temp.data[[1]] <- subset(temp.data[[1]], rownames(temp.data[[1]]) %in% rownames(temp.data[[2]]))
+      return(temp.data)}
+}
+
+
+
+
+
+
+
+
+
