@@ -1078,7 +1078,7 @@ datamatrix.pca <- function (Data.list, Samples.grp = NULL, Variables.grp = NULL,
 #' datamatrix.transform()
 datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
   temp.data <- data.frame(apply(data, 2, function(x) {x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}))
-  if(isTRUE(TransL)) {return(Trans.fun(x, ...))}
+  if(isTRUE(TransL)) {return(Trans.fun(data, ...))}
   return(temp.data)
 }
 
