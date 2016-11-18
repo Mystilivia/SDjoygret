@@ -1027,6 +1027,119 @@ plot.theme.1 <- function(Samples.grp = NULL, Variables.grp = NULL, limits = NULL
 }
 
 
+
+
+
+
+
+
+
+#' Overview of 3 level datas
+#'
+#' Perform a quick analysis of a 3 levels list by showing for each variables : the average value,
+#' the Coefficient of Variation, the skew and the percentage of zero values. Calculations is done by
+#' grouping factors for each variables and returned in a list with the plot.
+#' @param data 3 levels list of dataframe
+#' @param var2.names vector of grouping factors names
+#' @param IC Logical for IC95 calculation (could be slow if true)
+#' @param plotL Logical for generating plot
+#' @param alpha Transparency value of graphs
+#' @param labels list of graph labels (title, x, y)
+#' @param x.labL Logical for showing point labels
+#' @keywords summary, graph
+#' @return Return a list with the calculations results as a data frame and the plot if asked.
+#' @export
+#' @examples
+#' datamatrix.summary()
+datamatrix.summary <- function(data,
+                               var2.names = NULL,
+                               IC = F,
+                               plotL = F,
+                               alpha = 0.2,
+                               labels = list(title = "", x = "", y = ""),
+                               x.labL = F) {
+  require(reshape2) ; require(plyr) ; require(dplyr)
+  temp.data.0 <- merge(data[[2]][var2.names], data[[1]], by = 0)
+  temp.data <- melt(temp.data.0[-1], id.vars = var2.names, value.name = "value", variable.name = "variable")
+  if(IC == T){
+    temp.data.summary <- ddply(temp.data, c(var2.names, "variable"), summarise,
+                               "N" = length(value),
+                               "NA" = length(which(is.na(temp.data[[1]]) == T)),
+                               "Zero" = length(which(value == 0)),
+                               "Perc_Zero" = round(Zero * 100 / N, 3),
+                               "Avg" = round(mean(value, na.rm = T), 3),
+                               "Median" = round(median(value, na.rm = T), 3),
+                               "Sum" = round(sum(value, na.rm = T), 3),
+                               "Min" = round(min(value, na.rm = T), 3),
+                               "Max" = round(max(value, na.rm = T), 3),
+                               "SD" = round(sd(value, na.rm = T), 3),
+                               "CV" = round(SD*100/Avg, 3),
+                               "IC95_min_manual" = round(Avg-2*(SD/N), 3),
+                               "IC95_max_manual" = round(Avg+2*(SD/N), 3),
+                               "Skew" = round(e1071::skewness(value, na.rm = T), 3),
+                               "Avg_IC95_min" = round(t.test(na.omit(value))$conf.int[1], 3),
+                               "Avg_IC95_max" = round(t.test(na.omit(value))$conf.int[2], 3),
+                               "Quant1" = round(quantile(value, na.rm = T)[1], 3),
+                               "Quant2" = round(quantile(value, na.rm = T)[2], 3),
+                               "Quant3" = round(quantile(value, na.rm = T)[3], 3),
+                               "Quant4" = round(quantile(value, na.rm = T)[4], 3)
+    )
+  } else {
+    temp.data.summary <- ddply(temp.data, c(var2.names, "variable"), summarise,
+                               "N" = length(value),
+                               "NA" = length(which(is.na(temp.data[[1]]) == T)),
+                               "Zero" = length(which(value == 0)),
+                               "Perc_Zero" = round(Zero * 100 / N, 3),
+                               "Avg" = round(mean(value, na.rm = T), 3),
+                               "Median" = round(median(value, na.rm = T), 3),
+                               "Sum" = round(sum(value, na.rm = T), 3),
+                               "Min" = round(min(value, na.rm = T), 3),
+                               "Max" = round(max(value, na.rm = T), 3),
+                               "SD" = round(sd(value, na.rm = T), 3),
+                               "CV" = round(SD*100/Avg, 3),
+                               "IC95_min_manual" = round(Avg-2*(SD/N), 3),
+                               "IC95_max_manual" = round(Avg+2*(SD/N), 3),
+                               "Skew" = round(e1071::skewness(value, na.rm = T), 3)
+    )
+  }
+  if(plotL == T) {
+    require(ggplot2)
+    # Data prep
+    temp.data.1 <- subset(temp.data.summary, select = c("variable", "Avg", "CV", "Skew", "Perc_Zero"))
+    temp.plot <- melt(temp.data.1, variable.name = "Measure")
+    temp.plot$variable <- factor(temp.plot$variable, levels = levels(reorder(temp.data.summary$variable, temp.data.summary$Avg)))
+    # plot variables
+    x <- "variable"
+    y <- "value"
+    group <- "Measure"
+    yline <- rbind(data.frame("Measure" = "Skew", "yint" = c(0,-1,1), "color_var" = c("black", "red", "blue")),
+                   data.frame("Measure" = "Perc_Zero", "yint" = c(50, 0, 100), "color_var" = c("black", "red", "blue")))
+    # plot
+    plot1 <- ggplot(temp.plot, aes(x = get(x), y = get(y), ymin = 0, ymax = get(y), color = get(group))) +
+      geom_hline(data = yline, aes(yintercept = yint), color = yline$color_var, linetype = 2, alpha = alpha) +
+      geom_pointrange(alpha = alpha, size = 0.02) +
+      facet_grid(paste0(group, "~."), scale = "free_y") +
+      ggplot_SD.theme +
+      theme(legend.position = 0) +
+      labs(labels)
+    if(x.labL == F){
+      plot1 <- plot1 + ggplot_SD_nox_lab
+    } else {
+      plot1 <- plot1 + ggplot_SD_lab90
+    }
+    return(list("Data" = temp.data.summary, "Plot" = plot1))
+  }
+  return(list("Data" = temp.data.summary))
+}
+
+
+
+
+
+
+
+
+
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
@@ -1088,11 +1201,11 @@ datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
 
 
 require(ggplot2)
-ggplot_labels_90 <- theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 0.95))
+ggplot_SD_lab90 <- theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 0.95))
 ggplot_labels_strip_0 <-   theme(strip.text.y = element_text(angle=0))
-ggplot_nox_labels <- theme(axis.text.x = element_blank(), axis.ticks = element_blank())
-ggplot_noy_labels <- theme(axis.text.y = element_blank(), axis.ticks = element_blank())
-ggplot_no_labels <- ggplot_nox_labels + ggplot_noy_labels
+ggplot_SD_nox_lab <- theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+ggplot_SD_noy_lab <- theme(axis.text.y = element_blank(), axis.ticks = element_blank())
+ggplot_no_labels <- ggplot_SD_nox_lab + ggplot_SD_noy_lab
 ggplot_theme_sly <- theme_classic() +  theme(axis.line.x = element_line(), axis.line.y = element_line())
 ggplot_SD.theme <- theme_bw() + theme(panel.grid.minor = element_blank(),
                                    panel.grid.major = element_blank())
