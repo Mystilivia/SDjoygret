@@ -37,6 +37,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## To install the package
 - devtools::install_github("Mystilivia/SDjoygret")
+- require(SDjoygret)
 
 ```{r Compile documentation, warning=FALSE, include=FALSE}
 library(devtools)

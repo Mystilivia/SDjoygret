@@ -803,7 +803,14 @@ get_sign = function(model) {
 }
 
 
-###############################
+
+
+
+
+
+
+
+
 
 #' check.list.format
 #'
@@ -815,6 +822,8 @@ get_sign = function(model) {
 #' @keywords list, check
 #' @examples
 #' check.list.format(Data.list)
+#' @export
+#'
 
 check.list.format <- function (data) {
   if(!is.list(List.Result)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
@@ -840,6 +849,8 @@ check.list.format <- function (data) {
 #' @keywords subset, list
 #' @examples
 #' data.subset(data, Var.sel = c(1,4,5,8), Samples.sel = c(1,8,9,15))
+#' @export
+#'
 
 data.subset <- function(data, Var.sel = NULL, Samples.sel = NULL) {
   check.list.format(data)
