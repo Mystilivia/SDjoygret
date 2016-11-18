@@ -2,7 +2,7 @@
 % Please edit documentation in R/Package.1_functions.R
 \name{check.list.format}
 \alias{check.list.format}
-\title{check.list.format}
+\title{Check format of 3 levels list}
 \usage{
 check.list.format(data)
 }
@@ -16,7 +16,8 @@ Check the format of 3 levels list :
 [[3]] variables.ID x variable.metadata (same order than columns in [[1]])
 }
 \examples{
-check.list.format(Data.list)
+check.list.format()
+
 }
 \keyword{check}
 \keyword{list,}

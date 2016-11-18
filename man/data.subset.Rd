@@ -2,7 +2,7 @@
 % Please edit documentation in R/Package.1_functions.R
 \name{data.subset}
 \alias{data.subset}
-\title{data.subset}
+\title{Subset list}
 \usage{
 data.subset(data, Var.sel = NULL, Samples.sel = NULL)
 }
@@ -20,7 +20,8 @@ Subset a list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]
 [[3]] variables.ID x variable.metadata (same order than columns in [[1]])
 }
 \examples{
-data.subset(data, Var.sel = c(1,4,5,8), Samples.sel = c(1,8,9,15))
+data.subset()
+
 }
 \keyword{list}
 \keyword{subset,}

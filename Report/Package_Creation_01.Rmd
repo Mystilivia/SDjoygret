@@ -44,6 +44,10 @@ library(devtools)
 document()
 ```
 
+```{r}
+devtools::install_github("Mystilivia/SDjoygret")
+require(SDjoygret)
+```
 
 
 

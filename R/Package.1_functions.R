@@ -812,7 +812,7 @@ get_sign = function(model) {
 
 
 
-#' check.list.format
+#' Check format of 3 levels list
 #'
 #' Check the format of 3 levels list :
 #' [[1]] samples.ID x variables.ID
@@ -820,9 +820,9 @@ get_sign = function(model) {
 #' [[3]] variables.ID x variable.metadata (same order than columns in [[1]])
 #' @param data Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
 #' @keywords list, check
-#' @examples
-#' check.list.format(Data.list)
 #' @export
+#' @examples
+#' check.list.format()
 #'
 
 check.list.format <- function (data) {
@@ -837,7 +837,7 @@ check.list.format <- function (data) {
 }
 
 
-#' data.subset
+#' Subset list
 #'
 #' Subset a list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
 #' [[1]] samples.ID x variables.ID
@@ -847,9 +847,9 @@ check.list.format <- function (data) {
 #' @param Var.sel vector of variable to subset (rownames) from [[3]]
 #' @param Samples.sel vector of samples to subset (rownames) from [[2]]
 #' @keywords subset, list
-#' @examples
-#' data.subset(data, Var.sel = c(1,4,5,8), Samples.sel = c(1,8,9,15))
 #' @export
+#' @examples
+#' data.subset()
 #'
 
 data.subset <- function(data, Var.sel = NULL, Samples.sel = NULL) {
