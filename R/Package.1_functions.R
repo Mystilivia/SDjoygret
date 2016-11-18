@@ -787,9 +787,10 @@ get_sign = function(model) {
 
 
 
-#' Import Excel file to list
+#' Import Excel file to list (XLConnect)
 #'
-#' Import excel spreadsheet to a 3 levels list. This function doesn't work for big files because of memory issue with Java.
+#' Import excel spreadsheet to a 3 levels list. This function doesn't work for big files because of
+#' memory issue with Java (using package XLConnect). Try importWorksheets.2 if this one doesn't work.
 #' @param filename Path to the excel file to import
 #' @return A 3 levels list
 #' @keywords list, import, excel
@@ -797,7 +798,7 @@ get_sign = function(model) {
 #' @examples
 #' importWorksheets()
 
-importWorksheets <- function(filename) {
+importWorksheets.1 <- function(filename) {
   ## Sources : http://stackoverflow.com/questions/12945687/how-to-read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frame-e
   require(XLConnect)
   # filename: name of Excel file
@@ -815,6 +816,25 @@ importWorksheets <- function(filename) {
 }
 
 
+#' Import Excel file to list
+#'
+#' Import each sheet of an excel file to a list. This function use the readxl package, which seems
+#' to handle large files.
+#' @param Data.path Path to the excel file to import
+#' @return A list of dataframe
+#' @keywords list, import, excel
+#' @export
+#' @examples
+#' importWorksheets.2()
+importWorksheets.2 <- function(Data.path) {
+  require (readxl)
+  Sheet.names <- excel_sheets(Data.path)
+  data.list <- list()
+  for (i in Sheet.names) {
+    data.list[[i]] <- read_excel(Data.path, sheet = i)
+  }
+  return(data.list)
+}
 
 
 #' Check format of 3 levels list
