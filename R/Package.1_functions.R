@@ -1066,10 +1066,49 @@ datamatrix.pca <- function (Data.list, Samples.grp = NULL, Variables.grp = NULL,
 }
 
 
+#' Transform a datamatrix and replace zero
+#'
+#' Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).
+#' @param data Argument description
+#' @param data Argument description
+#' @keywords x1, x2, x3
+#' @return result of the function
+#' @export
+#' @examples
+#' datamatrix.transform()
+datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
+  temp.data <- data.frame(apply(data, 2, function(x) {x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}))
+  if(isTRUE(TransL)) {return(Trans.fun(x, ...))}
+  return(temp.data)
+}
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+#' TITLE
+#'
+#' Description of the function
+#' @param x Argument description
+#' @keywords x1, x2, x3
+#' @return result of the function
+#' @export
+#' @examples
+#' test()
+test <- function(x) {
+  print(x)
+}
 
 
 
