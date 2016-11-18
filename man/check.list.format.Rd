@@ -9,6 +9,9 @@ check.list.format(data)
 \arguments{
 \item{data}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}
 }
+\value{
+Result of check as character
+}
 \description{
 Check the format of 3 levels list.
 }

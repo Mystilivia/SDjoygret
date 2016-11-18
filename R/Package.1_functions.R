@@ -841,6 +841,7 @@ importWorksheets.2 <- function(Data.path) {
 #'
 #' Check the format of 3 levels list.
 #' @param data Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
+#' @return Result of check as character
 #' @keywords list, check
 #' @export
 #' @examples
