@@ -1018,7 +1018,7 @@ plot.theme.1 <- function(Samples.grp = NULL, Variables.grp = NULL, limits = NULL
     geom_point(alpha = 0.8),
     if(!is.null(limits)){xlim(limits[1,1], limits[1,2])},
     if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
-    ggplot_theme,
+    ggplot_SD.theme,
     labs(labels),
     if(labelsL == T){geom_text(vjust = -0.8)},
     if(Legend.L == F){theme(legend.position = 0)} else {theme(legend.position = c(0,0), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
@@ -1083,6 +1083,10 @@ datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
 }
 
 
+
+
+
+
 require(ggplot2)
 ggplot_labels_90 <- theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 0.95))
 ggplot_labels_strip_0 <-   theme(strip.text.y = element_text(angle=0))
@@ -1090,7 +1094,7 @@ ggplot_nox_labels <- theme(axis.text.x = element_blank(), axis.ticks = element_b
 ggplot_noy_labels <- theme(axis.text.y = element_blank(), axis.ticks = element_blank())
 ggplot_no_labels <- ggplot_nox_labels + ggplot_noy_labels
 ggplot_theme_sly <- theme_classic() +  theme(axis.line.x = element_line(), axis.line.y = element_line())
-ggplot_theme <- theme_bw() + theme(panel.grid.minor = element_blank(),
+ggplot_SD.theme <- theme_bw() + theme(panel.grid.minor = element_blank(),
                                    panel.grid.major = element_blank())
 
 
