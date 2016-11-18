@@ -12,8 +12,5 @@ testing_function_01(x)
 \description{
 This function is just a test for R package creation.
 }
-\examples{
-testing_function_01(1)
-}
 \keyword{Test}
 

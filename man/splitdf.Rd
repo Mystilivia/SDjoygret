@@ -2,7 +2,7 @@
 % Please edit documentation in R/Package.1_functions.R
 \name{splitdf}
 \alias{splitdf}
-\title{splitdf}
+\title{Split a dataframe}
 \usage{
 splitdf(cars, p = 0.5, seed = 95687)
 }
@@ -18,6 +18,9 @@ A list with [1] trainset dataframe, [2] testset dataframe.
 }
 \description{
 Split a dataframe in two.
+}
+\examples{
+splitdf()
 }
 \keyword{dataframe,}
 \keyword{subset}

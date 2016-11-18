@@ -4,7 +4,6 @@
 #' @param x Must be numeric
 #' @keywords Test
 #' @export
-#' @examples
 #' testing_function_01(1)
 
 testing_function_01 <- function(x){
@@ -857,7 +856,7 @@ data.subset <- function(data, Var.sel = NULL, Samples.sel = NULL) {
 #' @return A list with [1] trainset dataframe, [2] testset dataframe.
 #' @usage splitdf(cars, p = 0.5, seed = 95687)
 #' @export
-#' @example
+#' @examples
 #' splitdf()
 
 splitdf <- function(dataframe, p = 0.5, seed = 95687) {
@@ -872,14 +871,14 @@ splitdf <- function(dataframe, p = 0.5, seed = 95687) {
 
 #' Write CSV for Excel Fr
 #'
-#' Write a csv directly sees as a table by excel
+#' Write a csv directly sees as a table by excel.
 #' @param data Dataframe to save
 #' @param file File path and name
 #' @keywords dataframe, excel, save
 #' @return Write a csv file
 #' @usage write.csv3(data, file = "./Results/Table_x.csv")
 #' @export
-#' @example
+#' @examples
 #' write.csv3()
 write.csv3 <- function(data, file) {
   write.table(data, file = file,
@@ -893,16 +892,17 @@ write.csv3 <- function(data, file) {
 
 #' Save file for GALAXY
 #'
-#' Write 3 csv files from a three levels list to import in GALAXY
+#' Write 3 csv files from a three levels list to import in GALAXY.
 #' @param x 3 levels list
+#' @param Results.path Saving path
 #' @param pref Prefix to add
 #' @keywords list, galaxy, export
 #' @return Write 3 csv file on disk
 #' @usage galaxy.save.list(data.list)
 #' @export
-#' @example
+#' @examples
 #' galaxy.save.list()
-galaxy.save.list <- function(x, pref = "GALAXY-"){
+galaxy.save.list <- function(x, Results.path = "./", pref = "GALAXY-"){
   List.format.check(x)
   temp <- t(x[[1]])
   write.table(data.frame("dataMatrix" = rownames(temp), temp), file = paste0(Results.path, pref, "Datamatrix.csv"), sep = "\t", quote = F, row.names = F)
