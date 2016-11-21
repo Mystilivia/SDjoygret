@@ -986,7 +986,7 @@ dlist.summary <- function(dlist,
 #' @examples
 #' dlist.summary.2()
 dlist.summary.2 <- function(dlist,
-                            var2names = NULL,
+                            var2names = c("Genotype", "Day", "Nitrogen"),
                             plotL = F,
                             alpha = 0.2,
                             labels = list(title = "", x = "", y = ""),
@@ -1014,9 +1014,11 @@ dlist.summary.2 <- function(dlist,
   if(plotL == T) {
     require(ggplot2)
     # Data prep
-    temp.data.1 <- subset(temp.summary, select = c("variable", "Avg", "CV", "Skew", "Perc_Zero"))
-    temp.plot <- melt(temp.data.1, variable.name = "Measure")
-    temp.plot$variable <- factor(temp.plot$variable, levels = levels(reorder(temp.summary$variable, temp.summary$Avg)))
+    temp.plot <- select(ungroup(temp.summary), variable, Avg, CV, Skew, Perc_Zero) %>%
+      arrange(Avg) %>%
+      gather(Measure, value, -variable) %>%
+      group_by(Measure)
+
     # plot variables
     x <- "variable"
     y <- "value"
@@ -1040,7 +1042,6 @@ dlist.summary.2 <- function(dlist,
   }
   return(list("Data" = temp.summary))
 }
-
 
 
 

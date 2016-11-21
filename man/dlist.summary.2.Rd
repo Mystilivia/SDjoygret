@@ -4,8 +4,9 @@
 \alias{dlist.summary.2}
 \title{dlist.summary.2}
 \usage{
-dlist.summary.2(dlist, var2names = NULL, plotL = F, alpha = 0.2,
-  labels = list(title = "", x = "", y = ""), x.labL = F)
+dlist.summary.2(dlist, var2names = c("Genotype", "Day", "Nitrogen"),
+  plotL = F, alpha = 0.2, labels = list(title = "", x = "", y = ""),
+  x.labL = F)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
