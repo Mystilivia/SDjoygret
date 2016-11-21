@@ -4,10 +4,12 @@
 \alias{dlist.summary.2}
 \title{dlist.summary.2}
 \usage{
-dlist.summary.2(dlist)
+dlist.summary.2(dlist, var2names = NULL)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
+
+\item{var2names}{List of grouping factor, if blank calculation while be done for eache variables.}
 }
 \value{
 result of the function

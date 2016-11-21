@@ -977,18 +977,19 @@ dlist.summary <- function(dlist,
 #' dlist.summary.2
 #'
 #' Description of the function
+#' @param var2names List of grouping factor, if blank calculation while be done for eache variables.
 #' @inheritParams dlist.subset
 #' @keywords x1, x2, x3
 #' @return result of the function
 #' @export
 #' @examples
 #' dlist.summary.2()
-dlist.summary.2 <- function(dlist){
+dlist.summary.2 <- function(dlist, var2names = NULL){
   require(dplyr) ; require(tidyr)
   dlist <- lapply(dlist, tbl_df)
   temp.summary <- bind_cols(dlist[[2]], dlist[[1]]) %>%
     gather_("Variable", "Value", names(dlist[[1]])) %>%
-    group_by_(temp.data.L, .dots = test) %>%
+    group_by_(.dots = c(var2names, "Variable")) %>%
     summarise("N" = length(Value),
               "NA" = length(which(is.na(Value) == T)),
               "Mean" = mean(Value),
@@ -1012,6 +1013,7 @@ dlist.summary.2 <- function(dlist){
               "Quant4" = round(quantile(Value, na.rm = T)[4], 3))
   return(temp.summary)
 }
+
 
 
 
