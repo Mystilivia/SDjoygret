@@ -50,7 +50,7 @@ xcms_orbi_GRT <- function(File_list,
   ## Package requirement
   require("xcms")
   require("ropls")
-
+  require("grDevices")
   ## Create directory and path
   Results.path.root <- paste0("./",Results.dir.name,"/")
   Results.path.rtgraph <- paste0(Results.path.root, "/RetCor_Dev/")
@@ -185,7 +185,7 @@ xcms_orbi_A <- function(File_list,
                         QCs_Graph        = FALSE) {
   ## Package requirement
   require("xcms")
-
+  require("grDevices")
   ## Create directory and path
 
   i <- 1
@@ -344,10 +344,8 @@ xcms_orbi_A2 <- function(File_list,
                         STDs_data        = NULL,
                         STDs_EIC         = FALSE,
                         QCs_Graph        = FALSE) {
-
   ## Package requirement
-  require("xcms") ; require("reshape2") ; require("ggplot2")
-
+  require("xcms") ; require("reshape2") ; require("ggplot2") ; require("grDevices")
   ## Create directory and path
   i <- 1
   Results.path.root <- paste0(Results.path, "XCMS_Result_", i, "/")
@@ -494,7 +492,7 @@ xcms_orbi_Results <- function(filled_peak_object,
                               Sample.Metadata,
                               PCA_group = c(1,2,3,4)){
   ## Package requirement
-  library("xcms")
+  library("xcms") ; require("grDevices")
 
   ## Create directory and path
   Results.path.root <- paste0("./", Results.dir.name, "/")
@@ -624,146 +622,6 @@ SD_batch_set <- function(Batch.files=Batch.files,
 }
 
 
-#' SD_files_class
-#'
-#' This function get multiple files path and name, and then parse the information into a dataframe,
-#' making files grouping by directory path easy.
-#' @param dir_path Origin directory pathway.
-#' @keywords Files, info
-#' @examples
-#' SD_files_class(dir_path = "./")
-#' @export
-#'
-SD_files_class <- function(dir_path) {
-  Files <- list.files("dir_path", recursive=T, full.names=T)
-  Files.str <- as.data.frame(read.table(textConnection(sub("*.mzXML","", x=Files)), sep="/"))
-  return(Files.str)
-}
-
-
-#' SD_pca
-#'
-#' Perform pca according to ropls method and save results in a folder.
-#' You can choose to color samples by factor or value contained in a sample metadata table.
-#' @param Data list with [[1]] Datamatrix [[2]] samples metadata
-#' @param Results.path.root Name for the results folder
-#' @param ropls_param Parameters to pass to ropls::opls function
-#' @param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
-#' @keywords pca
-#' @export
-#' @examples
-#' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F), factor_group = NULL)
-
-SD_pca <- function(Data_pca,
-                   Folder_name = "Default",
-                   ropls_param = list(predI = 2, plotL = F),
-                   factor_group = NULL
-                   )
-{
-  Results.path <- paste0("./", Folder_name, "/")
-  dir.create(Results.path, showWarnings = F)
-  require(ropls)
-  pca_result <- do.call(ropls::opls, append(list(x=(Data[[1]])), ropls_param))
-
-  png(filename = paste0(Results.path, "ACP_result.png"), height = 3 * 400, width = 2 * 400, units = "px", res = 100)
-  par(mfrow=c(3,2))
-  plot(pca_result, typeVc = "overview", parDevNewL = F)
-  plot(pca_result, typeVc = "x-loading", parDevNewL = F)
-  plot(pca_result, typeVc = "x-score", parDevNewL = F)
-  plot(pca_result, typeVc = "outlier", parDevNewL = F)
-  plot(pca_result, typeVc = "correlation", parDevNewL = F)
-  dev.off()
-  if (!is.null(factor_group) & is.data.frame(Data_pca[[2]])){
-    for (i in factor_group){
-      temp.factor <- Data_pca[[2]][,i]
-      temp.factor.names <- names(Data_pca[[2]][i])
-      png(filename=paste0(Results.path, "ACP_Ellipses_", temp.factor.names, ".png"), height = 800, width = 800, units = "px", res = 100)
-      plot(pca_result, typeVc = "x-score", parAsColFcVn=addNA(as.factor(temp.factor)), parEllipses = F, parDevNewL = F)
-      text(par()$usr[1]/1.2, par()$usr[3]/1.1, temp.factor.names)
-      dev.off()
-    }
-  }
-  return(invisible(pca_result))
-}
-
-
-#' SD_subset_zero
-#'
-#' Subset a dataframe containing numeric value by selecting column which have less than
-#' Z.Seuil percents of zero values.
-#' @param x Dataframe (a datamatrix) with only numeric values
-#' @param Z.Seuil Percentage threshold of zero values to accept for each variable
-#' @keywords pca
-#' @export
-#' @examples
-#' SD_subset_zero(Data[[1]], Z.Seuil = 50)
-
-SD_subset_zero <- function(x, Z.Seuil = 80) {
-  require(ggplot2)
-  ## Calculate percentage of zero value in each column
-  Zero.perc <- apply(x, 2, function(x) round(length(which(x == 0)) * 100 / length(x), 3))
-  Zero.perc.2 <- data.frame(Zero.perc)
-  ## Subset the selected column in the datamatrix
-  Zer.perc.var <- subset(data.frame(Zero.perc), Zero.perc <= Z.Seuil)
-  data.subset <- subset(x, select = rownames(Zer.perc.var))
-  ## Plot graph of results and selected thresold
-  Variable.Zero.Percentage.Plot <- ggplot(Zero.perc.2, aes(x = reorder(rownames(Zero.perc.2), Zero.perc))) +
-    geom_point(aes(y = Zero.perc, color = rownames(Zero.perc.2) %in% rownames(Zer.perc.var)), size = 3, shape=21, fill = "white") +
-    geom_hline(yintercept = Z.Seuil, color = "black", alpha = 0.5) +
-    ylim(0,100) +
-    theme(legend.position = 0) +
-    coord_flip()
-  ## Print results
-  print(paste0("Variable(s) selected : ", length(rownames(Zer.perc.var)), " on ", length(rownames(x))))
-  print(summary(Data.raw.zero.subset))
-  return(invisible(list("Data.Subset" = data.subset,
-                        "Zer.Perc" = Zero.perc,
-                        "Plot" = Variable.Zero.Percentage.Plot,
-                        "Zero.Threshold" = Z.Seuil)))
-}
-
-
-
-
-
-#' SD_data_sub
-#'
-#' Subset a list of three dataframes : [[1]] Datamatrix, [[2]] Samples.Metadata [[3]] Variable.Metadata.
-#' [[1]] With samples ids as rownames and variables ids as column names
-#' [[2]] Metadata of sample in column and samples ids as rownames (same order than rows in [[1]])
-#' [[3]] Variables metadata in column and variable ids as rownames (same order than columns in [[1]])
-#' @param Data list with [[1]] Datamatrix [[2]] samples metadata
-#' @param Results.path.root Name for the results folder
-#' @param ropls_param Parameters to pass to ropls::opls function
-#' @param factor_group vector of column(s) number/name of metadata table (in Data[[2]]) to use for grouping corcircles
-#' @keywords pca
-#' @examples
-#' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F), factor_group = NULL)
-
-Data_sub <- function(Data,
-                     col_select,
-                     ...)
-{
-  ## Check entry file
-  if (missing(Data)) stop("arg. Data is missing.")
-  if (!is.list(Data)) stop("arg. Data must be a list of two to three dataframe")
-  if (length(Data) < 2) stop("arg. Data must be a list of two to three dataframe")
-  if (length(Data) > 3) stop("arg. Data must be a list of two to three dataframe")
-  invisible(lapply(Data, function(x) if(!is.data.frame(x)) stop("arg. Data must be a list of dataframe")))
-  invisible(lapply(Data[[1]], function(x) if(!is.numeric(x)) stop("Data[[1]] need to be a matrix with numeric value")))
-
-  ## Filter by sample metadata
-  temp.choice <- c("A", "B")
-  col_name <-
-
-  Data.subset <- list()
-  Data.subset[[2]] <- subset(Data[[2]], colnames(Data[[2]]) %in% temp.choice)
-  Data.subset[[1]] <- subset(Data[[1]], rownames(Data[[1]]) %in% rownames(Data.subset[[2]]))
-  ## Filter by variable metadata
-  ## Filter by datamatrix values
-}
-
-
 #' get_sign
 #'
 #' Get the theoritical significance glm model.
@@ -806,34 +664,6 @@ check.list.format <- function (dlist) {
 }
 
 
-#' Import Excel file to list (XLConnect)
-#'
-#' Import excel spreadsheet to a 3 levels list. This function doesn't work for big files because of
-#' memory issue with Java (using package XLConnect). Try importWorksheets.2 if this one doesn't work.
-#' @param filename Path to the excel file to import
-#' @return A 3 levels list
-#' @keywords list, import, excel
-#' @export
-#' @examples
-#' importWorksheets()
-importWorksheets.1 <- function(filename) {
-  ## Sources : http://stackoverflow.com/questions/12945687/how-to-read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frame-e
-  require(XLConnect)
-  # filename: name of Excel file
-  workbook <- loadWorkbook(filename)
-  setMissingValue(workbook,  value = c("NA"))
-  sheet_names <- getSheets(workbook)
-  names(sheet_names) <- sheet_names
-  sheet_list <- lapply(sheet_names, function(.sheet){
-    readWorksheet(object=workbook, .sheet)})
-  sheet_list <- lapply(sheet_list, function(x) {
-    rownames(x) <- x[,1]
-    x <- x[-1]
-  })
-  return(sheet_list)
-}
-
-
 #' Import Excel file to list
 #'
 #' Import each sheet of an excel file to a list. This function use the readxl package, which seems
@@ -845,9 +675,9 @@ importWorksheets.1 <- function(filename) {
 #' @keywords list, import, excel
 #' @export
 #' @examples
-#' importWorksheets.2()
-importWorksheets.2 <- function(Data.path, fcolL = T) {
-  require (readxl)
+#' importWorksheets.xls()
+importWorksheets.xls <- function(Data.path, fcolL = T) {
+  require ("readxl")
   Sheet.names <- excel_sheets(Data.path)
   data.list <- list()
   for (i in Sheet.names) {
@@ -950,7 +780,7 @@ write.csv3 <- function(data,
 galaxy.save.list <- function(x,
                              Results.path = "./",
                              pref = "GALAXY-"){
-  List.format.check(x)
+  check.list.format(x)
   temp <- t(x[[1]])
   write.table(data.frame("dataMatrix" = rownames(temp), temp), file = paste0(Results.path, pref, "Datamatrix.csv"), sep = "\t", quote = F, row.names = F)
   write.table(data.frame("sampleMetadata" = rownames(x[[2]]), x[[2]]), file = paste0(Results.path, pref, "SampleMetadata.csv"), sep = "\t", quote = F, row.names = F)
