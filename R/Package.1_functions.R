@@ -1344,6 +1344,34 @@ data.ttest <- function(data,
 }
 
 
+#' 3 Levels list from xcmsSet Object
+#'
+#' Create a 3 levels list from the result of xcms integration.
+#' @param x xcmsSet Object
+#' @keywords 3levels.list, xcmsSet
+#' @return A 3 levels list (Datamatrix, SampleMetadata, VariableMetadata)
+#' @export
+#' @examples
+#' xcmsSet.Result.List()
+xcmsSet.Result.List <- function(x) {
+  if(class(x) != "xcmsSet"){stop("x must be an xcmsSet object")}
+  require(xcms)
+  PkTable <- peakTable(x)
+  Datamatrix <- data.frame(t(subset(PkTable, select = rownames(x@phenoData))))
+  rownames(PkTable) <- colnames(Datamatrix)
+  Variable.Metadata <- data.frame(subset(PkTable, select = !colnames(PkTable) %in% rownames(Datamatrix)))
+
+  list("Datamatrix" = Datamatrix,
+       "SampleMetadata" = x@phenoData,
+       "VariableMetadata" = Variable.Metadata)
+}
+
+
+
+
+
+
+
 
 
 #' TITLE
