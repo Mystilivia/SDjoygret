@@ -776,15 +776,15 @@ write.csv3 <- function(data,
 #' @usage galaxy.save.list(data.list)
 #' @export
 #' @examples
-#' galaxy.save.list()
-galadlisty.save.list <- function(dlist,
+#' galaxylist.save.list()
+galaxylist.save.list <- function(dlist,
                              Results.path = "./",
                              pref = "GALAdlistY-"){
   check.list.format(dlist)
   temp <- t(dlist[[1]])
-  write.table(data.frame("dataMatridlist" = rownames(temp), temp), file = paste0(Results.path, pref, "Datamatridlist.csv"), sep = "\t", quote = F, row.names = F)
-  write.table(data.frame("sampleMetadata" = rownames(dlist[[2]]), dlist[[2]]), file = paste0(Results.path, pref, "SampleMetadata.csv"), sep = "\t", quote = F, row.names = F)
-  write.table(data.frame("variableMetadata" = rownames(dlist[[3]]), dlist[[3]]), file = paste0(Results.path, pref, "VariableMetadata.csv"), sep = "\t", quote = F, row.names = F)
+  write.table(data.frame("Datamatrix" = rownames(temp), temp), file = paste0(Results.path, pref, "Datamatridlist.csv"), sep = "\t", quote = F, row.names = F)
+  write.table(data.frame("SampleMetadata" = rownames(dlist[[2]]), dlist[[2]]), file = paste0(Results.path, pref, "SampleMetadata.csv"), sep = "\t", quote = F, row.names = F)
+  write.table(data.frame("VariableMetadata" = rownames(dlist[[3]]), dlist[[3]]), file = paste0(Results.path, pref, "VariableMetadata.csv"), sep = "\t", quote = F, row.names = F)
 }
 
 
