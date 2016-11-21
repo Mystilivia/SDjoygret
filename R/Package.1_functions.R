@@ -770,10 +770,10 @@ write.csv3 <- function(data,
 #' Write 3 csv files from a three levels list to import in GALAXY.
 #' @param Results.path Saving path
 #' @param pref Prefix to add
-#' @inheritParams data.subset
+#' @inheritParams dlist.subset
 #' @keywords list, galaxy, export
 #' @return Write 3 csv file on disk
-#' @usage galaxy.save.list(data.list)
+#' @usage galaxy.save.list(data.list, Results.path = "./", pref = "GALAdlistY-")
 #' @export
 #' @examples
 #' galaxylist.save.list()

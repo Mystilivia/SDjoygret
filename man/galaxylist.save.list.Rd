@@ -4,9 +4,11 @@
 \alias{galaxylist.save.list}
 \title{Save file for GALAXY}
 \usage{
-galaxy.save.list(data.list)
+galaxy.save.list(data.list, Results.path = "./", pref = "GALAdlistY-")
 }
 \arguments{
+\item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
+
 \item{Results.path}{Saving path}
 
 \item{pref}{Prefix to add}
