@@ -997,7 +997,7 @@ find.limits <- function(x,
 
 #' Semi-automatic ggplot theme
 #'
-#' Returns the ploting parameters according to input, with working default for missing ones.
+#' \code{plot.theme} returns the ploting parameters according to input, with working default for missing ones.
 #' Used for custom ggplot of multivariate results (pca, pls, opls)
 #' @param Samples.grp Name of the grouping factor for samples
 #' @param Variables.grp Name of the grouping factor for variables
@@ -1011,8 +1011,8 @@ find.limits <- function(x,
 #' @return ggplot list of aestethic
 #' @export
 #' @examples
-#' plot.theme.1()
-plot.theme.1 <- function(Samples.grp = NULL,
+#' plot.theme()
+plot.theme <- function(Samples.grp = NULL,
                          Variables.grp = NULL,
                          limits = NULL,
                          Legend.L = T,
@@ -1179,9 +1179,9 @@ dlist.pca <- function (Data,
                   y = paste0("p2 (", temp.pca$modelDF$R2X[2]*100, " %)"))
   ## plots
   plot1 <- ggplot(temp.scores, aes(p1, p2)) +
-    plot.theme.1(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = Samp.lab.L)
+    plot.theme(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = Samp.lab.L)
   plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
-    plot.theme.1(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
+    plot.theme(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
   ## Result
   return(list("PCA" = temp.pca, "Plot" = grid.arrange(plot1, plot2, nrow = 1 )))
 }
@@ -1268,9 +1268,9 @@ dlist.opls <- function (Data,
                   y = paste0("o1 (", temp.opls$modelDF$R2X[2]*100, " %)"))
   ## plots
   plot1 <- ggplot(temp.scores, aes(p1, o1)) +
-    plot.theme.1(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
+    plot.theme(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
   plot2 <- ggplot(temp.loadings, aes(p1, o1, label = Row.names)) +
-    plot.theme.1(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
+    plot.theme(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
 
   ##
   temp.VIPs <- ggplot_oplsvip(temp.opls, VIP.thr = 1)
