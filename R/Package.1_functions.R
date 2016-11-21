@@ -1005,7 +1005,14 @@ find.limits <- function(x,y) {
 #' @export
 #' @examples
 #' plot.theme.1()
-plot.theme.1 <- function(Samples.grp = NULL, Variables.grp = NULL, limits = NULL, Legend.L = T, colorL = F, labels = list(title = "", x = "", y = ""), geom_path = F, labelsL = F) {
+plot.theme.1 <- function(Samples.grp = NULL,
+                         Variables.grp = NULL,
+                         limits = NULL,
+                         Legend.L = T,
+                         colorL = F,
+                         labels = list(title = "", x = "", y = ""),
+                         geom_path = F,
+                         labelsL = F) {
   opls.ggplot.theme <- list(
     if(!is.null(Samples.grp) & geom_path == T){geom_path(alpha = 0.4)},
     if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
@@ -1200,15 +1207,6 @@ datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
 
 
 
-require(ggplot2)
-ggplot_SD_lab90 <- theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 0.95))
-ggplot_labels_strip_0 <-   theme(strip.text.y = element_text(angle=0))
-ggplot_SD_nox_lab <- theme(axis.text.x = element_blank(), axis.ticks = element_blank())
-ggplot_SD_noy_lab <- theme(axis.text.y = element_blank(), axis.ticks = element_blank())
-ggplot_no_labels <- ggplot_SD_nox_lab + ggplot_SD_noy_lab
-ggplot_theme_sly <- theme_classic() +  theme(axis.line.x = element_line(), axis.line.y = element_line())
-ggplot_SD.theme <- theme_bw() + theme(panel.grid.minor = element_blank(),
-                                   panel.grid.major = element_blank())
 
 
 
@@ -1216,8 +1214,60 @@ ggplot_SD.theme <- theme_bw() + theme(panel.grid.minor = element_blank(),
 
 
 
+#' Perform OPLS and custom plots
+#'
+#' Perform an OPLS analysis using "ropls" package and plot results if asked (scores, loadings, VIPs & summary).
+#' @param Data Argument description
+#' @param Opls.y Name of the grouping factor used in OPLS
+#' @param Samples.grp Vector of samples grouping factor (for plot color only)
+#' @param Variables.grp Vector of variable grouping factor (for plot color only)
+#' @param Legend.L Logical to draw legends
+#' @param colorL Logical to use colors instead of black & white
+#' @param LabelsL Logical to show labels on plot
+#' @keywords x1, x2, x3
+#' @return result of the function
+#' @export
+#' @examples
+#' datamatrix.opls()
+datamatrix.opls <- function (Data,
+                             Opls.y,
+                             Samples.grp = NULL,
+                             Variables.grp = NULL,
+                             Legend.L = T,
+                             colorL = F,
+                             LabelsL = F) {
+  require(ropls) ; require(ggplot2) ; require(gridExtra)
+  temp.opls <- opls(Data[[1]], Data[[2]][[Opls.y]], orthoI = NA, plotL = F)
+  temp.scores <- merge(Data[[2]], data.frame(temp.opls$scoreMN), by.x = 0, by.y = 0)
+  temp.scores <- merge(temp.scores, data.frame(temp.opls$orthoScoreMN), by.x = "Row.names", by.y = 0, all = T)
+  limits1 <- find.limits(temp.scores$p1, temp.scores$o1)
+  temp.loadings <- merge(Data[[3]], data.frame(temp.opls$loadingMN), by.x = 0, by.y = 0)
+  temp.loadings <- merge(temp.loadings, data.frame(temp.opls$orthoLoadingMN), by.x = "Row.names", by.y = 0, all = T)
+  limits2 <- find.limits(temp.loadings$p1, temp.loadings$o1)
+  ## var
+  labels1 <- list(title = paste0("Scores plot ", temp.opls$descriptionMC[1], " samples\n(", temp.opls$descriptionMC[4], " missing values)"),
+                  x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls$modelDF$R2X[1]*100, " %)"),
+                  y = paste0("o1 (", temp.opls$modelDF$R2X[2]*100, " %)"))
+  labels2 <- list(title = paste0("Loadings plot\n", temp.opls$descriptionMC[2], " variables (", temp.opls$descriptionMC[3], " excluded)"),
+                  x = paste0("p1 (", temp.opls$modelDF$R2X[1]*100, " %)"),
+                  y = paste0("o1 (", temp.opls$modelDF$R2X[2]*100, " %)"))
+  ## plots
+  plot1 <- ggplot(temp.scores, aes(p1, o1)) +
+    plot.theme.1(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
+  plot2 <- ggplot(temp.loadings, aes(p1, o1, label = Row.names)) +
+    plot.theme.1(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
 
-
+  ##
+  temp.VIPs <- ggplot_oplsvip(temp.opls, VIP.thr = 1)
+  ## Result
+  return(list("OPLS" = temp.opls,
+              "Plot" = grid.arrange(plot1,
+                                    plot2,
+                                    tableGrob(temp.opls$summaryDF, theme = ttheme_minimal()),
+                                    temp.VIPs$Plot,
+                                    nrow = 2, heights = c(3,1)),
+              "VIPs" = temp.VIPs$VIPs))
+}
 
 
 
@@ -1237,4 +1287,21 @@ test <- function(x) {
 }
 
 
+
+
+
+
+
+
+
+
+require(ggplot2)
+ggplot_SD_lab90 <- theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 0.95))
+ggplot_labels_strip_0 <-   theme(strip.text.y = element_text(angle=0))
+ggplot_SD_nox_lab <- theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+ggplot_SD_noy_lab <- theme(axis.text.y = element_blank(), axis.ticks = element_blank())
+ggplot_no_labels <- ggplot_SD_nox_lab + ggplot_SD_noy_lab
+ggplot_theme_sly <- theme_classic() +  theme(axis.line.x = element_line(), axis.line.y = element_line())
+ggplot_SD.theme <- theme_bw() + theme(panel.grid.minor = element_blank(),
+                                      panel.grid.major = element_blank())
 
