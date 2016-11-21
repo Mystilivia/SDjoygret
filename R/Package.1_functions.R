@@ -972,6 +972,53 @@ dlist.summary <- function(dlist,
 }
 
 
+
+
+#' dlist.summary.2
+#'
+#' Description of the function
+#' @inheritParams dlist.subset
+#' @keywords x1, x2, x3
+#' @return result of the function
+#' @export
+#' @examples
+#' dlist.summary.2()
+dlist.summary.2 <- function(dlist){
+  require(dplyr) ; require(tidyr)
+  dlist <- lapply(dlist, tbl_df)
+  temp.data.W <- bind_cols(dlist[[2]], dlist[[1]])
+  select.data <- which(names(temp.data.W) %in% names(dlist[[1]]))
+  temp.data.L <- gather(temp.data.W, "Variable", "Value", select.data)
+  temp.summary <- temp.data.L %>%
+    group_by(Genotype, Stade, Nitrogen, Variable) %>%
+    summarise("N" = length(Value),
+              "NA" = length(which(is.na(Value) == T)),
+              "Mean" = mean(Value),
+              "Zero" = length(which(Value == 0)),
+              "Perc_Zero" = round(Zero * 100 / N, 3),
+              "Avg" = round(mean(Value, na.rm = T), 3),
+              "Median" = round(median(Value, na.rm = T), 3),
+              "Sum" = round(sum(Value, na.rm = T), 3),
+              "Min" = round(min(Value, na.rm = T), 3),
+              "Max" = round(max(Value, na.rm = T), 3),
+              "SD" = round(sd(Value, na.rm = T), 3),
+              "CV" = round(SD*100/Avg, 3),
+              "IC95_min_manual" = round(Avg-2*(SD/N), 3),
+              "IC95_max_manual" = round(Avg+2*(SD/N), 3),
+              "Skew" = round(e1071::skewness(Value, na.rm = T), 3),
+              "Avg_IC95_min" = round(t.test(na.omit(Value))$conf.int[1], 3),
+              "Avg_IC95_max" = round(t.test(na.omit(Value))$conf.int[2], 3),
+              "Quant1" = round(quantile(Value, na.rm = T)[1], 3),
+              "Quant2" = round(quantile(Value, na.rm = T)[2], 3),
+              "Quant3" = round(quantile(Value, na.rm = T)[3], 3),
+              "Quant4" = round(quantile(Value, na.rm = T)[4], 3)
+    )
+  return(temp.summary)
+}
+
+
+
+
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
