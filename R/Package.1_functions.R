@@ -986,31 +986,25 @@ dlist.summary <- function(dlist,
 #' dlist.summary.2()
 dlist.summary.2 <- function(dlist, var2names = NULL){
   require(dplyr) ; require(tidyr)
+  check.list.format(dlist)
   dlist <- lapply(dlist, tbl_df)
   temp.summary <- bind_cols(dlist[[2]], dlist[[1]]) %>%
-    gather_("Variable", "Value", names(dlist[[1]])) %>%
-    group_by_(.dots = c(var2names, "Variable")) %>%
-    summarise("N" = length(Value),
-              "NA" = length(which(is.na(Value) == T)),
-              "Mean" = mean(Value),
-              "Zero" = length(which(Value == 0)),
+    gather_("variable", "value", names(dlist[[1]])) %>%
+    group_by_(.dots = c(var2names, "variable")) %>%
+    summarise("N" = length(value),
+              "NA" = length(which(is.na(temp.data[[1]]) == T)),
+              "Zero" = length(which(value == 0)),
               "Perc_Zero" = round(Zero * 100 / N, 3),
-              "Avg" = round(mean(Value, na.rm = T), 3),
-              "Median" = round(median(Value, na.rm = T), 3),
-              "Sum" = round(sum(Value, na.rm = T), 3),
-              "Min" = round(min(Value, na.rm = T), 3),
-              "Max" = round(max(Value, na.rm = T), 3),
-              "SD" = round(sd(Value, na.rm = T), 3),
+              "Avg" = round(mean(value, na.rm = T), 3),
+              "Median" = round(median(value, na.rm = T), 3),
+              "Sum" = round(sum(value, na.rm = T), 3),
+              "Min" = round(min(value, na.rm = T), 3),
+              "Max" = round(max(value, na.rm = T), 3),
+              "SD" = round(sd(value, na.rm = T), 3),
               "CV" = round(SD*100/Avg, 3),
               "IC95_min_manual" = round(Avg-2*(SD/N), 3),
               "IC95_max_manual" = round(Avg+2*(SD/N), 3),
-              "Skew" = round(e1071::skewness(Value, na.rm = T), 3),
-              "Avg_IC95_min" = round(t.test(na.omit(Value))$conf.int[1], 3),
-              "Avg_IC95_max" = round(t.test(na.omit(Value))$conf.int[2], 3),
-              "Quant1" = round(quantile(Value, na.rm = T)[1], 3),
-              "Quant2" = round(quantile(Value, na.rm = T)[2], 3),
-              "Quant3" = round(quantile(Value, na.rm = T)[3], 3),
-              "Quant4" = round(quantile(Value, na.rm = T)[4], 3))
+              "Skew" = round(e1071::skewness(value, na.rm = T), 3))
   return(temp.summary)
 }
 
