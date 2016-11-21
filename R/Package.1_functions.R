@@ -978,13 +978,19 @@ dlist.summary <- function(dlist,
 #'
 #' Description of the function
 #' @param var2names List of grouping factor, if blank calculation while be done for eache variables.
+#' @inheritParamsdlist.summary
 #' @inheritParams dlist.subset
 #' @keywords x1, x2, x3
 #' @return result of the function
 #' @export
 #' @examples
 #' dlist.summary.2()
-dlist.summary.2 <- function(dlist, var2names = NULL){
+dlist.summary.2 <- function(dlist,
+                            var2names = NULL,
+                            plotL = F,
+                            alpha = 0.2,
+                            labels = list(title = "", x = "", y = ""),
+                            x.labL = F){
   require(dplyr) ; require(tidyr)
   check.list.format(dlist)
   dlist <- lapply(dlist, tbl_df)
@@ -1005,7 +1011,34 @@ dlist.summary.2 <- function(dlist, var2names = NULL){
               "IC95_min_manual" = round(Avg-2*(SD/N), 3),
               "IC95_max_manual" = round(Avg+2*(SD/N), 3),
               "Skew" = round(e1071::skewness(value, na.rm = T), 3))
-  return(temp.summary)
+  if(plotL == T) {
+    require(ggplot2)
+    # Data prep
+    temp.data.1 <- subset(temp.summary, select = c("variable", "Avg", "CV", "Skew", "Perc_Zero"))
+    temp.plot <- melt(temp.data.1, variable.name = "Measure")
+    temp.plot$variable <- factor(temp.plot$variable, levels = levels(reorder(temp.summary$variable, temp.summary$Avg)))
+    # plot variables
+    x <- "variable"
+    y <- "value"
+    group <- "Measure"
+    yline <- rbind(data.frame("Measure" = "Skew", "yint" = c(0,-1,1), "color_var" = c("black", "red", "blue")),
+                   data.frame("Measure" = "Perc_Zero", "yint" = c(50, 0, 100), "color_var" = c("black", "red", "blue")))
+    # plot
+    plot1 <- ggplot(temp.plot, aes(x = get(x), y = get(y), ymin = 0, ymax = get(y), color = get(group))) +
+      geom_hline(data = yline, aes(yintercept = yint), color = yline$color_var, linetype = 2, alpha = alpha) +
+      geom_pointrange(alpha = alpha, size = 0.02) +
+      facet_grid(paste0(group, "~."), scale = "free_y") +
+      ggplot_SD.theme +
+      theme(legend.position = 0) +
+      labs(labels)
+    if(x.labL == F){
+      plot1 <- plot1 + ggplot_SD_nox_lab
+    } else {
+      plot1 <- plot1 + ggplot_SD_lab90
+    }
+    return(list("Data" = temp.summary, "Plot" = plot1))
+  }
+  return(list("Data" = temp.summary))
 }
 
 
