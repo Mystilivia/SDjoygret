@@ -828,7 +828,9 @@ importWorksheets.2 <- function(Data.path) {
   Sheet.names <- excel_sheets(Data.path)
   data.list <- list()
   for (i in Sheet.names) {
-    data.list[[i]] <- read_excel(Data.path, sheet = i)
+    data.list[[i]] <- data.frame(read_excel(Data.path, sheet = i, col_names = T))
+    rownames(data.list[[i]]) <- data.list[[i]][[1]]
+    data.list[[i]] <- data.list[[i]][-1]
   }
   return(data.list)
 }
