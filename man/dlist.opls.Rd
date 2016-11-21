@@ -4,11 +4,11 @@
 \alias{dlist.opls}
 \title{Perform OPLS and custom plots}
 \usage{
-dlist.opls(Data, Opls.y, Samples.grp = NULL, Variables.grp = NULL,
+dlist.opls(dlist, Opls.y, Samples.grp = NULL, Variables.grp = NULL,
   Legend.L = T, colorL = F, LabelsL = F)
 }
 \arguments{
-\item{Data}{A dlist}
+\item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
 \item{Opls.y}{Name of the grouping factor used in OPLS}
 

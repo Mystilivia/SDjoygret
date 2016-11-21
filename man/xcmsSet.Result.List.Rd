@@ -10,7 +10,7 @@ xcmsSet.Result.List(x)
 \item{x}{xcmsSet Object}
 }
 \value{
-A 3 levels list (Datamatrix, SampleMetadata, VariableMetadata)
+A dlist : 3 levels list (Datamatrix, SampleMetadata, VariableMetadata)
 }
 \description{
 Create a 3 levels list from the result of xcms integration.

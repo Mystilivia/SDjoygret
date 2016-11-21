@@ -877,19 +877,19 @@ plotheme.auto <- function(Samples.grp = NULL,
 #' Perform a quick analysis of a 3 levels list by showing for each variables : the average value,
 #' the Coefficient of Variation, the skew and the percentage of zero values. Calculations is done by
 #' grouping factors for each variables and returned in a list with the plot.
-#' @param data 3 levels list of dataframe
 #' @param var2.names vector of grouping factors names
 #' @param IC Logical for IC95 calculation (could be slow if true)
 #' @param plotL Logical for generating plot
 #' @param alpha Transparency value of graphs
 #' @param labels list of graph labels (title, x, y)
 #' @param x.labL Logical for showing point labels
+#' @inheritParams dlist.subset
 #' @keywords summary, graph
 #' @return Return a list with the calculations results as a data frame and the plot if asked.
 #' @export
 #' @examples
 #' dlist.summary()
-dlist.summary <- function(data,
+dlist.summary <- function(dlist,
                                var2.names = NULL,
                                IC = F,
                                plotL = F,
@@ -897,8 +897,8 @@ dlist.summary <- function(data,
                                labels = list(title = "", x = "", y = ""),
                                x.labL = F) {
   require(reshape2) ; require(plyr) ; require(dplyr)
-  check.list.format(data)
-  temp.data.0 <- merge(data[[2]][var2.names], data[[1]], by = 0)
+  check.list.format(dlist)
+  temp.data.0 <- merge(dlist[[2]][var2.names], dlist[[1]], by = 0)
   temp.data <- melt(temp.data.0[-1], id.vars = var2.names, value.name = "value", variable.name = "variable")
   if(IC == T){
     temp.data.summary <- ddply(temp.data, c(var2.names, "variable"), summarise,
@@ -975,19 +975,19 @@ dlist.summary <- function(data,
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
-#' @param Data A 3 levels list with the data
 #' @param Samples.grp Factor name used for grouping samples (affect plot only)
 #' @param Variables.grp Factor name used for grouping variables (affect plot only)
 #' @param Legend.L Logical for drawing legends
 #' @param colorL Logical for using color or greyscale
 #' @param Samp.lab.L Logical for drawing Sample labels
 #' @param Var.lab.L Logical for drawing Variable labels
+#' @inheritParams dlist.subset
 #' @keywords pca, ggplot
 #' @return A list with [1] pca results, [2] plot as grobs.
 #' @export
 #' @examples
 #' dlist.pca()
-dlist.pca <- function (Data,
+dlist.pca <- function (dlist,
                             Samples.grp = NULL,
                             Variables.grp = NULL,
                             Legend.L = F,
@@ -995,11 +995,11 @@ dlist.pca <- function (Data,
                             Samp.lab.L = F,
                             Var.lab.L = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
-  check.list.format(Data)
-  temp.pca <- opls(Data[[1]], predI = 2, plotL = F)
-  temp.scores <- merge(Data[[2]], data.frame(temp.pca$scoreMN), by.x = 0, by.y = 0)
+  check.list.format(dlist)
+  temp.pca <- opls(dlist[[1]], predI = 2, plotL = F)
+  temp.scores <- merge(dlist[[2]], data.frame(temp.pca$scoreMN), by.x = 0, by.y = 0)
   limits1 <- find.limits(temp.scores$p1,temp.scores$p2)
-  temp.loadings <- merge(Data[[3]], data.frame(temp.pca$loadingMN), by.x = 0, by.y = 0)
+  temp.loadings <- merge(dlist[[3]], data.frame(temp.pca$loadingMN), by.x = 0, by.y = 0)
   limits2 <- find.limits(temp.loadings$p1,temp.loadings$p2)
   ## plot variables
   labels1 <- list(title = paste0("Scores plot ", temp.pca$descriptionMC[1], " samples\n(", temp.pca$descriptionMC[4], " missing values)"),
@@ -1044,37 +1044,37 @@ dataframe.transform <- function(data,
 #'
 #' Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).
 #' Same function as dataframe.transform(), but formatted for direct use on dlist.
-#' @param Data a list with 3 dataframes (Datamatrix, SampleMetadata and VariableMetadata)
 #' @param ... Argument passed to dataframe.transform()
+#' @inheritParams dlist.subset
 #' @keywords transform, dlist
 #' @return The resulting datamatrix only
 #' @export
 #' @examples
 #' dlist.transform()
-dlist.transform <- function(Data,
+dlist.transform <- function(dlist,
                             ...) {
-  check.list.format(Data)
-  Data[[1]] <- dataframe.transform(Data[[1]], ...)
-  return(Data)
+  check.list.format(dlist)
+  dlist[[1]] <- dataframe.transform(dlist[[1]], ...)
+  return(dlist)
 }
 
 
 #' Perform OPLS and custom plots
 #'
 #' Perform an OPLS analysis using "ropls" package and plot results if asked (scores, loadings, VIPs & summary).
-#' @param Data A dlist
 #' @param Opls.y Name of the grouping factor used in OPLS
 #' @param Samples.grp Vector of samples grouping factor (for plot color only)
 #' @param Variables.grp Vector of variable grouping factor (for plot color only)
 #' @param Legend.L Logical to draw legends
 #' @param colorL Logical to use colors instead of black & white
 #' @param LabelsL Logical to show labels on plot
+#' @inheritParams dlist.subset
 #' @keywords opls, ggplot
 #' @return A list with (OPLS, Plot, VIPS)
 #' @export
 #' @examples
 #' dlist.opls()
-dlist.opls <- function (Data,
+dlist.opls <- function (dlist,
                              Opls.y,
                              Samples.grp = NULL,
                              Variables.grp = NULL,
@@ -1082,12 +1082,12 @@ dlist.opls <- function (Data,
                              colorL = F,
                              LabelsL = F) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
-  check.list.format(Data)
-  temp.opls <- opls(Data[[1]], Data[[2]][[Opls.y]], orthoI = NA, plotL = F)
-  temp.scores <- merge(Data[[2]], data.frame(temp.opls$scoreMN), by.x = 0, by.y = 0)
+  check.list.format(dlist)
+  temp.opls <- opls(dlist[[1]], dlist[[2]][[Opls.y]], orthoI = NA, plotL = F)
+  temp.scores <- merge(dlist[[2]], data.frame(temp.opls$scoreMN), by.x = 0, by.y = 0)
   temp.scores <- merge(temp.scores, data.frame(temp.opls$orthoScoreMN), by.x = "Row.names", by.y = 0, all = T)
   limits1 <- find.limits(temp.scores$p1, temp.scores$o1)
-  temp.loadings <- merge(Data[[3]], data.frame(temp.opls$loadingMN), by.x = 0, by.y = 0)
+  temp.loadings <- merge(dlist[[3]], data.frame(temp.opls$loadingMN), by.x = 0, by.y = 0)
   temp.loadings <- merge(temp.loadings, data.frame(temp.opls$orthoLoadingMN), by.x = "Row.names", by.y = 0, all = T)
   limits2 <- find.limits(temp.loadings$p1, temp.loadings$o1)
   ## var
@@ -1167,22 +1167,18 @@ densplot <- function(Data,
 #' 3 levels t-test
 #'
 #' Perform t-test on a 3 levels list between groups
-#' @param data a 3 levels list
 #' @param group The grouping factor
+#' @inheritParams dlist.subset
 #' @keywords t-test
 #' @return A dataframe with p.valus, x and y estimates, delta mean and CV
 #' @export
 #' @examples
 #' data.ttest()
-data.ttest <- function(data,
+data.ttest <- function(dlist,
                        group) {
-  ## Verif
-  if(!is.data.frame(data)){stop("Data should be a datamatrix (only numerics)")}
-  if(any(apply(data, 2, is.numeric)== FALSE)){stop("Data should be a datamatrix (only numerics)")}
-  if(!is.data.frame(group)){stop("group should be a dataframe with rownames as in data and one grouping column")}
-  if(nrow(group) != nrow(data)){stop("group should be the same length as data")}
+  check.list.format(dlist)
   ## Data prep
-  temp.data <- melt(as.matrix(data), varnames = c("sample", "variable"))
+  temp.data <- melt(as.matrix(dlist), varnames = c("sample", "variable"))
   temp.data <- merge(temp.data, group, by.x = "sample", by.y = 0)
   print("Data OK, performing t-test")
   Statistic.summary <- ddply(temp.data, c("variable"), function(x) {
@@ -1206,7 +1202,7 @@ data.ttest <- function(data,
 #' Create a 3 levels list from the result of xcms integration.
 #' @param x xcmsSet Object
 #' @keywords 3levels.list, xcmsSet
-#' @return A 3 levels list (Datamatrix, SampleMetadata, VariableMetadata)
+#' @return A dlist : 3 levels list (Datamatrix, SampleMetadata, VariableMetadata)
 #' @export
 #' @examples
 #' xcmsSet.Result.List()

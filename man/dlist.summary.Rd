@@ -4,11 +4,11 @@
 \alias{dlist.summary}
 \title{Overview of 3 level datas}
 \usage{
-dlist.summary(data, var2.names = NULL, IC = F, plotL = F, alpha = 0.2,
+dlist.summary(dlist, var2.names = NULL, IC = F, plotL = F, alpha = 0.2,
   labels = list(title = "", x = "", y = ""), x.labL = F)
 }
 \arguments{
-\item{data}{3 levels list of dataframe}
+\item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
 \item{var2.names}{vector of grouping factors names}
 

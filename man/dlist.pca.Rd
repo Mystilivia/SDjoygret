@@ -4,11 +4,11 @@
 \alias{dlist.pca}
 \title{Perform PCA and custom plot}
 \usage{
-dlist.pca(Data, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F,
+dlist.pca(dlist, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F,
   colorL = F, Samp.lab.L = F, Var.lab.L = T)
 }
 \arguments{
-\item{Data}{A 3 levels list with the data}
+\item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
 \item{Samples.grp}{Factor name used for grouping samples (affect plot only)}
 

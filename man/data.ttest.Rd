@@ -4,10 +4,10 @@
 \alias{data.ttest}
 \title{3 levels t-test}
 \usage{
-data.ttest(data, group)
+data.ttest(dlist, group)
 }
 \arguments{
-\item{data}{a 3 levels list}
+\item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
 \item{group}{The grouping factor}
 }

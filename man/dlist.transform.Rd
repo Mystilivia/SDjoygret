@@ -4,10 +4,10 @@
 \alias{dlist.transform}
 \title{Transform function for dlist}
 \usage{
-dlist.transform(Data, ...)
+dlist.transform(dlist, ...)
 }
 \arguments{
-\item{Data}{a list with 3 dataframes (Datamatrix, SampleMetadata and VariableMetadata)}
+\item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
 \item{...}{Argument passed to dataframe.transform()}
 }
