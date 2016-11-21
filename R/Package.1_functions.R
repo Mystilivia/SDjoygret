@@ -986,11 +986,9 @@ dlist.summary <- function(dlist,
 dlist.summary.2 <- function(dlist){
   require(dplyr) ; require(tidyr)
   dlist <- lapply(dlist, tbl_df)
-  temp.data.W <- bind_cols(dlist[[2]], dlist[[1]])
-  select.data <- which(names(temp.data.W) %in% names(dlist[[1]]))
-  temp.data.L <- gather(temp.data.W, "Variable", "Value", select.data)
-  temp.summary <- temp.data.L %>%
-    group_by(Genotype, Stade, Nitrogen, Variable) %>%
+  temp.summary <- bind_cols(dlist[[2]], dlist[[1]]) %>%
+    gather_("Variable", "Value", names(dlist[[1]])) %>%
+    group_by_(temp.data.L, .dots = test) %>%
     summarise("N" = length(Value),
               "NA" = length(which(is.na(Value) == T)),
               "Mean" = mean(Value),
@@ -1011,8 +1009,7 @@ dlist.summary.2 <- function(dlist){
               "Quant1" = round(quantile(Value, na.rm = T)[1], 3),
               "Quant2" = round(quantile(Value, na.rm = T)[2], 3),
               "Quant3" = round(quantile(Value, na.rm = T)[3], 3),
-              "Quant4" = round(quantile(Value, na.rm = T)[4], 3)
-    )
+              "Quant4" = round(quantile(Value, na.rm = T)[4], 3))
   return(temp.summary)
 }
 
