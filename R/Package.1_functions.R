@@ -787,6 +787,7 @@ get_sign = function(model) {
 #' Chech if the list elements are data.frame, id rownames [[1]] and [[2]] are identical,
 #' and if colnames [[1]] are identical to rownames [[3]]. Check also dataframes dimension to check
 #' consistency.
+#'
 #' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
 #' @return Result of check as character
 #' @keywords list, check
@@ -834,8 +835,6 @@ importWorksheets.1 <- function(filename) {
 
 
 #' Import Excel file to list
-#'
-#' Import xls sheets in a list of dataframe.
 #'
 #' Import each sheet of an excel file to a list. This function use the readxl package, which seems
 #' to handle large files. By default, NA is set to "NA" first column to rownames and first
