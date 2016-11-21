@@ -700,15 +700,12 @@ SD_pca <- function(Data_pca,
 
 SD_subset_zero <- function(x, Z.Seuil = 80) {
   require(ggplot2)
-
   ## Calculate percentage of zero value in each column
   Zero.perc <- apply(x, 2, function(x) round(length(which(x == 0)) * 100 / length(x), 3))
   Zero.perc.2 <- data.frame(Zero.perc)
-
   ## Subset the selected column in the datamatrix
   Zer.perc.var <- subset(data.frame(Zero.perc), Zero.perc <= Z.Seuil)
   data.subset <- subset(x, select = rownames(Zer.perc.var))
-
   ## Plot graph of results and selected thresold
   Variable.Zero.Percentage.Plot <- ggplot(Zero.perc.2, aes(x = reorder(rownames(Zero.perc.2), Zero.perc))) +
     geom_point(aes(y = Zero.perc, color = rownames(Zero.perc.2) %in% rownames(Zer.perc.var)), size = 3, shape=21, fill = "white") +
@@ -716,11 +713,9 @@ SD_subset_zero <- function(x, Z.Seuil = 80) {
     ylim(0,100) +
     theme(legend.position = 0) +
     coord_flip()
-
   ## Print results
   print(paste0("Variable(s) selected : ", length(rownames(Zer.perc.var)), " on ", length(rownames(x))))
   print(summary(Data.raw.zero.subset))
-
   return(invisible(list("Data.Subset" = data.subset,
                         "Zer.Perc" = Zero.perc,
                         "Plot" = Variable.Zero.Percentage.Plot,
@@ -745,7 +740,9 @@ SD_subset_zero <- function(x, Z.Seuil = 80) {
 #' @examples
 #' SD_pca(Data, Results.path.root = "Default", ropls_param = list(predI = 2, plotL = F), factor_group = NULL)
 
-Data_sub <- function(Data, col_select, ...)
+Data_sub <- function(Data,
+                     col_select,
+                     ...)
 {
   ## Check entry file
   if (missing(Data)) stop("arg. Data is missing.")
@@ -871,7 +868,9 @@ check.list.format <- function (data) {
 #' data.subset()
 #'
 
-data.subset <- function(data, Var.sel = NULL, Samples.sel = NULL) {
+data.subset <- function(data,
+                        Var.sel = NULL,
+                        Samples.sel = NULL) {
   check.list.format(data)
   temp.data <- data
   if(!is.null(Samples.sel)){
@@ -900,7 +899,9 @@ data.subset <- function(data, Var.sel = NULL, Samples.sel = NULL) {
 #' @examples
 #' splitdf()
 
-splitdf <- function(dataframe, p = 0.5, seed = 95687) {
+splitdf <- function(dataframe,
+                    p = 0.5,
+                    seed = 95687) {
   if (!is.null(seed)) set.seed(seed)
   index <- 1:nrow(dataframe)
   trainindex <- sample(index, trunc(length(index)*p))
@@ -921,7 +922,8 @@ splitdf <- function(dataframe, p = 0.5, seed = 95687) {
 #' @export
 #' @examples
 #' write.csv3()
-write.csv3 <- function(data, file) {
+write.csv3 <- function(data,
+                       file) {
   write.table(data, file = file,
               sep = ";",
               dec = ".",
@@ -943,7 +945,9 @@ write.csv3 <- function(data, file) {
 #' @export
 #' @examples
 #' galaxy.save.list()
-galaxy.save.list <- function(x, Results.path = "./", pref = "GALAXY-"){
+galaxy.save.list <- function(x,
+                             Results.path = "./",
+                             pref = "GALAXY-"){
   List.format.check(x)
   temp <- t(x[[1]])
   write.table(data.frame("dataMatrix" = rownames(temp), temp), file = paste0(Results.path, pref, "Datamatrix.csv"), sep = "\t", quote = F, row.names = F)
@@ -981,7 +985,8 @@ g_legend <- function(a.gplot){
 #' @export
 #' @examples
 #' find.limits()
-find.limits <- function(x,y) {
+find.limits <- function(x,
+                        y) {
   temp.list <- rbind(c(max(abs(x))*-1.1, max(abs(x))*1.1),
                      c(max(abs(y))*-1.1, max(abs(y))*1.1))
   return(temp.list)
@@ -1148,7 +1153,13 @@ datamatrix.summary <- function(data,
 #' @export
 #' @examples
 #' datamatrix.pca()
-datamatrix.pca <- function (Data.list, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F, colorL = F, Samp.lab.L = F, Var.lab.L = T) {
+datamatrix.pca <- function (Data.list,
+                            Samples.grp = NULL,
+                            Variables.grp = NULL,
+                            Legend.L = F,
+                            colorL = F,
+                            Samp.lab.L = F,
+                            Var.lab.L = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
   temp.pca <- opls(Data.list[[1]], predI = 2, plotL = F)
   temp.scores <- merge(Data.list[[2]], data.frame(temp.pca$scoreMN), by.x = 0, by.y = 0)
@@ -1182,7 +1193,10 @@ datamatrix.pca <- function (Data.list, Samples.grp = NULL, Variables.grp = NULL,
 #' @export
 #' @examples
 #' datamatrix.transform()
-datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
+datamatrix.transform <- function(data,
+                                 TransL = F,
+                                 Trans.fun = log2,
+                                 ...) {
   temp.data <- data.frame(apply(data, 2, function(x) {x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}))
   if(isTRUE(TransL)) {return(Trans.fun(data, ...))}
   return(temp.data)
@@ -1293,7 +1307,41 @@ densplot <- function(Data,
 }
 
 
-
+#' 3 levels t-test
+#'
+#' Perform t-test on a 3 levels list between groups
+#' @param data a 3 levels list
+#' @param group The grouping factor
+#' @keywords t-test
+#' @return A dataframe with p.valus, x and y estimates, delta mean and CV
+#' @export
+#' @examples
+#' data.ttest()
+data.ttest <- function(data,
+                       group) {
+  ## Verif
+  if(!is.data.frame(data)){stop("Data should be a datamatrix (only numerics)")}
+  if(any(apply(data, 2, is.numeric)== FALSE)){stop("Data should be a datamatrix (only numerics)")}
+  if(!is.data.frame(group)){stop("group should be a dataframe with rownames as in data and one grouping column")}
+  if(nrow(group) != nrow(data)){stop("group should be the same length as data")}
+  ## Data prep
+  temp.data <- melt(as.matrix(data), varnames = c("sample", "variable"))
+  temp.data <- merge(temp.data, group, by.x = "sample", by.y = 0)
+  print("Data OK, performing t-test")
+  Statistic.summary <- ddply(temp.data, c("variable"), function(x) {
+    test.try <- try(t.test(as.formula(paste("value ~",names(group))), data = x))
+    if (class(test.try) != "try-error") {
+      w <- t.test(as.formula(paste("value ~", names(group))), data = x)
+      with(w, data.frame(statistic,
+                         p.value,
+                         "x.estimate" = estimate[1],
+                         "y.estimate" = estimate[2],
+                         "mean.delta" = abs(estimate[1] - estimate[2]),
+                         "CV.mean.delta" = abs(estimate[1] - estimate[2])/max(c(estimate[1], estimate[2]))))
+    }
+  })
+  return(Statistic.summary)
+}
 
 
 
