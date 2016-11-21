@@ -997,7 +997,7 @@ find.limits <- function(x,
 
 #' Semi-automatic ggplot theme
 #'
-#' \code{plot.theme} returns the ploting parameters according to input, with working default for missing ones.
+#' Returns the ploting parameters according to input, with working default for missing ones.
 #' Used for custom ggplot of multivariate results (pca, pls, opls)
 #' @param Samples.grp Name of the grouping factor for samples
 #' @param Variables.grp Name of the grouping factor for variables
@@ -1011,17 +1011,18 @@ find.limits <- function(x,
 #' @return ggplot list of aestethic
 #' @export
 #' @examples
-#' plot.theme()
-plot.theme <- function(Samples.grp = NULL,
-                         Variables.grp = NULL,
-                         limits = NULL,
-                         Legend.L = T,
-                         colorL = F,
-                         labels = list(title = "", x = "", y = ""),
-                         geom_path = F,
-                         labelsL = F) {
-  opls.ggplot.theme <- list(
-    if(!is.null(Samples.grp) & geom_path == T){geom_path(alpha = 0.4)},
+#' plotheme.auto()
+plotheme.auto <- function(Samples.grp = NULL,
+                            Variables.grp = NULL,
+                            limits = NULL,
+                            Legend.L = T,
+                            colorL = F,
+                            labels = list(title = "", x = "", y = ""),
+                            Geom_path = F,
+                            labelsL = F) {
+  require(ggplot2)
+  opls.ggplotheme.auto <- list(
+    if(!is.null(Samples.grp) & Geom_path == T){geom_path(alpha = 0.4)},
     if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
     if(!is.null(Samples.grp)){aes(group = as.factor(get(Samples.grp)), color = as.factor(get(Samples.grp)))},
     if(!is.null(Variables.grp)){aes(color = as.factor(get(Variables.grp)))},
@@ -1037,7 +1038,7 @@ plot.theme <- function(Samples.grp = NULL,
     if(labelsL == T){geom_text(vjust = -0.8)},
     if(Legend.L == F){theme(legend.position = 0)} else {theme(legend.position = c(0,0), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
   )
-  return(opls.ggplot.theme)
+  return(opls.ggplotheme.auto)
 }
 
 
@@ -1179,9 +1180,9 @@ dlist.pca <- function (Data,
                   y = paste0("p2 (", temp.pca$modelDF$R2X[2]*100, " %)"))
   ## plots
   plot1 <- ggplot(temp.scores, aes(p1, p2)) +
-    plot.theme(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = Samp.lab.L)
+    plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = Samp.lab.L)
   plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
-    plot.theme(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
+    plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
   ## Result
   return(list("PCA" = temp.pca, "Plot" = grid.arrange(plot1, plot2, nrow = 1 )))
 }
@@ -1268,9 +1269,9 @@ dlist.opls <- function (Data,
                   y = paste0("o1 (", temp.opls$modelDF$R2X[2]*100, " %)"))
   ## plots
   plot1 <- ggplot(temp.scores, aes(p1, o1)) +
-    plot.theme(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
+    plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
   plot2 <- ggplot(temp.loadings, aes(p1, o1, label = Row.names)) +
-    plot.theme(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
+    plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
 
   ##
   temp.VIPs <- ggplot_oplsvip(temp.opls, VIP.thr = 1)
