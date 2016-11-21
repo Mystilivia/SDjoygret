@@ -992,7 +992,7 @@ dlist.summary.2 <- function(dlist, var2names = NULL){
     gather_("variable", "value", names(dlist[[1]])) %>%
     group_by_(.dots = c(var2names, "variable")) %>%
     summarise("N" = length(value),
-              "NA" = length(which(is.na(temp.data[[1]]) == T)),
+              "NA" = length(which(is.na(value[[1]]) == T)),
               "Zero" = length(which(value == 0)),
               "Perc_Zero" = round(Zero * 100 / N, 3),
               "Avg" = round(mean(value, na.rm = T), 3),
