@@ -2,7 +2,7 @@
 % Please edit documentation in R/Package.1_functions.R
 \name{check.list.format}
 \alias{check.list.format}
-\title{Check format of 3 levels list}
+\title{Check format of dlist}
 \usage{
 check.list.format(dlist)
 }
@@ -14,6 +14,11 @@ Result of check as character
 }
 \description{
 Check the format of 3 levels list.
+}
+\details{
+Chech if the list elements are data.frame, id rownames [[1]] and [[2]] are identical,
+and if colnames [[1]] are identical to rownames [[3]]. Check also dataframes dimension to check
+consistency.
 }
 \examples{
 check.list.format()

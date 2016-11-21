@@ -780,8 +780,27 @@ get_sign = function(model) {
 }
 
 
-
-
+#' Check format of dlist
+#' @description Check the format of 3 levels list.
+#' @details Chech if the list elements are data.frame, id rownames [[1]] and [[2]] are identical,
+#' and if colnames [[1]] are identical to rownames [[3]]. Check also dataframes dimension to check
+#' consistency.
+#' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
+#' @return Result of check as character
+#' @keywords list, check
+#' @export
+#' @examples
+#' check.list.format()
+check.list.format <- function (dlist) {
+  if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
+  if(FALSE %in% c(lapply(dlist, class) == "data.frame")){stop("List levels should be data.frame")}
+  if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+  if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
+  dim.temp <- lapply(dlist, dim)
+  if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
+  if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
+  print("Data seems OK")
+}
 
 
 #' Import Excel file to list (XLConnect)
@@ -813,11 +832,12 @@ importWorksheets.1 <- function(filename) {
 
 
 #' Import Excel file to list
-#' @description Import xls sheets in a list of dataframe.
-#' @details Import each sheet of an excel file to a list. This function use the readxl package, which seems
+#' @description
+#' Import xls sheets in a list of dataframe.
+#' @details
+#' Import each sheet of an excel file to a list. This function use the readxl package, which seems
 #' to handle large files. By default, NA is set to "NA" first column to rownames and first
 #' row to column names. Rownames can be override with fcolL argument.
-#' @inheritParams check.list.format
 #' @param Data.path Path to the excel file to import
 #' @param fcolL Logical to specify if th first column should be use for rownames (must contains unique names)
 #' @return A list of dataframe
@@ -837,27 +857,6 @@ importWorksheets.2 <- function(Data.path, fcolL = T) {
     }
   }
   return(data.list)
-}
-
-
-#' Check format of 3 levels list
-#'
-#' Check the format of 3 levels list.
-#' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
-#' @return Result of check as character
-#' @keywords list, check
-#' @export
-#' @examples
-#' check.list.format()
-check.list.format <- function (dlist) {
-  if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
-  if(FALSE %in% c(lapply(dlist, class) == "data.frame")){stop("List levels should be data.frame")}
-  if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
-  if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-  dim.temp <- lapply(dlist, dim)
-  if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
-  if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
-  print("Data seems OK")
 }
 
 
