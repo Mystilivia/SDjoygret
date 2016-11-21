@@ -18,7 +18,6 @@ Subset a three level list by variables and/or samples.
 }
 \examples{
 data.subset()
-
 }
 \keyword{list}
 \keyword{subset,}

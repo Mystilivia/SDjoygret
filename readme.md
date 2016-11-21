@@ -4,8 +4,9 @@
 This package has been made during my PhD as a biologist specialized in metabolism.
 
 ## Installation
-To install the package :
+To install the package, install the "devtools" package and type the following command in the r console.
 
+```{r}
 require(devtools)
 devtools::install_github("Mystilivia/SDjoygret")
-
+```

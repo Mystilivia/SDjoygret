@@ -818,19 +818,22 @@ importWorksheets.1 <- function(filename) {
 #' Import each sheet of an excel file to a list. This function use the readxl package, which seems
 #' to handle large files.
 #' @param Data.path Path to the excel file to import
+#' @param fcolL Logical to specify if th first column should be use for rownames (must contains unique names)
 #' @return A list of dataframe
 #' @keywords list, import, excel
 #' @export
 #' @examples
 #' importWorksheets.2()
-importWorksheets.2 <- function(Data.path) {
+importWorksheets.2 <- function(Data.path, fcolL = T) {
   require (readxl)
   Sheet.names <- excel_sheets(Data.path)
   data.list <- list()
   for (i in Sheet.names) {
     data.list[[i]] <- data.frame(read_excel(Data.path, sheet = i, col_names = T))
+    if(isTRUE(fcolL)) {
     rownames(data.list[[i]]) <- data.list[[i]][[1]]
     data.list[[i]] <- data.list[[i]][-1]
+    }
   }
   return(data.list)
 }
@@ -845,7 +848,6 @@ importWorksheets.2 <- function(Data.path) {
 #' @export
 #' @examples
 #' check.list.format()
-
 check.list.format <- function (data) {
   if(!is.list(data)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   if(FALSE %in% c(lapply(data, class) == "data.frame")){stop("List levels should be data.frame")}
@@ -868,8 +870,6 @@ check.list.format <- function (data) {
 #' @export
 #' @examples
 #' data.subset()
-#'
-
 data.subset <- function(data,
                         Var.sel = NULL,
                         Samples.sel = NULL) {
@@ -900,7 +900,6 @@ data.subset <- function(data,
 #' @export
 #' @examples
 #' splitdf()
-
 splitdf <- function(dataframe,
                     p = 0.5,
                     seed = 95687) {

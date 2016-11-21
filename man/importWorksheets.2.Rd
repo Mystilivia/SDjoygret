@@ -4,10 +4,12 @@
 \alias{importWorksheets.2}
 \title{Import Excel file to list}
 \usage{
-importWorksheets.2(Data.path)
+importWorksheets.2(Data.path, fcolL = T)
 }
 \arguments{
 \item{Data.path}{Path to the excel file to import}
+
+\item{fcolL}{Logical to specify if th first column should be use for rownames (must contains unique names)}
 }
 \value{
 A list of dataframe
