@@ -694,28 +694,28 @@ importWorksheets.xls <- function(Data.path, fcolL = T) {
 #' Subset list
 #'
 #' Subset a three level list by variables and/or samples.
-#' @param data list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
+#' @param dlist list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
 #' @param Var.sel vector of variable to subset (rownames) from [[3]]
 #' @param Samples.sel vector of samples to subset (rownames) from [[2]]
 #' @keywords subset, list
 #' @export
 #' @examples
-#' data.subset()
-data.subset <- function(data,
-                        Var.sel = NULL,
-                        Samples.sel = NULL) {
-  check.list.format(data)
-  temp.data <- data
+#' dlist.subset()
+dlist.subset <- function(dlist,
+                         Var.sel = NULL,
+                         Samples.sel = NULL) {
+  check.list.format(dlist)
+  temp.dlist <- dlist
   if(!is.null(Samples.sel)){
-    temp.data[[2]] <- subset(temp.data[[2]], rownames(temp.data[[2]]) %in% Samples.sel)}
+    temp.dlist[[2]] <- subset(temp.dlist[[2]], rownames(temp.dlist[[2]]) %in% Samples.sel)}
   if(!is.null(Var.sel)){
-    temp.data[[3]] <- subset(temp.data[[3]], rownames(temp.data[[3]]) %in% Var.sel)}
-  if(length(data)==3){
-    temp.data[[1]] <- subset(temp.data[[1]], rownames(temp.data[[1]]) %in% rownames(temp.data[[2]]), select = rownames(temp.data[[3]]))
-    return(temp.data)} else {
-      warning("No Variable metadata")
-      temp.data[[1]] <- subset(temp.data[[1]], rownames(temp.data[[1]]) %in% rownames(temp.data[[2]]))
-      return(temp.data)}
+    temp.dlist[[3]] <- subset(temp.dlist[[3]], rownames(temp.dlist[[3]]) %in% Var.sel)}
+  if(length(dlist)==3){
+    temp.dlist[[1]] <- subset(temp.dlist[[1]], rownames(temp.dlist[[1]]) %in% rownames(temp.dlist[[2]]), select = rownames(temp.dlist[[3]]))
+    return(temp.dlist)} else {
+      warning("No Variable metadlist")
+      temp.dlist[[1]] <- subset(temp.dlist[[1]], rownames(temp.dlist[[1]]) %in% rownames(temp.dlist[[2]]))
+      return(temp.dlist)}
 }
 
 
@@ -768,7 +768,7 @@ write.csv3 <- function(data,
 #' Save file for GALAXY
 #'
 #' Write 3 csv files from a three levels list to import in GALAXY.
-#' @param x 3 levels list
+#' @inheritParams data.subset
 #' @param Results.path Saving path
 #' @param pref Prefix to add
 #' @keywords list, galaxy, export
@@ -777,14 +777,14 @@ write.csv3 <- function(data,
 #' @export
 #' @examples
 #' galaxy.save.list()
-galaxy.save.list <- function(x,
+galadlisty.save.list <- function(dlist,
                              Results.path = "./",
-                             pref = "GALAXY-"){
-  check.list.format(x)
-  temp <- t(x[[1]])
-  write.table(data.frame("dataMatrix" = rownames(temp), temp), file = paste0(Results.path, pref, "Datamatrix.csv"), sep = "\t", quote = F, row.names = F)
-  write.table(data.frame("sampleMetadata" = rownames(x[[2]]), x[[2]]), file = paste0(Results.path, pref, "SampleMetadata.csv"), sep = "\t", quote = F, row.names = F)
-  write.table(data.frame("variableMetadata" = rownames(x[[3]]), x[[3]]), file = paste0(Results.path, pref, "VariableMetadata.csv"), sep = "\t", quote = F, row.names = F)
+                             pref = "GALAdlistY-"){
+  check.list.format(dlist)
+  temp <- t(dlist[[1]])
+  write.table(data.frame("dataMatridlist" = rownames(temp), temp), file = paste0(Results.path, pref, "Datamatridlist.csv"), sep = "\t", quote = F, row.names = F)
+  write.table(data.frame("sampleMetadata" = rownames(dlist[[2]]), dlist[[2]]), file = paste0(Results.path, pref, "SampleMetadata.csv"), sep = "\t", quote = F, row.names = F)
+  write.table(data.frame("variableMetadata" = rownames(dlist[[3]]), dlist[[3]]), file = paste0(Results.path, pref, "VariableMetadata.csv"), sep = "\t", quote = F, row.names = F)
 }
 
 
