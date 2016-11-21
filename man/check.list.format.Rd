@@ -4,10 +4,10 @@
 \alias{check.list.format}
 \title{Check format of 3 levels list}
 \usage{
-check.list.format(data)
+check.list.format(dlist)
 }
 \arguments{
-\item{data}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}
+\item{dlist}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}
 }
 \value{
 Result of check as character

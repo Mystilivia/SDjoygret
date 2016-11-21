@@ -15,8 +15,12 @@ importWorksheets.2(Data.path, fcolL = T)
 A list of dataframe
 }
 \description{
+Import xls sheets in a list of dataframe.
+}
+\details{
 Import each sheet of an excel file to a list. This function use the readxl package, which seems
-to handle large files.
+to handle large files. By default, NA is set to "NA" first column to rownames and first
+row to column names. Rownames can be override with fcolL argument.
 }
 \examples{
 importWorksheets.2()

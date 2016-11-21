@@ -29,7 +29,5 @@ Draw a 2 dimensions plot with density graph on each axis
 \examples{
 densplot()
 }
-\keyword{x1,}
-\keyword{x2,}
-\keyword{x3}
+\keyword{ggplot}
 

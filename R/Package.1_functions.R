@@ -794,7 +794,6 @@ get_sign = function(model) {
 #' @export
 #' @examples
 #' importWorksheets()
-
 importWorksheets.1 <- function(filename) {
   ## Sources : http://stackoverflow.com/questions/12945687/how-to-read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frame-e
   require(XLConnect)
@@ -814,9 +813,11 @@ importWorksheets.1 <- function(filename) {
 
 
 #' Import Excel file to list
-#'
-#' Import each sheet of an excel file to a list. This function use the readxl package, which seems
-#' to handle large files.
+#' @description Import xls sheets in a list of dataframe.
+#' @details Import each sheet of an excel file to a list. This function use the readxl package, which seems
+#' to handle large files. By default, NA is set to "NA" first column to rownames and first
+#' row to column names. Rownames can be override with fcolL argument.
+#' @inheritParams check.list.format
 #' @param Data.path Path to the excel file to import
 #' @param fcolL Logical to specify if th first column should be use for rownames (must contains unique names)
 #' @return A list of dataframe
@@ -829,7 +830,7 @@ importWorksheets.2 <- function(Data.path, fcolL = T) {
   Sheet.names <- excel_sheets(Data.path)
   data.list <- list()
   for (i in Sheet.names) {
-    data.list[[i]] <- data.frame(read_excel(Data.path, sheet = i, col_names = T))
+    data.list[[i]] <- data.frame(read_excel(Data.path, sheet = i, col_names = T, na = "NA"))
     if(isTRUE(fcolL)) {
     rownames(data.list[[i]]) <- data.list[[i]][[1]]
     data.list[[i]] <- data.list[[i]][-1]
@@ -842,18 +843,18 @@ importWorksheets.2 <- function(Data.path, fcolL = T) {
 #' Check format of 3 levels list
 #'
 #' Check the format of 3 levels list.
-#' @param data Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
+#' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
 #' @return Result of check as character
 #' @keywords list, check
 #' @export
 #' @examples
 #' check.list.format()
-check.list.format <- function (data) {
-  if(!is.list(data)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
-  if(FALSE %in% c(lapply(data, class) == "data.frame")){stop("List levels should be data.frame")}
-  if(!identical(colnames(data[[1]]), rownames(data[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
-  if(!identical(rownames(data[[1]]), rownames(data[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-  dim.temp <- lapply(data, dim)
+check.list.format <- function (dlist) {
+  if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
+  if(FALSE %in% c(lapply(dlist, class) == "data.frame")){stop("List levels should be data.frame")}
+  if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+  if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
+  dim.temp <- lapply(dlist, dim)
   if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
   if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
   print("Data seems OK")
@@ -1056,8 +1057,8 @@ plot.theme.1 <- function(Samples.grp = NULL,
 #' @return Return a list with the calculations results as a data frame and the plot if asked.
 #' @export
 #' @examples
-#' datamatrix.summary()
-datamatrix.summary <- function(data,
+#' dlist.summary()
+dlist.summary <- function(data,
                                var2.names = NULL,
                                IC = F,
                                plotL = F,
@@ -1065,6 +1066,7 @@ datamatrix.summary <- function(data,
                                labels = list(title = "", x = "", y = ""),
                                x.labL = F) {
   require(reshape2) ; require(plyr) ; require(dplyr)
+  check.list.format(data)
   temp.data.0 <- merge(data[[2]][var2.names], data[[1]], by = 0)
   temp.data <- melt(temp.data.0[-1], id.vars = var2.names, value.name = "value", variable.name = "variable")
   if(IC == T){
@@ -1142,7 +1144,7 @@ datamatrix.summary <- function(data,
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
-#' @param Data.list A 3 levels list with the data
+#' @param Data A 3 levels list with the data
 #' @param Samples.grp Factor name used for grouping samples (affect plot only)
 #' @param Variables.grp Factor name used for grouping variables (affect plot only)
 #' @param Legend.L Logical for drawing legends
@@ -1153,8 +1155,8 @@ datamatrix.summary <- function(data,
 #' @return A list with [1] pca results, [2] plot as grobs.
 #' @export
 #' @examples
-#' datamatrix.pca()
-datamatrix.pca <- function (Data.list,
+#' dlist.pca()
+dlist.pca <- function (Data,
                             Samples.grp = NULL,
                             Variables.grp = NULL,
                             Legend.L = F,
@@ -1162,10 +1164,11 @@ datamatrix.pca <- function (Data.list,
                             Samp.lab.L = F,
                             Var.lab.L = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
-  temp.pca <- opls(Data.list[[1]], predI = 2, plotL = F)
-  temp.scores <- merge(Data.list[[2]], data.frame(temp.pca$scoreMN), by.x = 0, by.y = 0)
+  check.list.format(Data)
+  temp.pca <- opls(Data[[1]], predI = 2, plotL = F)
+  temp.scores <- merge(Data[[2]], data.frame(temp.pca$scoreMN), by.x = 0, by.y = 0)
   limits1 <- find.limits(temp.scores$p1,temp.scores$p2)
-  temp.loadings <- merge(Data.list[[3]], data.frame(temp.pca$loadingMN), by.x = 0, by.y = 0)
+  temp.loadings <- merge(Data[[3]], data.frame(temp.pca$loadingMN), by.x = 0, by.y = 0)
   limits2 <- find.limits(temp.loadings$p1,temp.loadings$p2)
   ## plot variables
   labels1 <- list(title = paste0("Scores plot ", temp.pca$descriptionMC[1], " samples\n(", temp.pca$descriptionMC[4], " missing values)"),
@@ -1187,14 +1190,16 @@ datamatrix.pca <- function (Data.list,
 #' Transform a datamatrix and replace zero
 #'
 #' Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).
-#' @param data Argument description
-#' @param data Argument description
-#' @keywords x1, x2, x3
+#' @param data a dataframe with value only to transform
+#' @param TransL Should transformation be made
+#' @param Trans.fun Which transformation to perform (default log2)
+#' @param ... Argument to pass to Trans.fun
+#' @keywords transform
 #' @return The resulting datamatrix only
 #' @export
 #' @examples
-#' datamatrix.transform()
-datamatrix.transform <- function(data,
+#' dataframe.transform()
+dataframe.transform <- function(data,
                                  TransL = F,
                                  Trans.fun = log2,
                                  ...) {
@@ -1204,22 +1209,41 @@ datamatrix.transform <- function(data,
 }
 
 
+#' Transform function for dlist
+#'
+#' Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).
+#' Same function as dataframe.transform(), but formatted for direct use on dlist.
+#' @param Data a list with 3 dataframes (Datamatrix, SampleMetadata and VariableMetadata)
+#' @param ... Argument passed to dataframe.transform()
+#' @keywords transform, dlist
+#' @return The resulting datamatrix only
+#' @export
+#' @examples
+#' dlist.transform()
+dlist.transform <- function(Data,
+                            ...) {
+  check.list.format(Data)
+  Data[[1]] <- dataframe.transform(Data[[1]], ...)
+  return(Data)
+}
+
+
 #' Perform OPLS and custom plots
 #'
 #' Perform an OPLS analysis using "ropls" package and plot results if asked (scores, loadings, VIPs & summary).
-#' @param Data Argument description
+#' @param Data A dlist
 #' @param Opls.y Name of the grouping factor used in OPLS
 #' @param Samples.grp Vector of samples grouping factor (for plot color only)
 #' @param Variables.grp Vector of variable grouping factor (for plot color only)
 #' @param Legend.L Logical to draw legends
 #' @param colorL Logical to use colors instead of black & white
 #' @param LabelsL Logical to show labels on plot
-#' @keywords x1, x2, x3
+#' @keywords opls, ggplot
 #' @return A list with (OPLS, Plot, VIPS)
 #' @export
 #' @examples
-#' datamatrix.opls()
-datamatrix.opls <- function (Data,
+#' dlist.opls()
+dlist.opls <- function (Data,
                              Opls.y,
                              Samples.grp = NULL,
                              Variables.grp = NULL,
@@ -1227,6 +1251,7 @@ datamatrix.opls <- function (Data,
                              colorL = F,
                              LabelsL = F) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
+  check.list.format(Data)
   temp.opls <- opls(Data[[1]], Data[[2]][[Opls.y]], orthoI = NA, plotL = F)
   temp.scores <- merge(Data[[2]], data.frame(temp.opls$scoreMN), by.x = 0, by.y = 0)
   temp.scores <- merge(temp.scores, data.frame(temp.opls$orthoScoreMN), by.x = "Row.names", by.y = 0, all = T)
@@ -1269,7 +1294,7 @@ datamatrix.opls <- function (Data,
 #' @param fill filling color or factor
 #' @param color string for point color
 #' @param labels List for labels with (title, x, y)
-#' @keywords x1, x2, x3
+#' @keywords ggplot
 #' @return a ggplot
 #' @export
 #' @examples
