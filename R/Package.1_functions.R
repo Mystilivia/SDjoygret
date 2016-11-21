@@ -1034,13 +1034,6 @@ plot.theme.1 <- function(Samples.grp = NULL,
 }
 
 
-
-
-
-
-
-
-
 #' Overview of 3 level datas
 #'
 #' Perform a quick analysis of a 3 levels list by showing for each variables : the average value,
@@ -1140,13 +1133,6 @@ datamatrix.summary <- function(data,
 }
 
 
-
-
-
-
-
-
-
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
@@ -1192,7 +1178,7 @@ datamatrix.pca <- function (Data.list, Samples.grp = NULL, Variables.grp = NULL,
 #' @param data Argument description
 #' @param data Argument description
 #' @keywords x1, x2, x3
-#' @return result of the function
+#' @return The resulting datamatrix only
 #' @export
 #' @examples
 #' datamatrix.transform()
@@ -1201,17 +1187,6 @@ datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
   if(isTRUE(TransL)) {return(Trans.fun(data, ...))}
   return(temp.data)
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 #' Perform OPLS and custom plots
@@ -1225,7 +1200,7 @@ datamatrix.transform <- function(data, TransL = F, Trans.fun = log2, ...) {
 #' @param colorL Logical to use colors instead of black & white
 #' @param LabelsL Logical to show labels on plot
 #' @keywords x1, x2, x3
-#' @return result of the function
+#' @return A list with (OPLS, Plot, VIPS)
 #' @export
 #' @examples
 #' datamatrix.opls()
@@ -1268,6 +1243,56 @@ datamatrix.opls <- function (Data,
                                     nrow = 2, heights = c(3,1)),
               "VIPs" = temp.VIPs$VIPs))
 }
+
+
+#' 2 dimension plot with density
+#'
+#' Draw a 2 dimensions plot with density graph on each axis
+#' @param Data Long format data to plot
+#' @param x column with x data
+#' @param y column with y data
+#' @param fill filling color or factor
+#' @param color string for point color
+#' @param labels List for labels with (title, x, y)
+#' @keywords x1, x2, x3
+#' @return a ggplot
+#' @export
+#' @examples
+#' densplot()
+densplot <- function(Data,
+                     x,
+                     y,
+                     fill = "grey",
+                     color = "black",
+                     labels = list("title", "x", "y")) {
+  plot1 <- ggplot(Data, aes(x = x, fill = fill)) +
+    geom_density(adjust = 1/5, alpha = 0.25, color = color) +
+    labs(list(title = labels[[1]], x = "", y = "density")) +
+    theme_bw()
+  plot2 <- ggplot(Data, aes(x = y, fill = fill)) +
+    geom_density(adjust = 1/10, alpha = 0.25, color = color) +
+    labs(list(title = "", x = "", y = "density")) +
+    theme_bw() +
+    coord_flip()
+  plot3 <- ggplot(Data, aes(x = x, y = y, color = fill)) +
+    geom_point(size = 0.5) +
+    labs(list(title = "", x = labels[[2]], y = labels[[3]])) +
+    theme_bw()
+  if(is.factor(fill) == T){
+    plot4 <- g_legend(plot1)
+  } else {
+    plot4 <- ggplot() + theme(plot.background = element_blank(), panel.background = element_blank()) + theme(legend.position = "none")
+  }
+  grid.arrange(plot1 + theme(legend.position = "none"),
+               plot4,
+               plot3 + theme(legend.position = "none"),
+               plot2 + theme(legend.position = "none"),
+               ncol = 2,
+               heights = c(1,2),
+               widths = c(2,1))
+}
+
+
 
 
 

@@ -12,7 +12,7 @@ datamatrix.transform(data, TransL = F, Trans.fun = log2, ...)
 \item{data}{Argument description}
 }
 \value{
-result of the function
+The resulting datamatrix only
 }
 \description{
 Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).

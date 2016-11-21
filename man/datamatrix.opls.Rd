@@ -23,7 +23,7 @@ datamatrix.opls(Data, Opls.y, Samples.grp = NULL, Variables.grp = NULL,
 \item{LabelsL}{Logical to show labels on plot}
 }
 \value{
-result of the function
+A list with (OPLS, Plot, VIPS)
 }
 \description{
 Perform an OPLS analysis using "ropls" package and plot results if asked (scores, loadings, VIPs & summary).
