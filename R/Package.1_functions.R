@@ -781,8 +781,10 @@ get_sign = function(model) {
 
 
 #' Check format of dlist
-#' @description Check the format of 3 levels list.
-#' @details Chech if the list elements are data.frame, id rownames [[1]] and [[2]] are identical,
+#'
+#' Check the format of 3 levels list.
+#'
+#' Chech if the list elements are data.frame, id rownames [[1]] and [[2]] are identical,
 #' and if colnames [[1]] are identical to rownames [[3]]. Check also dataframes dimension to check
 #' consistency.
 #' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
@@ -832,9 +834,9 @@ importWorksheets.1 <- function(filename) {
 
 
 #' Import Excel file to list
-#' @description
+#'
 #' Import xls sheets in a list of dataframe.
-#' @details
+#'
 #' Import each sheet of an excel file to a list. This function use the readxl package, which seems
 #' to handle large files. By default, NA is set to "NA" first column to rownames and first
 #' row to column names. Rownames can be override with fcolL argument.
