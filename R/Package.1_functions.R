@@ -984,7 +984,7 @@ dlist.summary <- function(dlist,
 #' @examples
 #' dlist.summary.2()
 dlist.summary.2 <- function(dlist,
-                            var2names = c("Genotype", "Day", "Nitrogen"),
+                            var2names = NULL,
                             plotL = F,
                             alpha = 0.2,
                             labels = list(title = "", x = "", y = ""),
@@ -1021,7 +1021,7 @@ dlist.summary.2 <- function(dlist,
       group_by(Measure)
     yline <- rbind(data.frame("Measure" = "Skew", "yint" = c(0,-1,1), "color_var" = c("black", "red", "blue")),
                    data.frame("Measure" = "Perc_Zero", "yint" = c(50, 0, 100), "color_var" = c("black", "red", "blue")))
-    plot1 <- ggplot(temp.plot, aes(variable, value, ymin = 0, ymax = value, color = Measure)) +
+    plot1 <- ggplot(temp.plot, aes(reorder(variable, Avg), value, ymin = 0, ymax = value, color = Measure)) +
       geom_hline(data = yline, aes(yintercept = yint), color = yline$color_var, linetype = 2, alpha = alpha) +
       geom_pointrange(alpha = alpha, size = 0.02) +
       facet_grid(Measure~., scale = "free_y") +
