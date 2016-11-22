@@ -972,8 +972,6 @@ dlist.summary <- function(dlist,
 }
 
 
-
-
 #' dlist.summary.2
 #'
 #' Description of the function
@@ -991,9 +989,13 @@ dlist.summary.2 <- function(dlist,
                             alpha = 0.2,
                             labels = list(title = "", x = "", y = ""),
                             x.labL = F){
-  require(dplyr) ; require(tidyr)
+  require(dplyr) ; require(tidyr) ## Load packages
   check.list.format(dlist)
-  dlist <- lapply(dlist, tbl_df)
+  dlist <- lapply(dlist, tbl_df) ## transform data to tbl class
+  if(length(which(var2names %in% c("N", "NA", "Zero", "Perc_Zero", "Avg", "Median",
+                                   "Sum", "Min", "Max", "SD", "CV", "IC95_min_manual",
+                                   "IC95_max_manual", "Skew") == T)) > 0) {
+    stop("var2names conflict with calculated variable. Must be different than : N, NA, Zero, Perc_Zero, Avg, Median, Sum, Min, Max, SD, CV, IC95_min_manual, IC95_max_manual, Skew")}
   temp.summary <- bind_cols(dlist[[2]], dlist[[1]]) %>%
     gather_("variable", "value", names(dlist[[1]])) %>%
     group_by_(.dots = c(var2names, "variable")) %>%
@@ -1013,23 +1015,16 @@ dlist.summary.2 <- function(dlist,
               "Skew" = round(e1071::skewness(value, na.rm = T), 3))
   if(plotL == T) {
     require(ggplot2)
-    # Data prep
     temp.plot <- select(ungroup(temp.summary), variable, Avg, CV, Skew, Perc_Zero) %>%
       arrange(Avg) %>%
       gather(Measure, value, -variable) %>%
       group_by(Measure)
-
-    # plot variables
-    x <- "variable"
-    y <- "value"
-    group <- "Measure"
     yline <- rbind(data.frame("Measure" = "Skew", "yint" = c(0,-1,1), "color_var" = c("black", "red", "blue")),
                    data.frame("Measure" = "Perc_Zero", "yint" = c(50, 0, 100), "color_var" = c("black", "red", "blue")))
-    # plot
-    plot1 <- ggplot(temp.plot, aes(x = get(x), y = get(y), ymin = 0, ymax = get(y), color = get(group))) +
+    plot1 <- ggplot(temp.plot, aes(variable, value, ymin = 0, ymax = value, color = Measure)) +
       geom_hline(data = yline, aes(yintercept = yint), color = yline$color_var, linetype = 2, alpha = alpha) +
       geom_pointrange(alpha = alpha, size = 0.02) +
-      facet_grid(paste0(group, "~."), scale = "free_y") +
+      facet_grid(Measure~., scale = "free_y") +
       ggplot_SD.theme +
       theme(legend.position = 0) +
       labs(labels)
@@ -1313,11 +1308,6 @@ xcmsSet.Result.List <- function(x) {
 test <- function(x) {
   print(x)
 }
-
-
-
-
-
 
 
 
