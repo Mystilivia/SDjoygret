@@ -852,7 +852,7 @@ plotheme.auto <- function(Samples.grp = NULL,
                             labelsL = F) {
   require(ggplot2)
   opls.ggplotheme.auto <- list(
-    if(!is.null(Samples.grp) & Geom_path == T){geom_path(alpha = 0.4)},
+    if(!is.null(Samples.grp) & geom_path == T){geom_path(alpha = 0.4)},
     if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
     if(!is.null(Samples.grp)){aes(group = as.factor(get(Samples.grp)), color = as.factor(get(Samples.grp)))},
     if(!is.null(Variables.grp)){aes(color = as.factor(get(Variables.grp)))},
