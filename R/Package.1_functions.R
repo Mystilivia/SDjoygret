@@ -848,7 +848,7 @@ plotheme.auto <- function(Samples.grp = NULL,
                             Legend.L = T,
                             colorL = F,
                             labels = list(title = "", x = "", y = ""),
-                            Geom_path = F,
+                            geom_path = F,
                             labelsL = F) {
   require(ggplot2)
   opls.ggplotheme.auto <- list(

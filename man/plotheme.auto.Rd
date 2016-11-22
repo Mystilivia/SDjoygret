@@ -6,7 +6,7 @@
 \usage{
 plotheme.auto(Samples.grp = NULL, Variables.grp = NULL, limits = NULL,
   Legend.L = T, colorL = F, labels = list(title = "", x = "", y = ""),
-  Geom_path = F, labelsL = F)
+  geom_path = F, labelsL = F)
 }
 \arguments{
 \item{Samples.grp}{Name of the grouping factor for samples}
@@ -21,9 +21,9 @@ plotheme.auto(Samples.grp = NULL, Variables.grp = NULL, limits = NULL,
 
 \item{labels}{list for titles (title, x, y)}
 
-\item{labelsL}{Add labels to points}
-
 \item{geom_path}{Logical for drawing path}
+
+\item{labelsL}{Add labels to points}
 }
 \value{
 ggplot list of aestethic
