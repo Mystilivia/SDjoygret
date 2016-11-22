@@ -676,7 +676,7 @@ check.list.format <- function (dlist) {
 #' @export
 #' @examples
 #' importWorksheets.xls()
-importWorksheets.xls <- function(Data.path, fcolL = T) {
+importWorksheets.xls <- function(Data.path, fcolL = F) {
   require ("readxl")
   Sheet.names <- excel_sheets(Data.path)
   data.list <- list()
@@ -989,7 +989,7 @@ dlist.summary.2 <- function(dlist,
                             alpha = 0.2,
                             labels = list(title = "", x = "", y = ""),
                             x.labL = F){
-  require(dplyr) ; require(tidyr) ## Load packages
+  require(dplyr) ; require(tidyr) ; require(e1071) ## Load packages
   check.list.format(dlist)
   dlist <- lapply(dlist, tbl_df) ## transform data to tbl class
   if(length(which(var2names %in% c("N", "NA", "Zero", "Perc_Zero", "Avg", "Median",
@@ -1018,7 +1018,7 @@ dlist.summary.2 <- function(dlist,
     temp.plot <- select(ungroup(temp.summary), variable, Avg, CV, Skew, Perc_Zero) %>%
       arrange(Avg) %>%
       mutate(variable = factor(variable, variable)) %>%
-      gather(Measure, value, -variable) %>%
+      gather("Measure", "value", -variable) %>%
       group_by(Measure)
     yline <- rbind(data.frame("Measure" = "Skew", "yint" = c(0,-1,1), "color_var" = c("black", "red", "blue")),
                    data.frame("Measure" = "Perc_Zero", "yint" = c(50, 0, 100), "color_var" = c("black", "red", "blue")))

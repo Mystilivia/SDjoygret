@@ -4,7 +4,7 @@
 \alias{importWorksheets.xls}
 \title{Import Excel file to list}
 \usage{
-importWorksheets.xls(Data.path, fcolL = T)
+importWorksheets.xls(Data.path, fcolL = F)
 }
 \arguments{
 \item{Data.path}{Path to the excel file to import}
