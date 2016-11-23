@@ -1219,7 +1219,7 @@ densplot <- function(Data,
     geom_point(size = 0.5, aes_string(fill = group), alpha = alpha) +
     labs(list(title = "", x = labels[[2]], y = labels[[3]])) +
     theme_bw()
-  if(any(!is.null(fill) & group %in% names(Data)) == T) {
+  if(any(!is.null(group) & group %in% names(Data)) == T) {
     plot4 <- g_legend(plot1)
   } else {
     plot4 <- ggplot() + theme(plot.background = element_blank(), panel.background = element_blank()) + theme(legend.position = "none")
