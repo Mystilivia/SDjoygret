@@ -4,21 +4,21 @@
 \alias{densplot}
 \title{2 dimension plot with density}
 \usage{
-densplot(Data, x, y, fill = NULL, color = "black", alpha = 0.8,
-  labels = list("title", "x", "y"))
+densplot(Data, x, y, group = NULL, color = "black", alpha = 0.5,
+  labels = list(title = "", x = "", y = ""))
 }
 \arguments{
 \item{Data}{Long format data to plot}
 
-\item{x}{column with x data}
+\item{x}{Column name for x values as string}
 
-\item{y}{column with y data}
+\item{y}{Column name for x values as string}
 
-\item{fill}{filling color or factor}
+\item{group}{Column name for grouping factor as string}
 
-\item{color}{string for point color}
+\item{color}{Point color (default is "black")}
 
-\item{alpha}{alpha value of point}
+\item{alpha}{alpha value of point (default is 0.5)}
 
 \item{labels}{List for labels with (title, x, y)}
 }

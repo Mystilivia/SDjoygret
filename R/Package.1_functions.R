@@ -1188,11 +1188,11 @@ dlist.opls <- function (dlist,
 #'
 #' Draw a 2 dimensions plot with density graph on each axis
 #' @param Data Long format data to plot
-#' @param x column with x data
-#' @param y column with y data
-#' @param fill filling color or factor
-#' @param color string for point color
-#' @param alpha alpha value of point
+#' @param x Column name for x values as string
+#' @param y Column name for x values as string
+#' @param group Column name for grouping factor as string
+#' @param color Point color (default is "black")
+#' @param alpha alpha value of point (default is 0.5)
 #' @param labels List for labels with (title, x, y)
 #' @keywords ggplot
 #' @return a ggplot
@@ -1202,24 +1202,24 @@ dlist.opls <- function (dlist,
 densplot <- function(Data,
                      x,
                      y,
-                     fill = NULL,
+                     group = NULL,
                      color = "black",
-                     alpha = 0.8,
-                     labels = list("title", "x", "y")) {
-  plot1 <- ggplot(Data, aes(x = get(x), fill = get(fill))) +
+                     alpha = 0.5,
+                     labels = list(title = "", x = "", y = "")) {
+  plot1 <- ggplot(Data, aes_string(x = x, fill = group)) +
     geom_density(adjust = 1/5, alpha = 0.25, color = color) +
     labs(list(title = labels[[1]], x = "", y = "density")) +
     theme_bw()
-  plot2 <- ggplot(Data, aes(x = get(y), fill = get(fill))) +
+  plot2 <- ggplot(Data, aes_string(x = y, fill = group)) +
     geom_density(adjust = 1/10, alpha = 0.25, color = color) +
     labs(list(title = "", x = "", y = "density")) +
     theme_bw() +
     coord_flip()
-  plot3 <- ggplot(Data, aes(x = get(x), y = get(y), color = get(fill))) +
-    geom_point(size = 0.5, alpha = alpha) +
+  plot3 <- ggplot(Data, aes_string(x = x, y = y)) +
+    geom_point(size = 0.5, aes_string(fill = group), alpha = alpha) +
     labs(list(title = "", x = labels[[2]], y = labels[[3]])) +
     theme_bw()
-  if(is.factor(get(fill)) == T){
+  if(any(!is.null(fill) & group %in% names(Data)) == T) {
     plot4 <- g_legend(plot1)
   } else {
     plot4 <- ggplot() + theme(plot.background = element_blank(), panel.background = element_blank()) + theme(legend.position = "none")
