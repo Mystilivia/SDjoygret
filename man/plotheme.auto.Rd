@@ -6,7 +6,7 @@
 \usage{
 plotheme.auto(Samples.grp = NULL, Variables.grp = NULL, limits = NULL,
   Legend.L = T, colorL = F, labels = list(title = "", x = "", y = ""),
-  geom_path = F, labelsL = F)
+  geom_path = F, labelsL = F, alpha = 0.8)
 }
 \arguments{
 \item{Samples.grp}{Name of the grouping factor for samples}

@@ -843,13 +843,14 @@ find.limits <- function(x,
 #' @examples
 #' plotheme.auto()
 plotheme.auto <- function(Samples.grp = NULL,
-                            Variables.grp = NULL,
-                            limits = NULL,
-                            Legend.L = T,
-                            colorL = F,
-                            labels = list(title = "", x = "", y = ""),
-                            geom_path = F,
-                            labelsL = F) {
+                          Variables.grp = NULL,
+                          limits = NULL,
+                          Legend.L = T,
+                          colorL = F,
+                          labels = list(title = "", x = "", y = ""),
+                          geom_path = F,
+                          labelsL = F,
+                          alpha = 0.8) {
   require(ggplot2)
   opls.ggplotheme.auto <- list(
     if(!is.null(Samples.grp) & geom_path == T){geom_path(alpha = 0.4)},
@@ -860,7 +861,7 @@ plotheme.auto <- function(Samples.grp = NULL,
     if(colorL == F) {scale_colour_grey()},
     geom_hline(yintercept = 0, linetype = 2, color = "grey"),
     geom_vline(xintercept = 0, linetype = 2, color = "grey"),
-    geom_point(alpha = 0.8),
+    geom_point(alpha = alpha),
     if(!is.null(limits)){xlim(limits[1,1], limits[1,2])},
     if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
     ggplot_SD.theme,
@@ -1049,6 +1050,7 @@ dlist.summary.2 <- function(dlist,
 #' @param colorL Logical for using color or greyscale
 #' @param Samp.lab.L Logical for drawing Sample labels
 #' @param Var.lab.L Logical for drawing Variable labels
+#' @param alpha Transparency for loadings points (between 0 and 1)
 #' @inheritParams densplot
 #' @inheritParams dlist.subset
 #' @keywords pca, ggplot
@@ -1063,6 +1065,7 @@ dlist.pca <- function (dlist,
                        colorL = F,
                        Samp.lab.L = F,
                        Var.lab.L = T,
+                       alpha = 0.8,
                        ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
   check.list.format(dlist)
@@ -1086,7 +1089,7 @@ dlist.pca <- function (dlist,
                                                             labels1, geom_path = T, labelsL = Samp.lab.L)
   plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
     plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2,
-                  Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
+                  Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L, alpha = alpha)
   if(ShowPlot == T) {
     return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
   } else {
