@@ -866,7 +866,7 @@ plotheme.auto <- function(Samples.grp = NULL,
     ggplot_SD.theme,
     labs(labels),
     if(labelsL == T){geom_text(vjust = -0.8)},
-    if(Legend.L == F){theme(legend.position = 0)} else {theme(legend.position = c(0,0), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
+    if(Legend.L == F){theme(legend.position = 0)} else {theme(legend.position = c(0.005,0.005), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
   )
   return(opls.ggplotheme.auto)
 }
@@ -1065,24 +1065,27 @@ dlist.pca <- function (dlist,
   require(ropls) ; require(ggplot2) ; require(gridExtra)
   check.list.format(dlist)
   temp.pca <- opls(dlist[[1]], predI = 2, plotL = F)
-  temp.scores <- merge(dlist[[2]], data.frame(temp.pca$scoreMN), by.x = 0, by.y = 0)
-  limits1 <- find.limits(temp.scores$p1,temp.scores$p2)
-  temp.loadings <- merge(dlist[[3]], data.frame(temp.pca$loadingMN), by.x = 0, by.y = 0)
-  limits2 <- find.limits(temp.loadings$p1,temp.loadings$p2)
-  ## plot variables
-  labels1 <- list(title = paste0("Scores plot ", temp.pca$descriptionMC[1], " samples\n(", temp.pca$descriptionMC[4], " missing values)"),
-                  x = paste0("p1 (", temp.pca$modelDF$R2X[1]*100, " %)"),
-                  y = paste0("p2 (", temp.pca$modelDF$R2X[2]*100, " %)"))
-  labels2 <- list(title = paste0("Loadings plot\n", temp.pca$descriptionMC[2], " variables (", temp.pca$descriptionMC[3], " excluded)"),
-                  x = paste0("p1 (", temp.pca$modelDF$R2X[1]*100, " %)"),
-                  y = paste0("p2 (", temp.pca$modelDF$R2X[2]*100, " %)"))
-  ## plots
-  plot1 <- ggplot(temp.scores, aes(p1, p2)) +
-    plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = Samp.lab.L)
+  temp.scores <- merge(dlist[[2]], data.frame(temp.pca$scoreMN),
+                       by.x = 0, by.y = 0)
+  limits1 <- find.limits(temp.scores$p1, temp.scores$p2)
+  temp.loadings <- merge(dlist[[3]], data.frame(temp.pca$loadingMN),
+                         by.x = 0, by.y = 0)
+  limits2 <- find.limits(temp.loadings$p1, temp.loadings$p2)
+  labels1 <- list(title = paste0("Scores plot ", temp.pca$descriptionMC[1],
+                                 " samples\n(", temp.pca$descriptionMC[4], " missing values)"),
+                  x = paste0("p1 (", temp.pca$modelDF$R2X[1] * 100, " %)"),
+                  y = paste0("p2 (", temp.pca$modelDF$R2X[2] * 100, " %)"))
+  labels2 <- list(title = paste0("Loadings plot\n", temp.pca$descriptionMC[2],
+                                 " variables (", temp.pca$descriptionMC[3], " excluded)"),
+                  x = paste0("p1 (", temp.pca$modelDF$R2X[1] * 100, " %)"),
+                  y = paste0("p2 (", temp.pca$modelDF$R2X[2] * 100, " %)"))
+  plot1 <- ggplot(temp.scores, aes(p1, p2)) + plotheme.auto(Samples.grp,
+                                                            Variables.grp = NULL, limits = limits1, Legend.L, colorL,
+                                                            labels1, geom_path = T, labelsL = Samp.lab.L)
   plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
-    plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
-  ## Result
-  return(list("PCA" = temp.pca, "Plot" = grid.arrange(plot1, plot2, nrow = 1 )))
+    plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2,
+                  Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
+  return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
 }
 
 
