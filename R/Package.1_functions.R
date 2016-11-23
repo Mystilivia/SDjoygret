@@ -1040,8 +1040,6 @@ dlist.summary.2 <- function(dlist,
 }
 
 
-
-
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
@@ -1194,6 +1192,7 @@ dlist.opls <- function (dlist,
 #' @param y column with y data
 #' @param fill filling color or factor
 #' @param color string for point color
+#' @param alpha alpha value of point
 #' @param labels List for labels with (title, x, y)
 #' @keywords ggplot
 #' @return a ggplot
@@ -1205,6 +1204,7 @@ densplot <- function(Data,
                      y,
                      fill = "grey",
                      color = "black",
+                     alpha = 0.8,
                      labels = list("title", "x", "y")) {
   plot1 <- ggplot(Data, aes(x = x, fill = fill)) +
     geom_density(adjust = 1/5, alpha = 0.25, color = color) +
@@ -1216,7 +1216,7 @@ densplot <- function(Data,
     theme_bw() +
     coord_flip()
   plot3 <- ggplot(Data, aes(x = x, y = y, color = fill)) +
-    geom_point(size = 0.5) +
+    geom_point(size = 0.5, alpha = alpha) +
     labs(list(title = "", x = labels[[2]], y = labels[[3]])) +
     theme_bw()
   if(is.factor(fill) == T){
@@ -1288,8 +1288,6 @@ xcmsSet.Result.List <- function(x) {
        "SampleMetadata" = x@phenoData,
        "VariableMetadata" = Variable.Metadata)
 }
-
-
 
 
 

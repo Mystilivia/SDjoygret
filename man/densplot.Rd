@@ -4,7 +4,7 @@
 \alias{densplot}
 \title{2 dimension plot with density}
 \usage{
-densplot(Data, x, y, fill = "grey", color = "black",
+densplot(Data, x, y, fill = "grey", color = "black", alpha = 0.8,
   labels = list("title", "x", "y"))
 }
 \arguments{
@@ -17,6 +17,8 @@ densplot(Data, x, y, fill = "grey", color = "black",
 \item{fill}{filling color or factor}
 
 \item{color}{string for point color}
+
+\item{alpha}{alpha value of point}
 
 \item{labels}{List for labels with (title, x, y)}
 }
