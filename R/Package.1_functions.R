@@ -1049,6 +1049,7 @@ dlist.summary.2 <- function(dlist,
 #' @param colorL Logical for using color or greyscale
 #' @param Samp.lab.L Logical for drawing Sample labels
 #' @param Var.lab.L Logical for drawing Variable labels
+#' @inheritParams densplot
 #' @inheritParams dlist.subset
 #' @keywords pca, ggplot
 #' @return A list with [1] pca results, [2] plot as grobs.
@@ -1056,12 +1057,13 @@ dlist.summary.2 <- function(dlist,
 #' @examples
 #' dlist.pca()
 dlist.pca <- function (dlist,
-                            Samples.grp = NULL,
-                            Variables.grp = NULL,
-                            Legend.L = F,
-                            colorL = F,
-                            Samp.lab.L = F,
-                            Var.lab.L = T) {
+                       Samples.grp = NULL,
+                       Variables.grp = NULL,
+                       Legend.L = F,
+                       colorL = F,
+                       Samp.lab.L = F,
+                       Var.lab.L = T,
+                       ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
   check.list.format(dlist)
   temp.pca <- opls(dlist[[1]], predI = 2, plotL = F)
@@ -1085,7 +1087,11 @@ dlist.pca <- function (dlist,
   plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
     plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2,
                   Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L)
-  return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
+  if(ShowPlot == T) {
+    return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
+  } else {
+    return(list(PCA = temp.pca, Plot = arrangeGrob(plot1, plot2, nrow = 1)))
+  }
 }
 
 

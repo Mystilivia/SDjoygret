@@ -5,7 +5,7 @@
 \title{Perform PCA and custom plot}
 \usage{
 dlist.pca(dlist, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F,
-  colorL = F, Samp.lab.L = F, Var.lab.L = T)
+  colorL = F, Samp.lab.L = F, Var.lab.L = T, ShowPlot = T)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
@@ -21,6 +21,8 @@ dlist.pca(dlist, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F,
 \item{Samp.lab.L}{Logical for drawing Sample labels}
 
 \item{Var.lab.L}{Logical for drawing Variable labels}
+
+\item{ShowPlot}{Logical to directly draw the plot or return the grobs (faster)}
 }
 \value{
 A list with [1] pca results, [2] plot as grobs.
