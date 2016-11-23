@@ -4,7 +4,7 @@
 \alias{densplot}
 \title{2 dimension plot with density}
 \usage{
-densplot(Data, x, y, fill = "grey", color = "black", alpha = 0.8,
+densplot(Data, x, y, fill = NULL, color = "black", alpha = 0.8,
   labels = list("title", "x", "y"))
 }
 \arguments{

@@ -1202,24 +1202,24 @@ dlist.opls <- function (dlist,
 densplot <- function(Data,
                      x,
                      y,
-                     fill = "grey",
+                     fill = NULL,
                      color = "black",
                      alpha = 0.8,
                      labels = list("title", "x", "y")) {
-  plot1 <- ggplot(Data, aes(x = x, fill = fill)) +
+  plot1 <- ggplot(Data, aes(x = get(x), fill = get(fill))) +
     geom_density(adjust = 1/5, alpha = 0.25, color = color) +
     labs(list(title = labels[[1]], x = "", y = "density")) +
     theme_bw()
-  plot2 <- ggplot(Data, aes(x = y, fill = fill)) +
+  plot2 <- ggplot(Data, aes(x = get(y), fill = get(fill))) +
     geom_density(adjust = 1/10, alpha = 0.25, color = color) +
     labs(list(title = "", x = "", y = "density")) +
     theme_bw() +
     coord_flip()
-  plot3 <- ggplot(Data, aes(x = x, y = y, color = fill)) +
+  plot3 <- ggplot(Data, aes(x = get(x), y = get(y), color = get(fill))) +
     geom_point(size = 0.5, alpha = alpha) +
     labs(list(title = "", x = labels[[2]], y = labels[[3]])) +
     theme_bw()
-  if(is.factor(fill) == T){
+  if(is.factor(get(fill)) == T){
     plot4 <- g_legend(plot1)
   } else {
     plot4 <- ggplot() + theme(plot.background = element_blank(), panel.background = element_blank()) + theme(legend.position = "none")
