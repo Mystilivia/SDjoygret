@@ -5,8 +5,8 @@
 \title{Perform PCA and custom plot}
 \usage{
 dlist.pca(dlist, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F,
-  colorL = F, Samp.lab.L = F, Var.lab.L = T, alpha = 0.8,
-  ShowPlot = T)
+  colorL = F, Samp.lab.L = F, Var.lab.L = T, palpha = 0.8,
+  psize = 0.8, ShowPlot = T)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
@@ -23,7 +23,9 @@ dlist.pca(dlist, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F,
 
 \item{Var.lab.L}{Logical for drawing Variable labels}
 
-\item{alpha}{Transparency for loadings points (between 0 and 1)}
+\item{palpha}{Transparency for loadings points (between 0 and 1)}
+
+\item{psize}{Loadings points size}
 
 \item{ShowPlot}{Logical to directly draw the plot or return the grobs (faster)}
 }

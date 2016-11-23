@@ -837,6 +837,8 @@ find.limits <- function(x,
 #' @param labels list for titles (title, x, y)
 #' @param geom_path Logical for drawing path
 #' @param labelsL Add labels to points
+#' @param palpha Points transparency (between 0 and 1)
+#' @param psize Points size
 #' @keywords scales, ggplot
 #' @return ggplot list of aestethic
 #' @export
@@ -850,7 +852,8 @@ plotheme.auto <- function(Samples.grp = NULL,
                           labels = list(title = "", x = "", y = ""),
                           geom_path = F,
                           labelsL = F,
-                          alpha = 0.8) {
+                          palpha = 0.8,
+                          psize = 0.8) {
   require(ggplot2)
   opls.ggplotheme.auto <- list(
     if(!is.null(Samples.grp) & geom_path == T){geom_path(alpha = 0.4)},
@@ -861,7 +864,7 @@ plotheme.auto <- function(Samples.grp = NULL,
     if(colorL == F) {scale_colour_grey()},
     geom_hline(yintercept = 0, linetype = 2, color = "grey"),
     geom_vline(xintercept = 0, linetype = 2, color = "grey"),
-    geom_point(alpha = alpha),
+    geom_point(alpha = palpha, size = psize),
     if(!is.null(limits)){xlim(limits[1,1], limits[1,2])},
     if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
     ggplot_SD.theme,
@@ -1050,7 +1053,8 @@ dlist.summary.2 <- function(dlist,
 #' @param colorL Logical for using color or greyscale
 #' @param Samp.lab.L Logical for drawing Sample labels
 #' @param Var.lab.L Logical for drawing Variable labels
-#' @param alpha Transparency for loadings points (between 0 and 1)
+#' @param palpha Transparency for loadings points (between 0 and 1)
+#' @param psize Loadings points size
 #' @inheritParams densplot
 #' @inheritParams dlist.subset
 #' @keywords pca, ggplot
@@ -1065,7 +1069,8 @@ dlist.pca <- function (dlist,
                        colorL = F,
                        Samp.lab.L = F,
                        Var.lab.L = T,
-                       alpha = 0.8,
+                       palpha = 0.8,
+                       psize = 0.8,
                        ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
   check.list.format(dlist)
@@ -1089,7 +1094,7 @@ dlist.pca <- function (dlist,
                                                             labels1, geom_path = T, labelsL = Samp.lab.L)
   plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
     plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2,
-                  Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L, alpha = alpha)
+                  Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L, palpha = palpha, psize = psize)
   if(ShowPlot == T) {
     return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
   } else {

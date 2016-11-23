@@ -6,7 +6,7 @@
 \usage{
 plotheme.auto(Samples.grp = NULL, Variables.grp = NULL, limits = NULL,
   Legend.L = T, colorL = F, labels = list(title = "", x = "", y = ""),
-  geom_path = F, labelsL = F, alpha = 0.8)
+  geom_path = F, labelsL = F, palpha = 0.8, psize = 0.8)
 }
 \arguments{
 \item{Samples.grp}{Name of the grouping factor for samples}
@@ -24,6 +24,10 @@ plotheme.auto(Samples.grp = NULL, Variables.grp = NULL, limits = NULL,
 \item{geom_path}{Logical for drawing path}
 
 \item{labelsL}{Add labels to points}
+
+\item{palpha}{Points transparency (between 0 and 1)}
+
+\item{psize}{Points size}
 }
 \value{
 ggplot list of aestethic
