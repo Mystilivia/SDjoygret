@@ -5,7 +5,7 @@
 \title{Perform OPLS and custom plots}
 \usage{
 dlist.opls(dlist, Opls.y, Samples.grp = NULL, Variables.grp = NULL,
-  Legend.L = T, colorL = F, LabelsL = F)
+  Legend.L = T, colorL = F, VIP.thr = 1, LabelsL = F, ShowPlot = T)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
@@ -21,6 +21,8 @@ dlist.opls(dlist, Opls.y, Samples.grp = NULL, Variables.grp = NULL,
 \item{colorL}{Logical to use colors instead of black & white}
 
 \item{LabelsL}{Logical to show labels on plot}
+
+\item{ShowPlot}{Logical to directly draw the plot or return the grobs (faster)}
 }
 \value{
 A list with (OPLS, Plot, VIPS)

@@ -1153,6 +1153,8 @@ dlist.transform <- function(dlist,
 #' @param Legend.L Logical to draw legends
 #' @param colorL Logical to use colors instead of black & white
 #' @param LabelsL Logical to show labels on plot
+#' @param ShowPlot
+#' @inheritParams densplot
 #' @inheritParams dlist.subset
 #' @keywords opls, ggplot
 #' @return A list with (OPLS, Plot, VIPS)
@@ -1160,12 +1162,14 @@ dlist.transform <- function(dlist,
 #' @examples
 #' dlist.opls()
 dlist.opls <- function (dlist,
-                             Opls.y,
-                             Samples.grp = NULL,
-                             Variables.grp = NULL,
-                             Legend.L = T,
-                             colorL = F,
-                             LabelsL = F) {
+                        Opls.y,
+                        Samples.grp = NULL,
+                        Variables.grp = NULL,
+                        Legend.L = T,
+                        colorL = F,
+                        VIP.thr = 1,
+                        LabelsL = F,
+                        ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra)
   check.list.format(dlist)
   temp.opls <- opls(dlist[[1]], dlist[[2]][[Opls.y]], orthoI = NA, plotL = F)
@@ -1189,15 +1193,25 @@ dlist.opls <- function (dlist,
     plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
 
   ##
-  temp.VIPs <- ggplot_oplsvip(temp.opls, VIP.thr = 1)
+  temp.VIPs <- ggplot_opls(temp.opls, VIP.thr = VIP.thr, ShowPlot = F)
   ## Result
-  return(list("OPLS" = temp.opls,
-              "Plot" = grid.arrange(plot1,
+  if(ShowPlot == T) {
+    return(list("OPLS" = temp.opls,
+               "Plot" = grid.arrange(plot1,
+                                     plot2,
+                                     tableGrob(temp.opls$summaryDF, theme = ttheme_minimal()),
+                                     temp.VIPs$Plot,
+                                     nrow = 2, heights = c(3,1)),
+               "VIPs" = temp.VIPs$VIPs))
+  } else {
+    return(list("OPLS" = temp.opls,
+               "Plot" = arrangeGrob(plot1,
                                     plot2,
                                     tableGrob(temp.opls$summaryDF, theme = ttheme_minimal()),
                                     temp.VIPs$Plot,
                                     nrow = 2, heights = c(3,1)),
-              "VIPs" = temp.VIPs$VIPs))
+               "VIPs" = temp.VIPs$VIPs))
+  }
 }
 
 
@@ -1312,7 +1326,47 @@ xcmsSet.Result.List <- function(x) {
 
 
 
-
+#' Plot OPLS results with VIPs
+#'
+#' Description of the function
+#' @param data Result of ropls with opls method
+#' @param VIP.thr VIP threshold for groups (1 by default)
+#' @inheritParams densplot
+#' @keywords ggplot, opls
+#' @return Return a list with Plot and VIPs
+#' @export
+#' @examples
+#' ggplot_opls()
+ggplot_opls <- function(data, VIP.thr = 1, ShowPlot = T) {
+  # Test
+  if(class(data) != "opls"){print("Optimized for ropls::opls resulting object") ; stop()}
+  if(!data$typeC %in% c("OPLS", "OPLS-DA")){print("Optimized for OPLS-DA results") ; stop()}
+  # Data prep
+  temp.plot <- data.frame("Vip" = data$vipVn)
+  pos.list  <- subset(data.frame(data$loadingMN), p1 > 0)
+  neg.list  <- subset(data.frame(data$loadingMN), p1 < 0)
+  temp.plot[rownames(temp.plot) %in% rownames(neg.list),] <- temp.plot[rownames(temp.plot) %in% rownames(neg.list),] * -1
+  ## Plot var
+  plot.data <- temp.plot
+  x <- rownames(temp.plot)
+  y <- "Vip"
+  VIP.subset<- subset(temp.plot, abs(Vip) >= VIP.thr)
+  Select.var.VIP <- rownames(VIP.subset)
+  labels <- list(title = "", x = paste0("Variables (", data$descriptionMC[2], " of which ", length(Select.var.VIP), " have a VIP > ", VIP.thr, ")"), y = "Score VIP")
+  # Plot
+  plot1 <- ggplot(plot.data, aes(x = reorder(x, get(y)), y = get(y), ymin = 0, ymax = get(y))) +
+    geom_hline(yintercept = c(-1,-2,-VIP.thr, VIP.thr, 2), alpha = 0.4, linetype = 2) +
+    geom_pointrange(alpha = 0.6, size = 0.1, aes(color = abs(get(y)) >= VIP.thr)) +
+    labs(labels) +
+    ggplot_theme_sly +
+    ggplot_SD_nox_lab +
+    theme(legend.position = 0)
+  if(ShowPlot == T) {
+    return(list(Plot = temp.pca, VIPs = grid.arrange(plot1)))
+  } else {
+    return(list(Plot = temp.pca, VIPs = arrangeGrob(plot1)))
+  }
+}
 
 
 #' TITLE
