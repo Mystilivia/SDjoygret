@@ -5,7 +5,7 @@
 \title{2 dimension plot with density}
 \usage{
 densplot(Data, x, y, group = NULL, color = "black", alpha = 0.5,
-  labels = list(title = "", x = "", y = ""))
+  labels = list(title = "", x = "", y = ""), ShowPlot = T)
 }
 \arguments{
 \item{Data}{Long format data to plot}
@@ -21,6 +21,8 @@ densplot(Data, x, y, group = NULL, color = "black", alpha = 0.5,
 \item{alpha}{alpha value of point (default is 0.5)}
 
 \item{labels}{List for labels with (title, x, y)}
+
+\item{ShowPlot}{Logical to directly draw the plot or return the grobs (faster)}
 }
 \value{
 a ggplot

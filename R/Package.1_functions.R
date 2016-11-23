@@ -1194,6 +1194,7 @@ dlist.opls <- function (dlist,
 #' @param color Point color (default is "black")
 #' @param alpha alpha value of point (default is 0.5)
 #' @param labels List for labels with (title, x, y)
+#' @param ShowPlot Logical to directly draw the plot or return the grobs (faster)
 #' @keywords ggplot
 #' @return a ggplot
 #' @export
@@ -1205,7 +1206,8 @@ densplot <- function(Data,
                      group = NULL,
                      color = "black",
                      alpha = 0.5,
-                     labels = list(title = "", x = "", y = "")) {
+                     labels = list(title = "", x = "", y = ""),
+                     ShowPlot = T) {
   plot1 <- ggplot(Data, aes_string(x = x, fill = group)) +
     geom_density(adjust = 1/5, alpha = 0.25, color = color) +
     labs(list(title = labels[[1]], x = "", y = "density")) +
@@ -1224,13 +1226,14 @@ densplot <- function(Data,
   } else {
     plot4 <- ggplot() + theme(plot.background = element_blank(), panel.background = element_blank()) + theme(legend.position = "none")
   }
-  grid.arrange(plot1 + theme(legend.position = "none"),
+  plot <- arrangeGrob(plot1 + theme(legend.position = "none"),
                plot4,
                plot3 + theme(legend.position = "none"),
                plot2 + theme(legend.position = "none"),
                ncol = 2,
                heights = c(0.7,2),
                widths = c(2,0.7))
+  if(ShowPlot == T) {return(plot(plot))} else {return(plot)}
 }
 
 
