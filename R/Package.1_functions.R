@@ -1229,8 +1229,8 @@ densplot <- function(Data,
                plot3 + theme(legend.position = "none"),
                plot2 + theme(legend.position = "none"),
                ncol = 2,
-               heights = c(1,2),
-               widths = c(2,1))
+               heights = c(0.7,2),
+               widths = c(2,0.7))
 }
 
 
