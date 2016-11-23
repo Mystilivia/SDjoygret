@@ -1362,9 +1362,9 @@ ggplot_opls <- function(data, VIP.thr = 1, ShowPlot = T) {
     ggplot_SD_nox_lab +
     theme(legend.position = 0)
   if(ShowPlot == T) {
-    return(list(Plot = temp.pca, VIPs = grid.arrange(plot1)))
+    return(list(VIPs = VIP.subset, Plot = grid.arrange(plot1)))
   } else {
-    return(list(Plot = temp.pca, VIPs = arrangeGrob(plot1)))
+    return(list(VIPs = VIP.subset, Plot = arrangeGrob(plot1)))
   }
 }
 
