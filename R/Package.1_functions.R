@@ -1197,20 +1197,28 @@ dlist.opls <- function (dlist,
   ## Result
   if(ShowPlot == T) {
     return(list("OPLS" = temp.opls,
-               "Plot" = grid.arrange(plot1,
-                                     plot2,
-                                     tableGrob(temp.opls$summaryDF, theme = ttheme_minimal()),
-                                     temp.VIPs$Plot,
-                                     nrow = 2, heights = c(3,1)),
-               "VIPs" = temp.VIPs$VIPs))
+                "Plots" = list("ScoresPlot" = plot1,
+                               "LoadingsPlot" = plot2,
+                               "VipsPlot" = temp.VIPs.plot,
+                               "SummaryTable" = tableGrob(temp.opls$summaryDF, theme = ttheme_minimal())),
+                "DrawPlots" = grid.arrange(plot1,
+                                           plot2,
+                                           tableGrob(temp.opls$summaryDF, theme = ttheme_minimal()),
+                                           temp.VIPs$Plot,
+                                           nrow = 2, heights = c(3,1)),
+                "VIPs" = temp.VIPs$VIPs))
   } else {
     return(list("OPLS" = temp.opls,
-               "Plot" = arrangeGrob(plot1,
-                                    plot2,
-                                    tableGrob(temp.opls$summaryDF, theme = ttheme_minimal()),
-                                    temp.VIPs$Plot,
-                                    nrow = 2, heights = c(3,1)),
-               "VIPs" = temp.VIPs$VIPs))
+                "Plots" = list("ScoresPlot" = plot1,
+                               "LoadingsPlot" = plot2,
+                               "VipsPlot" = temp.VIPs.plot,
+                               "SummaryTable" = tableGrob(temp.opls$summaryDF, theme = ttheme_minimal())),
+                "DrawPlots" = arrangeGrob(plot1,
+                                          plot2,
+                                          tableGrob(temp.opls$summaryDF, theme = ttheme_minimal()),
+                                          temp.VIPs$Plot,
+                                          nrow = 2, heights = c(3,1)),
+                "VIPs" = temp.VIPs$VIPs))
   }
 }
 
