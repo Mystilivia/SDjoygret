@@ -1218,7 +1218,7 @@ densplot <- function(Data,
     theme_bw() +
     coord_flip()
   plot3 <- ggplot(Data, aes_string(x = x, y = y)) +
-    geom_point(size = 0.5, aes_string(color = group), alpha = alpha) +
+    geom_point(size = 0.5, aes_string(fill = group), alpha = alpha) +
     labs(list(title = "", x = labels[[2]], y = labels[[3]])) +
     theme_bw()
   if(any(!is.null(group) & group %in% names(Data)) == T) {
