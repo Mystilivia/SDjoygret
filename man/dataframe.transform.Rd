@@ -4,10 +4,12 @@
 \alias{dataframe.transform}
 \title{Transform a datamatrix and replace zero}
 \usage{
-dataframe.transform(data, TransL = F, Trans.fun = log2, ...)
+dataframe.transform(data, ZeroL = T, TransL = F, Trans.fun = log2, ...)
 }
 \arguments{
 \item{data}{a dataframe with value only to transform}
+
+\item{ZeroL}{Should zero be replaced by minimum value divided by 2}
 
 \item{TransL}{Should transformation be made}
 
@@ -19,7 +21,8 @@ dataframe.transform(data, TransL = F, Trans.fun = log2, ...)
 The resulting datamatrix only
 }
 \description{
-Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).
+Do any of the two following function : Replace zero by the minimum value divided by 2 and/or tranform data
+with Trans.fun function (by default log2).
 }
 \examples{
 dataframe.transform()

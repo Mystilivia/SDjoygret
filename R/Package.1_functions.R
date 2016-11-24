@@ -1105,10 +1105,12 @@ dlist.pca <- function (dlist,
 
 #' Transform a datamatrix and replace zero
 #'
-#' Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).
+#' Do any of the two following function : Replace zero by the minimum value divided by 2 and/or tranform data
+#' with Trans.fun function (by default log2).
 #' @param data a dataframe with value only to transform
 #' @param TransL Should transformation be made
 #' @param Trans.fun Which transformation to perform (default log2)
+#' @param ZeroL Should zero be replaced by minimum value divided by 2
 #' @param ... Argument to pass to Trans.fun
 #' @keywords transform
 #' @return The resulting datamatrix only
@@ -1116,10 +1118,11 @@ dlist.pca <- function (dlist,
 #' @examples
 #' dataframe.transform()
 dataframe.transform <- function(data,
-                                 TransL = F,
-                                 Trans.fun = log2,
-                                 ...) {
-  temp.data <- data.frame(apply(data, 2, function(x) {x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}))
+                                ZeroL = T,
+                                TransL = F,
+                                Trans.fun = log2,
+                                ...) {
+  if(isTRUE(ZeroL)) {temp.data <- data.frame(apply(data, 2, function(x) {x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}))}
   if(isTRUE(TransL)) {return(Trans.fun(data, ...))}
   return(temp.data)
 }
@@ -1199,7 +1202,7 @@ dlist.opls <- function (dlist,
     return(list("OPLS" = temp.opls,
                 "Plots" = list("ScoresPlot" = plot1,
                                "LoadingsPlot" = plot2,
-                               "VipsPlot" = temp.VIPs.plot,
+                               "VipsPlot" = temp.VIPs$Plot,
                                "SummaryTable" = tableGrob(temp.opls$summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm")))),
                 "DrawPlots" = grid.arrange(plot1,
                                            plot2,
@@ -1211,7 +1214,7 @@ dlist.opls <- function (dlist,
     return(list("OPLS" = temp.opls,
                 "Plots" = list("ScoresPlot" = plot1,
                                "LoadingsPlot" = plot2,
-                               "VipsPlot" = temp.VIPs$plot,
+                               "VipsPlot" = temp.VIPs$Plot,
                                "SummaryTable" = tableGrob(temp.opls$summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm")))),
                 "DrawPlots" = arrangeGrob(plot1,
                                           plot2,
