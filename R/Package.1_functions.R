@@ -797,20 +797,24 @@ importWorksheets.xls <- function(Data.path, fcolL = F) {
 dlist.subset <- function(dlist,
                          Var.sel = NULL,
                          Samples.sel = NULL) {
-  check.list.format(dlist)
-  temp.dlist <- dlist
+  require("data.table")
+  invisible(check.list.format(dlist, to.data.table.L = T))
   if(!is.null(Samples.sel)){
-    temp.dlist[[2]] <- subset(temp.dlist[[2]], rownames(temp.dlist[[2]]) %in% Samples.sel)}
+    setkeyv(dlist[[2]], names(dlist[[2]])[1])
+    dlist[[2]] <- dlist[[2]][Samples.sel]}
   if(!is.null(Var.sel)){
-    temp.dlist[[3]] <- subset(temp.dlist[[3]], rownames(temp.dlist[[3]]) %in% Var.sel)}
+    setkeyv(dlist[[3]], names(dlist[[3]])[1])
+    dlist[[3]] <- dlist[[3]][Var.sel]}
   if(length(dlist)==3){
-    temp.dlist[[1]] <- subset(temp.dlist[[1]], rownames(temp.dlist[[1]]) %in% rownames(temp.dlist[[2]]), select = rownames(temp.dlist[[3]]))
-    return(temp.dlist)} else {
-      warning("No Variable metadlist")
-      temp.dlist[[1]] <- subset(temp.dlist[[1]], rownames(temp.dlist[[1]]) %in% rownames(temp.dlist[[2]]))
-      return(temp.dlist)}
+    setkeyv(dlist[[1]], names(dlist[[1]])[1])
+    dlist[[1]] <- dlist[[1]][dlist[[2]][[1]], dlist[[3]][[1]], with = F]
+    return(dlist)
+    } else {
+    warning("No VariableMetadata in dlist")
+    dlist[[1]] <- dlist[[1]][dlist[[2]][[1]]]
+    dlist[[1]] <- subset(temp.dlist[[1]], rownames(temp.dlist[[1]]) %in% rownames(temp.dlist[[2]]))
+    return(dlist)}
 }
-
 
 #' Split a dataframe
 #'
