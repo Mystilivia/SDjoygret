@@ -680,12 +680,13 @@ check.list.format <- function (dlist, to.data.table.L = T) {
       if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
       if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
       print("Data seems OK but are stored in data.frame")
-      if(isTRUE(to.data.table.L)) {
+      if(to.data.table.L == T) {
         to.data.table(dlist, rownames = T)
       } else {
         print("Data weren't converted to data.table, set arg to.data.table = T if convertion is needed")
         print(temp.data.str)
-        return(dlist)}
+        return(dlist)
+      }
     }
   }
 }
