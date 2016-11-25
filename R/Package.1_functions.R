@@ -654,16 +654,16 @@ get_sign = function(model) {
 #' @export
 #' @examples
 #' check.list.format()
-check.list.format <- function (dlist, to.data.table = T) {
-  require(data.table)
+check.list.format <- function (dlist, to.data.table.L = T) {
+  require("data.table")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   temp.data.str <- data.table("ListLevel" = names(dlist),
                               "matrix" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
                               "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
                               "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
                               "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
-  if(temp.data.str[,any(data.table==F)] & temp.data.str[,any(data.frame==F)]) {stop("List levels should be data.frame or data.table")}
-  if(!temp.data.str[,any(data.table==F)]) { ## all are data.table
+  if(temp.data.str[,any(data.table == F)] & temp.data.str[,any(data.frame==F)]) {stop("List levels should be data.frame or data.table")}
+  if(!temp.data.str[,any(data.table == F)]) { ## all are data.table
     if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
     if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
     dim.temp <- lapply(dlist, dim)
@@ -680,7 +680,7 @@ check.list.format <- function (dlist, to.data.table = T) {
       if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
       if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
       print("Data seems OK but are stored in data.frame")
-      if(isTRUE(to.data.table)) {
+      if(isTRUE(to.data.table.L)) {
         to.data.table(dlist, rownames = T)
       } else {
         print("Data weren't converted to data.table, set arg to.data.table = T if convertion is needed")
