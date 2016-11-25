@@ -657,11 +657,13 @@ get_sign = function(model) {
 check.list.format <- function (dlist, to.data.table.L = T) {
   require("data.table")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
+
   temp.data.str <- data.table("ListLevel" = names(dlist),
                               "matrix" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
                               "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
                               "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
                               "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
+
   if(temp.data.str[,any(data.table == F)] & temp.data.str[,any(data.frame==F)]) {stop("List levels should be data.frame or data.table")}
   if(!temp.data.str[,any(data.table == F)]) { ## all are data.table
     if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
@@ -681,7 +683,7 @@ check.list.format <- function (dlist, to.data.table.L = T) {
       if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
       print("Data seems OK but are stored in data.frame")
       if(to.data.table.L == T) {
-        to.data.table(dlist, rownames = T)
+        to.data.table(dlist, T)
       } else {
         print("Data weren't converted to data.table, set arg to.data.table = T if convertion is needed")
         print(temp.data.str)
@@ -699,27 +701,27 @@ check.list.format <- function (dlist, to.data.table.L = T) {
 #' the function can place them as first variable (since data.table does not use rownames logic).
 #'
 #' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
-#' @param rownames Logical to specify wether the input dlist use data.frame rownames to store rowID.
+#' @param rownamesL Logical to specify wether the input dlist use data.frame rownames to store rowID.
 #' @return The dlist with data converted to dataframe. Also print a check status of class used in the
 #' dlist
 #' @keywords list, check, data.table
 #' @export
 #' @examples
 #' to.data.table()
-to.data.table <- function(dlist, rownames = F) {
+to.data.table <- function(dlist, rownamesL = F) {
   require(data.table)
   temp.data.str <- data.table("ListLevel" = names(dlist),
                               "matrix" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
                               "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
                               "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
                               "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
-  if(!temp.data.str[,any(data.table==F)]) { ## all are data.table
+  if(!temp.data.str[,any("data.table"==F)]) { ## all are data.table
     print("Data seems ok")
     print(temp.data.str)
     return(dlist)
   } else {
-    if(!temp.data.str[,any(data.frame==F)]) { ## at least one isn't a data.table but all are data.frame
-      if(rownames == F) {
+    if(!temp.data.str[,any("data.frame"==F)]) { ## at least one isn't a data.table but all are data.frame
+      if(rownamesL == F) {
         Data.2 <- lapply(dlist, function(x) {
           data.table(x)
         })
@@ -730,7 +732,7 @@ to.data.table <- function(dlist, rownames = F) {
           data.table("RowID" = rownames(x), x)
         })
         print("Data were converted to data.table and rownames added in RowID")
-        to.data.table(Data.2, rownames = F)
+        to.data.table(Data.2, F)
       }
     } else {
       print("Data were not data.frame or data.table :")

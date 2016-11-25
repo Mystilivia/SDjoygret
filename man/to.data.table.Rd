@@ -4,12 +4,12 @@
 \alias{to.data.table}
 \title{Check dlist table format and convert to data.table}
 \usage{
-to.data.table(dlist, rownames = F)
+to.data.table(dlist, rownamesL = F)
 }
 \arguments{
 \item{dlist}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}
 
-\item{rownames}{Logical to specify wether the input dlist use data.frame rownames to store rowID.}
+\item{rownamesL}{Logical to specify wether the input dlist use data.frame rownames to store rowID.}
 }
 \value{
 The dlist with data converted to dataframe. Also print a check status of class used in the
