@@ -642,26 +642,99 @@ get_sign = function(model) {
 #'
 #' Check the format of 3 levels list.
 #'
-#' Chech if the list elements are data.frame, id rownames [[1]] and [[2]] are identical,
-#' and if colnames [[1]] are identical to rownames [[3]]. Check also dataframes dimension to check
-#' consistency.
+#' Chech if the list elements are data.table or data.frame, id rownames [[1]] and [[2]] are identical (for
+#' data.frame only, use first column as row id with data.table), and if colnames [[1]] are identical to
+#' rownames [[3]]. Check also dataframes dimension to check consistency and propose to transform data.frame
+#' to data.table.
 #'
 #' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
-#' @return Result of check as character
+#' @param to.data.table Logical to convert data.frame's dlist to data.table with to.data.table function
+#' @return Print result of check as character and return the dlist (or converted dlist) if format is ok
 #' @keywords list, check
 #' @export
 #' @examples
 #' check.list.format()
-check.list.format <- function (dlist) {
+check.list.format <- function (dlist, to.data.table = T) {
+  require(data.table)
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
-  if(FALSE %in% c(lapply(dlist, class) == "data.frame")){stop("List levels should be data.frame")}
-  if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
-  if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-  dim.temp <- lapply(dlist, dim)
-  if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
-  if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
-  print("Data seems OK")
+  temp.data.str <- data.table("ListLevel" = names(dlist),
+                              "matrix" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
+                              "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
+                              "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
+                              "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
+  if(temp.data.str[,any(data.table==F)] & temp.data.str[,any(data.frame==F)]) {stop("List levels should be data.frame or data.table")}
+  if(!temp.data.str[,any(data.table==F)]) { ## all are data.table
+    if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+    if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
+    dim.temp <- lapply(dlist, dim)
+    if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
+    if(!dim.temp[[1]][2]-1 == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
+    return(dlist)
+  } else {
+    if(!temp.data.str[,any(data.frame==F)]) { ## all are data.table
+      if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+      if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
+      dim.temp <- lapply(dlist, dim)
+      if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
+      if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
+      print("Data seems OK but are stored in data.frame")
+      if(isTRUE(to.data.table)) {
+        to.data.table(dlist, rownames = T)
+      } else {return(dlist)}
+    }
+  }
 }
+
+
+#' Check dlist table format and convert to data.table
+#'
+#' Check the format of 3 levels list tables print a class summary and convert to
+#' data.table if not. User can specify if there is rownames (if data.frame were used in entry) so
+#' the function can place them as first variable (since data.table does not use rownames logic).
+#'
+#' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
+#' @param rownames Logical to specify wether the input dlist use data.frame rownames to store rowID.
+#' @return The dlist with data converted to dataframe. Also print a check status of class used in the
+#' dlist
+#' @keywords list, check, data.table
+#' @export
+#' @examples
+#' to.data.table()
+to.data.table <- function(dlist, rownames = F) {
+  require(data.table)
+  temp.data.str <- data.table("ListLevel" = names(dlist),
+                              "matrix" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
+                              "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
+                              "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
+                              "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
+  if(!temp.data.str[,any(data.table==F)]) { ## all are data.table
+    print("Data seems ok")
+    print(temp.data.str)
+    return(dlist)
+  } else {
+    if(!temp.data.str[,any(data.frame==F)]) { ## at least one isn't a data.table but all are data.frame
+      if(rownames == F) {
+        Data.2 <- lapply(dlist, function(x) {
+          data.table(x)
+        })
+        print("Data were converted to data.table")
+        to.data.table(Data.2)
+      } else {
+        Data.2 <- lapply(dlist, function(x) {
+          data.table("RowID" = rownames(x), x)
+        })
+        print("Data were converted to data.table and rownames added in RowID")
+        to.data.table(Data.2, rownames = F)
+      }
+    } else {
+      print("Data were not data.frame or data.table :")
+      print(temp.data.str)
+      return(NULL)
+    }
+  }
+}
+
+
 
 
 #' Import Excel file to list
