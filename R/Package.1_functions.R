@@ -705,6 +705,9 @@ check.list.format <- function (dlist, to.data.table.L = T) {
 to.data.table <- function(dlist, rownamesL = F) {
   require(data.table)
   temp.data.str <- dlist.class(dlist)
+
+  return(dlist)
+
   if(!any(temp.data.str[,data.table==F])) { ## all are data.table
     print("Data seems ok")
     print(temp.data.str)
