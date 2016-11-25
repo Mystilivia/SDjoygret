@@ -657,13 +657,7 @@ get_sign = function(model) {
 check.list.format <- function (dlist, to.data.table.L = T) {
   require("data.table")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
-
-  temp.data.str <- data.table("ListLevel" = names(dlist),
-                              "matrix" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
-                              "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
-                              "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
-                              "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
-
+  temp.data.str <- dlist.class(dlist)
   if(temp.data.str[,any(data.table == F)] & temp.data.str[,any(data.frame==F)]) {stop("List levels should be data.frame or data.table")}
   if(!temp.data.str[,any(data.table == F)]) { ## all are data.table
     if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
@@ -710,11 +704,7 @@ check.list.format <- function (dlist, to.data.table.L = T) {
 #' to.data.table()
 to.data.table <- function(dlist, rownamesL = F) {
   require(data.table)
-  temp.data.str <- data.table("ListLevel" = names(dlist),
-                              "matrix" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
-                              "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
-                              "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
-                              "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
+  temp.data.str <- dlist.class(dlist)
   if(!temp.data.str[,any(data.table==F)]) { ## all are data.table
     print("Data seems ok")
     print(temp.data.str)
@@ -726,13 +716,15 @@ to.data.table <- function(dlist, rownamesL = F) {
           data.table(x)
         })
         print("Data were converted to data.table")
-        to.data.table(Data.2)
+        print(dlist.class(Data.2))
+        return(Data.2)
       } else {
         Data.2 <- lapply(dlist, function(x) {
           data.table("RowID" = rownames(x), x)
         })
         print("Data were converted to data.table and rownames added in RowID")
-        to.data.table(Data.2, F)
+        print(dlist.class(Data.2))
+        return(Data.2)
       }
     } else {
       print("Data were not data.frame or data.table :")
@@ -743,6 +735,25 @@ to.data.table <- function(dlist, rownamesL = F) {
 }
 
 
+#' Check dlist class
+#'
+#' Check the class of dlist levels and return a summary table
+#'
+#' @inheritParams check.list.format
+#' @return A table with class summary
+#' @keywords list, check, data.table
+#' @export
+#' @examples
+#' dlist.class()
+dlist.class <- function(dlist) {
+  require("data.table")
+  return(data.table("ListLevel" = names(dlist),
+                    "matrix" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
+                    "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
+                    "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
+                    "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
+  )
+}
 
 
 #' Import Excel file to list
