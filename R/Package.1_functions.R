@@ -715,12 +715,12 @@ to.data.table <- function(dlist, rownamesL = F) {
                               "data.table" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
                               "data.frame" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
                               "tibble" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
-  if(!temp.data.str[,any("data.table"==F)]) { ## all are data.table
+  if(!temp.data.str[,any(data.table==F)]) { ## all are data.table
     print("Data seems ok")
     print(temp.data.str)
     return(dlist)
   } else {
-    if(!temp.data.str[,any("data.frame"==F)]) { ## at least one isn't a data.table but all are data.frame
+    if(!temp.data.str[,any(data.frame==F)]) { ## at least one isn't a data.table but all are data.frame
       if(rownamesL == F) {
         Data.2 <- lapply(dlist, function(x) {
           data.table(x)
