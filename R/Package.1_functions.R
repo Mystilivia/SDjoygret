@@ -706,12 +706,12 @@ check.list.format <- function (dlist, to.data.table.L = T) {
 to.data.table <- function(dlist, rownamesL = F) {
   require(data.table)
   temp.data.str <- dlist.class(dlist)
-  if(!any(temp.data.str[, class.d.t == F] == F)) { ## all are data.table
+  if(!any(temp.data.str[, class.d.t] == F)) { ## all are data.table
     print("Data seems ok")
     print(temp.data.str)
     return(dlist)
   } else {
-    if(!any(temp.data.str[, class.d.f == F] == F)) { ## at least one isn't a data.table but all are data.frame
+    if(!any(temp.data.str[, class.d.f] == F)) { ## at least one isn't a data.table but all are data.frame
       if(rownamesL == F) {
         Data.2 <- lapply(dlist, function(x) {
           data.table(x)
