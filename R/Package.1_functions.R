@@ -703,7 +703,7 @@ check.list.format <- function (dlist, to.data.table.L = T) {
 #' @examples
 #' to.data.table()
 to.data.table <- function(dlist, rownamesL = F) {
-  require(data.table)
+  require("data.table")
   temp.data.str <- dlist.class(dlist)
   if(!any(temp.data.str[, class.d.t] == F)) { ## all are data.table
     print("Data seems ok")
@@ -748,10 +748,10 @@ to.data.table <- function(dlist, rownamesL = F) {
 dlist.class <- function(dlist) {
   require("data.table")
   return(data.table("ListLevel" = names(dlist),
-                    "class.m" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
-                    "class.d.t" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
-                    "class.d.f" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
-                    "class.t" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
+                    "class.m" = unlist(lapply(dlist, function(x) {any(class(x) == "matrix")})),
+                    "class.d.t" = unlist(lapply(dlist, function(x) {any(class(x) == "data.table")})),
+                    "class.d.f" = unlist(lapply(dlist, function(x) {any(class(x) == "data.frame")})),
+                    "class.t" = unlist(lapply(dlist, function(x) {any(class(x) == "tibble")})))
   )
 }
 
