@@ -729,7 +729,7 @@ to.data.table <- function(dlist, rownamesL = F) {
     } else {
       print("Data were not data.frame or data.table :")
       print(temp.data.str)
-      return(NULL)
+      stop()
     }
   }
 }
