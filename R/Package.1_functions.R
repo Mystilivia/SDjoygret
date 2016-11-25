@@ -658,8 +658,8 @@ check.list.format <- function (dlist, to.data.table.L = T) {
   require("data.table")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   temp.data.str <- dlist.class(dlist)
-  if(any(temp.data.str[,data.table == F]) & any(temp.data.str[,data.frame == F])) {stop("List levels should be data.frame or data.table")}
-  if(!any(temp.data.str[,data.table == F])) { ## all are data.table
+  if(any(temp.data.str[,data.table == F] == F) & any(temp.data.str[,data.frame == F] == F)) {stop("List levels should be data.frame or data.table")}
+  if(!any(temp.data.str[,data.table == F] == F)) { ## all are data.table
     if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
     if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
     dim.temp <- lapply(dlist, dim)
@@ -669,7 +669,7 @@ check.list.format <- function (dlist, to.data.table.L = T) {
     print(temp.data.str)
     return(dlist)
   } else {
-    if(!any(temp.data.str[,data.frame==F])) { ## all are data.table
+    if(!any(temp.data.str[,data.frame==F] == F)) { ## all are data.table
       if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
       if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
       dim.temp <- lapply(dlist, dim)
@@ -705,37 +705,33 @@ check.list.format <- function (dlist, to.data.table.L = T) {
 to.data.table <- function(dlist, rownamesL = F) {
   require(data.table)
   temp.data.str <- dlist.class(dlist)
-
-  return(dlist)
-
-  if(!any(temp.data.str[,data.table==F])) { ## all are data.table
+  if(!any(temp.data.str[,data.table==F] == F)) { ## all are data.table
     print("Data seems ok")
     print(temp.data.str)
     return(dlist)
+  } else {
+    if(!any(temp.data.str[,data.frame==F] == F)) { ## at least one isn't a data.table but all are data.frame
+      if(rownamesL == F) {
+        Data.2 <- lapply(dlist, function(x) {
+          data.table(x)
+        })
+        print("Data were converted to data.table")
+        print(dlist.class(Data.2))
+        return(Data.2)
+      } else {
+        Data.2 <- lapply(dlist, function(x) {
+          data.table("RowID" = rownames(x), x)
+        })
+        print("Data were converted to data.table and rownames added in RowID")
+        print(dlist.class(Data.2))
+        return(Data.2)
+      }
+    } else {
+      print("Data were not data.frame or data.table :")
+      print(temp.data.str)
+      stop()
+    }
   }
-  #else {
-  #   if(!any(temp.data.str[,data.frame==F])) { ## at least one isn't a data.table but all are data.frame
-  #     if(rownamesL == F) {
-  #       Data.2 <- lapply(dlist, function(x) {
-  #         data.table(x)
-  #       })
-  #       print("Data were converted to data.table")
-  #       print(dlist.class(Data.2))
-  #       return(Data.2)
-  #     } else {
-  #       Data.2 <- lapply(dlist, function(x) {
-  #         data.table("RowID" = rownames(x), x)
-  #       })
-  #       print("Data were converted to data.table and rownames added in RowID")
-  #       print(dlist.class(Data.2))
-  #       return(Data.2)
-  #     }
-  #   } else {
-  #     print("Data were not data.frame or data.table :")
-  #     print(temp.data.str)
-  #     stop()
-  #   }
-  # }
 }
 
 
