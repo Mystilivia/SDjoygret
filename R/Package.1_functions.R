@@ -700,6 +700,7 @@ check.list.format <- function (dlist, to.data.table.L = T) {
 #' dlist
 #' @keywords list, check, data.table
 #' @export
+#' @import data.table
 #' @examples
 #' to.data.table()
 to.data.table <- function(dlist, rownamesL = F) {
