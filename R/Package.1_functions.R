@@ -668,7 +668,7 @@ check.list.format <- function (dlist, to.data.table.L = F, return.dlist = T) {
     if(!dim.temp[[1]][2]-1 == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
     print("Data format is ok")
     print(temp.data.str)
-    ifelse(return.dlist == T, return(dlist))
+    if(return.dlist == T) {return(dlist)}
   } else {
     if(!any(temp.data.str[,class.d.f] == F)) { ## all are data.table
       if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
@@ -682,7 +682,7 @@ check.list.format <- function (dlist, to.data.table.L = F, return.dlist = T) {
       } else {
         print("Data weren't converted to data.table, set arg to.data.table = T if convertion is needed")
         print(temp.data.str)
-        ifelse(return.dlist == T, return(dlist))
+        if(return.dlist == T) {return(dlist)}
       }
     }
   }
