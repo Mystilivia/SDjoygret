@@ -802,19 +802,22 @@ dlist.subset <- function(dlist,
   invisible(check.list.format(dlist, to.data.table.L = T))
   if(!is.null(Samples.sel)){
     setkeyv(dlist[[2]], names(dlist[[2]])[1])
-    dlist[[2]] <- dlist[[2]][Samples.sel]}
+    dlist[[2]] <- dlist[[2]][Samples.sel]
+  }
   if(!is.null(Var.sel)){
     setkeyv(dlist[[3]], names(dlist[[3]])[1])
-    dlist[[3]] <- dlist[[3]][Var.sel]}
+    dlist[[3]] <- dlist[[3]][Var.sel]
+  }
   if(length(dlist)==3){
     setkeyv(dlist[[1]], names(dlist[[1]])[1])
-    dlist[[1]] <- dlist[[1]][dlist[[2]][[1]], dlist[[3]][[1]], with = F]
+    dlist[[1]] <- dlist[[1]][dlist[[2]][[1]], c(names(dlist[[1]])[1], dlist[[3]][[1]]), with = F]
     return(dlist)
-    } else {
+  } else {
     warning("No VariableMetadata in dlist")
     dlist[[1]] <- dlist[[1]][dlist[[2]][[1]]]
     dlist[[1]] <- subset(temp.dlist[[1]], rownames(temp.dlist[[1]]) %in% rownames(temp.dlist[[2]]))
-    return(dlist)}
+    return(dlist)
+    }
 }
 
 #' Split a dataframe
@@ -1328,7 +1331,7 @@ dlist.opls <- function (dlist,
                         VIP.thr = 1,
                         LabelsL = F,
                         ShowPlot = T) {
-  require(ropls) ; require(ggplot2) ; require(gridExtra)
+  require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
   check.list.format(dlist)
   temp.opls <- opls(dlist[[1]], dlist[[2]][[Opls.y]], orthoI = NA, plotL = F)
   temp.scores <- merge(dlist[[2]], data.frame(temp.opls$scoreMN), by.x = 0, by.y = 0)
