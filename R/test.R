@@ -12,8 +12,7 @@ data <- list("data.frame" = list("Datamatrix"       = data.frame("RowID" = rowna
              )
 
 ## check
-lapply(data, function(x) {lapply(x, class)})
-
+lapply(data, dlist.class)
 
 
 
