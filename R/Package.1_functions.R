@@ -1159,8 +1159,8 @@ dlist.summary.2 <- function(dlist,
 #' @return A list with [1] pca results, [2] plot as grobs.
 #' @export
 #' @examples
-#' dlist.pca()
-dlist.pca <- function (dlist,
+#' dlist.pca.old()
+dlist.pca.old <- function (dlist,
                        Samples.grp = NULL,
                        Variables.grp = NULL,
                        Legend.L = F,
@@ -1218,23 +1218,23 @@ dlist.pca <- function (dlist,
 #' @return A list with [1] pca results, [2] plot as grobs.
 #' @export
 #' @examples
-#' dlist.pca.2()
-dlist.pca.2 <- function (dlist,
-                       Samples.grp = NULL,
-                       Variables.grp = NULL,
-                       Legend.L = F,
-                       colorL = F,
-                       Samp.lab.L = F,
-                       Var.lab.L = T,
-                       palpha = 0.8,
-                       psize = 0.8,
-                       ShowPlot = T) {
+#' dlist.pca()
+dlist.pca <- function (dlist,
+                         Samples.grp = NULL,
+                         Variables.grp = NULL,
+                         Legend.L = F,
+                         colorL = F,
+                         Samp.lab.L = F,
+                         Var.lab.L = T,
+                         palpha = 0.8,
+                         psize = 0.8,
+                         ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(dplyr)
   check.list.format(dlist, to.data.table.L = F, return.dlist = F)
   temp.pca <- opls(dlist[[1]][,-1, with = F], predI = 2, plotL = F)
   temp.scores <- bind_cols(dlist[[2]], data.frame(temp.pca$scoreMN))
   limits1 <- find.limits(temp.scores$p1, temp.scores$p2)
-  temp.loadings <- bind_cols(dlist[[3]], data.frame(temp.pca$loadingMN))
+  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.pca$loadingMN))
   limits2 <- find.limits(temp.loadings$p1, temp.loadings$p2)
   labels1 <- list(title = paste0("Scores plot ", temp.pca$descriptionMC[1],
                                  " samples\n(", temp.pca$descriptionMC[4], " missing values)"),
@@ -1247,7 +1247,7 @@ dlist.pca.2 <- function (dlist,
   plot1 <- ggplot(temp.scores, aes(p1, p2)) + plotheme.auto(Samples.grp,
                                                             Variables.grp = NULL, limits = limits1, Legend.L, colorL,
                                                             labels1, geom_path = T, labelsL = Samp.lab.L)
-  plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
+  plot2 <- ggplot(temp.loadings, aes(p1, p2, label =  names(temp.loadings)[1])) +
     plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2,
                   Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L, palpha = palpha, psize = psize)
   if(ShowPlot == T) {
