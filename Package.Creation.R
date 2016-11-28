@@ -22,3 +22,14 @@
 #'
 #' To install the package :
 #' devtools::install_github("Mystilivia/SDjoygret")
+
+```{r}
+require(devtools)
+document()
+```
+
+```{r}
+install_github("Mystilivia/SDjoygret")
+require(SDjoygret)
+```
+

@@ -1,26 +1,3 @@
-#' First function
-#'
-#' This function is just a test for R package creation.
-#' @param x Must be numeric
-#' @keywords Test
-#' testing_function_01()
-#' @export
-testing_function_01 <- function(x){
-  if (is.numeric(x)==FALSE){
-    stop("Please give me numeric to eat !")
-  }
-  if(x==1){
-    print("Yeah ! you typed 1")
-    result.step1 <- x*5
-    result.step2 <- x/2
-    list.result <- list(result.step1, result.step2)
-    return(list.result)
-  } else {
-    print("I don't get it...")
-  }
-}
-
-
 #' xcms_orbi_GRT
 #'
 #' This function simplify workflow from peak grouping and retention time correction
@@ -657,6 +634,7 @@ get_sign = function(model) {
 #' check.list.format()
 check.list.format <- function (dlist, to.data.table.L = F, return.dlist = T) {
   require("data.table")
+  require("tidyverse")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   temp.data.str <- dlist.class(dlist)
   if(any(temp.data.str[, class.d.t] == F) & any(temp.data.str[,class.d.f] == F)) {stop("List levels should be data.frame or data.table")}
@@ -753,7 +731,8 @@ dlist.class <- function(dlist) {
                     "class.m" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
                     "class.d.t" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
                     "class.d.f" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
-                    "class.t" = lapply(dlist, function(x) {any(class(x) == "tibble")}))
+                    "class.t" = lapply(dlist, function(x) {any(class(x) == "tbl")}))
+
   )
 }
 
@@ -1490,6 +1469,43 @@ xcmsSet.Result.List <- function(x) {
        "VariableMetadata" = Variable.Metadata)
 }
 
+
+
+
+
+#' Perform pca, pls(da) or opls(da) with ropls
+#'
+#' Perform multivariate analysis with ropls package and return a minimal object with results
+#' for plots.
+#' @param opls.y Name of SampleMetadata column to use as y response (quoted).
+#' @param min Logical to get full resulting object of minimal.
+#' @param plotL Logical to draw summary plot as in ropls package.
+#' @param ... Any argument used by ropls::opls function.
+#' @inheritParams check.list.format
+#' @keywords 3levels.list, xcmsSet
+#' @return The resulting list of opls function (subsetted if min = TRUE).
+#' @export
+#' @examples
+#' dlist.opls.min()
+dlist.opls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
+  require(dtplyr) ; require(data.table) ; require(ropls)
+  check.list.format(dlist, to.data.table.L = F, return.dlist = F)
+  if(!is.null(opls.y)) {opls.y <- dlist[[2]][,get(opls.y)]} else {opls.y <- NULL}
+  temp.result <- ropls::opls(dlist[[1]][,-1,with=F], y = opls.y, plotL = plotL, ...)
+  if (min == T) {
+    return(temp.result[c("typeC",
+                         "descriptionMC",
+                         "modelDF",
+                         "summaryDF",
+                         "orthoVipVn",
+                         "scoreMN",
+                         "loadingMN",
+                         "orthoScoreMN",
+                         "orthoLoadingMN")])
+  } else {
+    return(temp.result)
+  }
+}
 
 
 
