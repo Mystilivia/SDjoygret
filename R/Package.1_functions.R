@@ -625,45 +625,55 @@ get_sign = function(model) {
 #' to data.table.
 #'
 #' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
-#' @param return.dlist Logical to return a dlist object or not.
-#' @param to.data.table Logical to convert data.frame's dlist to data.table with to.data.table function
+#' @param rownamesL Does data.frame store Rows ID as rownames ?
+#' @param tibbleL Logical to convert data.frame and data.table dlist to tibbles.
 #' @return Print result of check as character and return the dlist (or converted dlist) if format is ok
 #' @keywords list, check
 #' @export
 #' @examples
 #' check.list.format()
-check.list.format <- function (dlist, to.data.table.L = F, return.dlist = T) {
-  require("data.table")
+check.list.format <- function (dlist, rownamesL = F, tibbleL = F) {
   require("tidyverse")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   temp.data.str <- dlist.class(dlist)
-  if(any(temp.data.str[, class.d.t] == F) & any(temp.data.str[,class.d.f] == F)) {stop("List levels should be data.frame or data.table")}
-  if(!any(temp.data.str[, class.d.t] == F)) { ## all are data.table
-    if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+  if(all(temp.data.str[,class.d.t] == F) & all(temp.data.str[,class.t] == F) & all(temp.data.str[,class.d.f] == F)) {stop("List levels should be data.frame, tibble or data.table") }
+  if(rownamesL == F){
     if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-    dim.temp <- lapply(dlist, dim)
-    if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
-    if(!dim.temp[[1]][2]-1 == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
-    print("Data format is ok")
-    print(temp.data.str)
-    if(return.dlist == T) {return(dlist)}
-  } else {
-    if(!any(temp.data.str[,class.d.f] == F)) { ## all are data.table
-      if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
-      if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-      dim.temp <- lapply(dlist, dim)
-      if(!dim.temp[[1]][1] == dim.temp[[2]][1]){stop("Datamatrix row number should be the same as Sample.Metadata")}
-      if(!dim.temp[[1]][2] == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
-      print("Data seems OK but are stored in data.frame")
-      if(to.data.table.L == T) {
-        to.data.table(dlist, T)
-      } else {
-        print("Data weren't converted to data.table, set arg to.data.table = T if convertion is needed")
-        print(temp.data.str)
-        if(return.dlist == T) {return(dlist)}
+    if(!identical(names(data.frame(dlist[[1]])[-1]), as.character(dlist[[3]][[1]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+  } else if(rownamesL == T){
+    if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
+    if(!identical(names(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+    message("Data are well structured.")
+    return(dlist)
+  }
+  if(all(temp.data.str[,class.t] == T)) {message("Data are stored as tibbles, well done !")
+  } else if(all(temp.data.str[,class.d.t] == T)) { ## all are data.table
+    if(tibbleL == F) {stop("Data are stored as data.table, to convert to tibbles : set args tibbleL to TRUE.")}
+    if(tibbleL == T) {
+      if(rownamesL == T) {stop("Data are stored as data.table, there shouldn't be any rownames, please check and set argument rownamesL to FALSE.")}
+      if(rownamesL == F) {
+        temp.list <- lapply(dlist, function(x) {tbl_df(x)})
+        names(temp.list) <- names(dlist)
+        message("Data were stored as data.table and were converted to tibbles.")
+        return(temp.list)
       }
     }
-  }
+  } else if(all(temp.data.str[,class.d.f] == T)) { ## all are data.frame
+    if(tibbleL == F) {stop("Data are stored as data.frame, to convert to tibbles : set args tibbleL to TRUE.")}
+    if(tibbleL == T) {
+      if(rownamesL == T) {
+        temp.list <- lapply(dlist, function(x) {tbl_df(rownames_to_column(x))})
+        names(temp.list) <- names(dlist)
+        message("Data were stored as data.frame and were converted to tibbles, rownames were added as first column.")
+        return(temp.list)
+      } else if(rownamesL == F) {
+        temp.list <- lapply(dlist, function(x) {tbl_df(x)})
+        names(temp.list) <- names(dlist)
+        message("Data were stored as data.frame and were converted to tibbles.")
+        return(temp.list)
+      }
+    }
+  } else {stop("Data class isn't recognized as data.frame, tibble or data.table.")}
 }
 
 
@@ -731,7 +741,9 @@ dlist.class <- function(dlist) {
                     "class.m" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
                     "class.d.t" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
                     "class.d.f" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
-                    "class.t" = lapply(dlist, function(x) {any(class(x) == "tbl")})
+                    "class.t" = lapply(dlist, function(x) {any(class(x) == "tbl")}),
+                    "rows" = lapply(dlist, function(x) {dim(x)[1]}),
+                    "cols" = lapply(dlist, function(x) {dim(x)[2]})
                     )
   )
 }

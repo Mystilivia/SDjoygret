@@ -4,14 +4,14 @@
 \alias{check.list.format}
 \title{Check format of dlist}
 \usage{
-check.list.format(dlist, to.data.table.L = F, return.dlist = T)
+check.list.format(dlist, rownamesL = F, tibbleL = F)
 }
 \arguments{
 \item{dlist}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}
 
-\item{return.dlist}{Logical to return a dlist object or not.}
+\item{rownamesL}{Does data.frame store Rows ID as rownames ?}
 
-\item{to.data.table}{Logical to convert data.frame's dlist to data.table with to.data.table function}
+\item{tibbleL}{Logical to convert data.frame and data.table dlist to tibbles.}
 }
 \value{
 Print result of check as character and return the dlist (or converted dlist) if format is ok
