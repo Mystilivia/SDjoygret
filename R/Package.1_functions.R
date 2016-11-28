@@ -1331,14 +1331,12 @@ dlist.opls <- function (dlist,
                         VIP.thr = 1,
                         LabelsL = F,
                         ShowPlot = T) {
-  require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
-  check.list.format(dlist)
-  temp.opls <- opls(dlist[[1]], dlist[[2]][[Opls.y]], orthoI = NA, plotL = F)
-  temp.scores <- merge(dlist[[2]], data.frame(temp.opls$scoreMN), by.x = 0, by.y = 0)
-  temp.scores <- merge(temp.scores, data.frame(temp.opls$orthoScoreMN), by.x = "Row.names", by.y = 0, all = T)
+  require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table) ; require(dtplyr)
+  check.list.format(dlist, to.data.table.L = F, return.dlist = F)
+  temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], orthoI = NA, plotL = F)
+  temp.scores <- bind_cols(dlist[[2]], data.table(temp.opls$scoreMN), data.table(temp.opls$orthoScoreMN))
   limits1 <- find.limits(temp.scores$p1, temp.scores$o1)
-  temp.loadings <- merge(dlist[[3]], data.frame(temp.opls$loadingMN), by.x = 0, by.y = 0)
-  temp.loadings <- merge(temp.loadings, data.frame(temp.opls$orthoLoadingMN), by.x = "Row.names", by.y = 0, all = T)
+  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.opls$loadingMN, data.table(temp.opls$orthoLoadingMN)))
   limits2 <- find.limits(temp.loadings$p1, temp.loadings$o1)
   ## var
   labels1 <- list(title = paste0("Scores plot ", temp.opls$descriptionMC[1], " samples\n(", temp.opls$descriptionMC[4], " missing values)"),
