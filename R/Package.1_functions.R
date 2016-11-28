@@ -1348,7 +1348,7 @@ dlist.opls <- function (dlist,
   ## plots
   plot1 <- ggplot(temp.scores, aes(p1, o1)) +
     plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
-  plot2 <- ggplot(temp.loadings, aes(p1, o1, label = Row.names)) +
+  plot2 <- ggplot(temp.loadings, aes(p1, o1, label = names(temp.loadings)[1])) +
     plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
 
   ##
