@@ -1201,6 +1201,63 @@ dlist.pca <- function (dlist,
 }
 
 
+#' Perform PCA and custom plot
+#'
+#' Perform a PCA analysis on a 3 levels list and create custom plot.
+#' @param Samples.grp Factor name used for grouping samples (affect plot only)
+#' @param Variables.grp Factor name used for grouping variables (affect plot only)
+#' @param Legend.L Logical for drawing legends
+#' @param colorL Logical for using color or greyscale
+#' @param Samp.lab.L Logical for drawing Sample labels
+#' @param Var.lab.L Logical for drawing Variable labels
+#' @param palpha Transparency for loadings points (between 0 and 1)
+#' @param psize Loadings points size
+#' @inheritParams densplot
+#' @inheritParams dlist.subset
+#' @keywords pca, ggplot
+#' @return A list with [1] pca results, [2] plot as grobs.
+#' @export
+#' @examples
+#' dlist.pca.2()
+dlist.pca.2 <- function (dlist,
+                       Samples.grp = NULL,
+                       Variables.grp = NULL,
+                       Legend.L = F,
+                       colorL = F,
+                       Samp.lab.L = F,
+                       Var.lab.L = T,
+                       palpha = 0.8,
+                       psize = 0.8,
+                       ShowPlot = T) {
+  require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(dplyr)
+  check.list.format(dlist, to.data.table.L = F, return.dlist = F)
+  temp.pca <- opls(dlist[[1]][,-1, with = F], predI = 2, plotL = F)
+  temp.scores <- bind_cols(dlist[[2]], data.frame(temp.pca$scoreMN))
+  limits1 <- find.limits(temp.scores$p1, temp.scores$p2)
+  temp.loadings <- bind_cols(dlist[[3]], data.frame(temp.pca$loadingMN))
+  limits2 <- find.limits(temp.loadings$p1, temp.loadings$p2)
+  labels1 <- list(title = paste0("Scores plot ", temp.pca$descriptionMC[1],
+                                 " samples\n(", temp.pca$descriptionMC[4], " missing values)"),
+                  x = paste0("p1 (", temp.pca$modelDF$R2X[1] * 100, " %)"),
+                  y = paste0("p2 (", temp.pca$modelDF$R2X[2] * 100, " %)"))
+  labels2 <- list(title = paste0("Loadings plot\n", temp.pca$descriptionMC[2],
+                                 " variables (", temp.pca$descriptionMC[3], " excluded)"),
+                  x = paste0("p1 (", temp.pca$modelDF$R2X[1] * 100, " %)"),
+                  y = paste0("p2 (", temp.pca$modelDF$R2X[2] * 100, " %)"))
+  plot1 <- ggplot(temp.scores, aes(p1, p2)) + plotheme.auto(Samples.grp,
+                                                            Variables.grp = NULL, limits = limits1, Legend.L, colorL,
+                                                            labels1, geom_path = T, labelsL = Samp.lab.L)
+  plot2 <- ggplot(temp.loadings, aes(p1, p2, label = Row.names)) +
+    plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2,
+                  Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L, palpha = palpha, psize = psize)
+  if(ShowPlot == T) {
+    return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
+  } else {
+    return(list(PCA = temp.pca, Plot = arrangeGrob(plot1, plot2, nrow = 1)))
+  }
+}
+
+
 #' Transform a datamatrix and replace zero
 #'
 #' Do any of the two following function : Replace zero by the minimum value divided by 2 and/or tranform data
