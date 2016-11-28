@@ -731,8 +731,8 @@ dlist.class <- function(dlist) {
                     "class.m" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
                     "class.d.t" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
                     "class.d.f" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
-                    "class.t" = lapply(dlist, function(x) {any(class(x) == "tbl")}))
-
+                    "class.t" = lapply(dlist, function(x) {any(class(x) == "tbl")})
+                    )
   )
 }
 
