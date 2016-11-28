@@ -4,10 +4,12 @@
 \alias{check.list.format}
 \title{Check format of dlist}
 \usage{
-check.list.format(dlist, to.data.table.L = T)
+check.list.format(dlist, to.data.table.L = F, return.dlist = T)
 }
 \arguments{
 \item{dlist}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}
+
+\item{return.dlist}{Logical to return a dlist object or not.}
 
 \item{to.data.table}{Logical to convert data.frame's dlist to data.table with to.data.table function}
 }

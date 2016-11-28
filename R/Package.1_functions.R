@@ -648,13 +648,14 @@ get_sign = function(model) {
 #' to data.table.
 #'
 #' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
+#' @param return.dlist Logical to return a dlist object or not.
 #' @param to.data.table Logical to convert data.frame's dlist to data.table with to.data.table function
 #' @return Print result of check as character and return the dlist (or converted dlist) if format is ok
 #' @keywords list, check
 #' @export
 #' @examples
 #' check.list.format()
-check.list.format <- function (dlist, to.data.table.L = T) {
+check.list.format <- function (dlist, to.data.table.L = F, return.dlist = T) {
   require("data.table")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   temp.data.str <- dlist.class(dlist)
@@ -667,7 +668,7 @@ check.list.format <- function (dlist, to.data.table.L = T) {
     if(!dim.temp[[1]][2]-1 == dim.temp[[3]][1]){stop("Datamatrix col number should be the same as Variable.Metadata row number")}
     print("Data format is ok")
     print(temp.data.str)
-    return(dlist)
+    ifelse(return.dlist == T, return(dlist))
   } else {
     if(!any(temp.data.str[,class.d.f] == F)) { ## all are data.table
       if(!identical(colnames(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
@@ -681,7 +682,7 @@ check.list.format <- function (dlist, to.data.table.L = T) {
       } else {
         print("Data weren't converted to data.table, set arg to.data.table = T if convertion is needed")
         print(temp.data.str)
-        return(dlist)
+        ifelse(return.dlist == T, return(dlist))
       }
     }
   }
