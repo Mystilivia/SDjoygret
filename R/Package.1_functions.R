@@ -639,7 +639,7 @@ check.list.format <- function (dlist, rownamesL = F, tibbleL = F) {
   if(all(temp.data.str[,"class.d.t"] == F) & all(temp.data.str[,"class.t"] == F) & all(temp.data.str[,"class.d.f"] == F)) {stop("List levels should be data.frame, tibble or data.table") }
   if(rownamesL == F){
     if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-    if(!identical(names(data.frame(dlist[[1]]))[-1], as.character(dlist[[3]][[1]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+    if(!identical(names(dlist[[1]])[-1], as.character(dlist[[3]][[1]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
   } else if(rownamesL == T){
     if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
     if(!identical(names(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
