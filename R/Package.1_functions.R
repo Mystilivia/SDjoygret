@@ -1493,21 +1493,14 @@ xcmsSet.Result.List <- function(x) {
 #' dlist.opls.min()
 dlist.opls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
   require(dtplyr) ; require(data.table) ; require(ropls)
-  check.list.format(dlist, to.data.table.L = F, return.dlist = F)
-  if(!is.null(opls.y)) {opls.y <- dlist[[2]][,get(opls.y)]} else {opls.y <- NULL}
-  temp.result <- ropls::opls(dlist[[1]][,-1,with=F], y = opls.y, plotL = plotL, ...)
+  if(!is.null(opls.y)) {opls.yV <- dlist[[2]][,get(opls.y)]} else {opls.yV <- NULL}
+  temp.result <- ropls::opls(dlist[[1]][,-1,with=F], y = opls.yV, plotL = plotL, ...)
   if (min == T) {
-    return(temp.result[c("typeC",
-                         "descriptionMC",
-                         "modelDF",
-                         "summaryDF",
-                         "orthoVipVn",
-                         "scoreMN",
-                         "loadingMN",
-                         "orthoScoreMN",
-                         "orthoLoadingMN")])
+    return(c(temp.result[c("typeC", "descriptionMC", "modelDF", "summaryDF", "orthoVipVn", "scoreMN", "loadingMN", "orthoScoreMN", "orthoLoadingMN", "fitted")],
+             "opls.y" = opls.y))
   } else {
-    return(temp.result)
+    return(c(temp.result,
+             "opls.y" = opls.y))
   }
 }
 
@@ -1554,6 +1547,72 @@ ggplot_opls <- function(data, VIP.thr = 1, ShowPlot = T) {
     return(list(VIPs = VIP.subset, Plot = arrangeGrob(plot1)))
   }
 }
+
+#' Get size of object or list objects
+#'
+#' Return the size in Mb of an object or list levels
+#' @param data Any variable
+#' @keywords x1, x2, x3
+#' @return Object size
+#' @export
+#' @examples
+#' size()
+size <- function(data) {
+  if(is.list(data)){return(lapply(data, function(x) {format(object.size(x), units = "Mb")}))}
+  else (return(format(object.size(data), units = "Mb")))
+}
+
+
+#' Return a list for plotting ropls results
+#'
+#' Return a list for plotting ropls results
+#' @param dlist The dlist used for ropls
+#' @param ropls.result Results of ropls package or dlist.opls.min function
+#' @keywords ropls
+#' @return A list with data for ggplot
+#' @export
+#' @examples
+#' dlist.opls.data()
+dlist.opls.data <- function(dlist, ropls.result) {
+ require(dtplyr) ; require(data.table)
+  ## Get scores
+  if (ropls.result$typeC %in% c("PCA", "PLS", "PLS-DA")) {
+    temp.scores <- bind_cols(data.table(dlist[[2]]), data.table(ropls.result$scoreMN))
+    temp.loadings <- bind_cols(data.table(dlist[[3]]), data.table(ropls.result$loadingMN))
+    x <- "p1"
+    y <- "p1"
+  } else if (ropls.result$typeC %in% c("OPLS", "OPLS-DA")) {
+    temp.scores <- bind_cols(data.table(dlist[[2]]), data.table(ropls.result$scoreMN), data.table(ropls.result$orthoScoreMN))
+    temp.loadings <- bind_cols(data.table(dlist[[3]]), data.table(ropls.result$loadingMN), data.table(ropls.result$orthoLoadingMN))
+    x <- "p1"
+    y <- "o1"
+    Vips10 <- data.table("RowID" = names(ropls.result$orthoVipVn),
+                         "Var" = as.numeric(ropls.result$orthoVipVn)) %>%
+      top_n(10, Var)
+  } else { stop("TypeC not recognized, please use the ropls package or dlist.opls.min to perform the multivariate analysis.
+             TypeC must be any of : PCA, PLS, PLS-DA, OPLS or OPLS-DA") }
+
+  Vips10 <- ifelse(exists("Vips10"), Vips10, "")
+  opls.y <- ifelse("opls.y" %in% names(ropls.result), ropls.result$opls.y, "")
+  return(list("x" = x,
+              "y" = y,
+              "TypeC" = ropls.result$typeC,
+              "scores" = temp.scores,
+              "loadings" = temp.loadings,
+              "labels_scores" = list("title" = paste0(ropls.result$typeC, " : Scores plot"),
+                                     "subtitle" = paste0(ropls.result$descriptionMC[1], " samples (", ropls.result$descriptionMC[4], " missing values)"),
+                                     "x" = paste0(x, opls.y, " (", ropls.result$modelDF$R2X[1]*100, " %)"),
+                                     "y" = paste0(y, " (", ropls.result$modelDF$R2X[2]*100, " %)")),
+              "labels_loadings" = list("title" = paste0(ropls.result$typeC, " : Loadings plot"),
+                                       "subtitle" = paste0(ropls.result$descriptionMC[2], " variables (", ropls.result$descriptionMC[3], " excluded)"),
+                                       "x" = paste0(x, " (", ropls.result$modelDF$R2X[1]*100, " %)"),
+                                       "y" = paste0(y, " (", ropls.result$modelDF$R2X[2]*100, " %)")),
+              "Vips10" = Vips10,
+              "Opls.Y" = opls.y
+  ))
+}
+
+
 
 
 #' TITLE
