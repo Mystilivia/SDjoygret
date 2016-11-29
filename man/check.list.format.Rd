@@ -17,9 +17,6 @@ check.list.format(dlist, rownamesL = F, tibbleL = F)
 Print result of check as character and return the dlist (or converted dlist) if format is ok
 }
 \description{
-Check the format of 3 levels list.
-}
-\details{
 Chech if the list elements are data.table or data.frame, id rownames [[1]] and [[2]] are identical (for
 data.frame only, use first column as row id with data.table), and if colnames [[1]] are identical to
 rownames [[3]]. Check also dataframes dimension to check consistency and propose to transform data.frame

@@ -617,8 +617,6 @@ get_sign = function(model) {
 
 #' Check format of dlist
 #'
-#' Check the format of 3 levels list.
-#'
 #' Chech if the list elements are data.table or data.frame, id rownames [[1]] and [[2]] are identical (for
 #' data.frame only, use first column as row id with data.table), and if colnames [[1]] are identical to
 #' rownames [[3]]. Check also dataframes dimension to check consistency and propose to transform data.frame
@@ -629,17 +627,18 @@ get_sign = function(model) {
 #' @param tibbleL Logical to convert data.frame and data.table dlist to tibbles.
 #' @return Print result of check as character and return the dlist (or converted dlist) if format is ok
 #' @keywords list, check
+#' @import tidyverse
 #' @export
 #' @examples
 #' check.list.format()
 check.list.format <- function (dlist, rownamesL = F, tibbleL = F) {
-  require("tidyverse")
+  require("tibble") ; require("tidyverse")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   temp.data.str <- dlist.class(dlist)
   if(all(temp.data.str[,"class.d.t"] == F) & all(temp.data.str[,"class.t"] == F) & all(temp.data.str[,"class.d.f"] == F)) {stop("List levels should be data.frame, tibble or data.table") }
   if(rownamesL == F){
     if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-    if(!identical(names(dlist[[1]])[-1], as.character(dlist[[3]][[1]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
+    if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
   } else if(rownamesL == T){
     if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
     if(!identical(names(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
@@ -771,6 +770,7 @@ importWorksheets.xls <- function(Data.path) {
 #' Subset list
 #'
 #' Subset a three level list by variables and/or samples.
+#'
 #' @param dlist list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
 #' @param Var.sel vector of variable to subset (rownames) from [[3]]
 #' @param Samples.sel vector of samples to subset (rownames) from [[2]]
@@ -1063,8 +1063,9 @@ dlist.summary <- function(dlist,
 #' dlist.summary.2
 #'
 #' Description of the function
+#'
 #' @param var2names List of grouping factor, if blank calculation while be done for eache variables.
-#' @inheritParamsdlist.summary
+#' @inheritParams dlist.summary
 #' @inheritParams dlist.subset
 #' @keywords x1, x2, x3
 #' @return result of the function

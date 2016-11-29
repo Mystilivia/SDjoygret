@@ -11,6 +11,14 @@ dlist.summary.2(dlist, var2names = NULL, plotL = F, alpha = 0.2,
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
 \item{var2names}{List of grouping factor, if blank calculation while be done for eache variables.}
+
+\item{plotL}{Logical for generating plot}
+
+\item{alpha}{Transparency value of graphs}
+
+\item{labels}{list of graph labels (title, x, y)}
+
+\item{x.labL}{Logical for showing point labels}
 }
 \value{
 result of the function
