@@ -4,14 +4,14 @@
 \alias{dlist.subset}
 \title{Subset list}
 \usage{
-dlist.subset(dlist, Var.sel = NULL, Samples.sel = NULL)
+dlist.subset(dlist, Var.sel = NULL, Sple.sel = NULL)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
 \item{Var.sel}{vector of variable to subset (rownames) from [[3]]}
 
-\item{Samples.sel}{vector of samples to subset (rownames) from [[2]]}
+\item{Sple.sel}{vector of samples to subset (rownames) from [[2]]}
 }
 \description{
 Subset a three level list by variables and/or samples.

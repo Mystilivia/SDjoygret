@@ -645,7 +645,9 @@ check.list.format <- function (dlist, rownamesL = F, tibbleL = F) {
     message("Data are well structured.")
     return(dlist)
   }
-  if(all(temp.data.str[,"class.t"] == T)) {message("Data are stored as tibbles, well done !")
+  if(all(temp.data.str[,"class.t"] == T)) {
+    message("Data are stored as tibbles, well done !")
+    return(dlist)
   } else if(all(temp.data.str[,"class.d.t"] == T)) { ## all are data.table
     if(tibbleL == F) {stop("Data are stored as data.table, to convert to tibbles : set args tibbleL to TRUE.")}
     if(tibbleL == T) {
@@ -773,34 +775,28 @@ importWorksheets.xls <- function(Data.path) {
 #'
 #' @param dlist list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.
 #' @param Var.sel vector of variable to subset (rownames) from [[3]]
-#' @param Samples.sel vector of samples to subset (rownames) from [[2]]
+#' @param Sple.sel vector of samples to subset (rownames) from [[2]]
 #' @keywords subset, list
 #' @export
 #' @examples
 #' dlist.subset()
-dlist.subset <- function(dlist,
-                         Var.sel = NULL,
-                         Samples.sel = NULL) {
-  require("data.table")
-  invisible(check.list.format(dlist, to.data.table.L = T))
-  if(!is.null(Samples.sel)){
-    setkeyv(dlist[[2]], names(dlist[[2]])[1])
-    dlist[[2]] <- dlist[[2]][Samples.sel]
+dlist.subset <- function (dlist, Var.sel = NULL, Sple.sel = NULL) {
+  require(data.table) ; require(dplyr) ; require(dtplyr)
+  dlist <- lapply(dlist, data.table)
+  if (!is.null(Sple.sel)) {
+    SpleID <- names(dlist[[2]])[1]
+    setkeyv(dlist[[2]], SpleID)
+    setkeyv(dlist[[1]], SpleID)
+    dlist[[2]] <- dlist[[2]][Sple.sel]
+    dlist[[1]] <- dlist[[1]][Sple.sel]
   }
-  if(!is.null(Var.sel)){
-    setkeyv(dlist[[3]], names(dlist[[3]])[1])
+  if (!is.null(Var.sel)) {
+    VareID <- names(dlist[[3]])[1]
+    setkeyv(dlist[[3]], VareID)
     dlist[[3]] <- dlist[[3]][Var.sel]
+    dlist[[1]] <- dlist[[1]][,Var.sel, with = F]
   }
-  if(length(dlist)==3){
-    setkeyv(dlist[[1]], names(dlist[[1]])[1])
-    dlist[[1]] <- dlist[[1]][dlist[[2]][[1]], c(names(dlist[[1]])[1], dlist[[3]][[1]]), with = F]
-    return(dlist)
-  } else {
-    warning("No VariableMetadata in dlist")
-    dlist[[1]] <- dlist[[1]][dlist[[2]][[1]]]
-    dlist[[1]] <- subset(temp.dlist[[1]], rownames(temp.dlist[[1]]) %in% rownames(temp.dlist[[2]]))
-    return(dlist)
-    }
+  return(dlist)
 }
 
 #' Split a dataframe

@@ -1,5 +1,5 @@
 ## DATA
-require(tidyverse) ; require(data.table) ; require("SDjoygret")
+require(tidyverse) ; require(data.table) ; require("SDjoygret") ; require(tibble) ; require(dplyr)
 sacurine <- SDjoygret::sacurine.dlist
 data <- list("data.frame" = list("Datamatrix"       = data.frame("RowID" = sacurine[[1]][[1]], sacurine[[1]][-1]),
                                  "SampleMetadata"   = data.frame("RowID" = sacurine[[2]][[1]], sacurine[[2]][-1]),
@@ -27,13 +27,18 @@ dlist <- data[[1]]
 
 
 ## DEVELOPMENT
+lapply(data[[3]], tbl_df)
+lapply(data[[2]], data.table)
 
 
+require(dtplyr)
 
-
-
-
-
+temp <- rbenchmark::benchmark(
+  dplyr.tibble      = filter(data[[2]][[1]], RowID %in% c("HU_015", "HU_011")),
+  dplyr.d.t         = filter(data[[3]][[1]], RowID %in% c("HU_015", "HU_011")),
+  data.table.d.t    = data[[3]][[1]][RowID %in% c("HU_015", "HU_011")],
+  replications = 1000
+)
 
 
 
