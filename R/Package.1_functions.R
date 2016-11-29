@@ -1490,13 +1490,13 @@ xcmsSet.Result.List <- function(x) {
 #' @return The resulting list of opls function (subsetted if min = TRUE).
 #' @export
 #' @examples
-#' dlist.opls.min()
-dlist.opls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
+#' dlist.ropls.min()
+dlist.ropls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
   require(dtplyr) ; require(data.table) ; require(ropls)
   if(!is.null(opls.y)) {opls.yV <- dlist[[2]][,get(opls.y)]} else {opls.yV <- NULL}
   temp.result <- ropls::opls(dlist[[1]][,-1,with=F], y = opls.yV, plotL = plotL, ...)
   if (min == T) {
-    return(c(temp.result[c("typeC", "descriptionMC", "modelDF", "summaryDF", "orthoVipVn", "scoreMN", "loadingMN", "orthoScoreMN", "orthoLoadingMN", "fitted")],
+    return(c(temp.result[c("typeC", "descriptionMC", "modelDF", "summaryDF", "orthoVipVn", "scoreMN", "loadingMN", "orthoScoreMN", "orthoLoadingMN", "fitted", "orthoVipVn", "vipVn")],
              "opls.y" = opls.y))
   } else {
     return(c(temp.result,
@@ -1572,28 +1572,23 @@ size <- function(data) {
 #' @return A list with data for ggplot
 #' @export
 #' @examples
-#' dlist.opls.data()
-dlist.opls.data <- function(dlist, ropls.result) {
- require(dtplyr) ; require(data.table)
+#' dlist.ropls.data()
+dlist.ropls.data <- function(dlist, ropls.result) {
+  require(dtplyr) ; require(data.table)
   ## Get scores
   if (ropls.result$typeC %in% c("PCA", "PLS", "PLS-DA")) {
-    temp.scores <- bind_cols(data.table(dlist[[2]]), data.table(ropls.result$scoreMN))
-    temp.loadings <- bind_cols(data.table(dlist[[3]]), data.table(ropls.result$loadingMN))
+    temp.scores <- data.table(dlist[[2]], ropls.result$scoreMN)
+    temp.loadings <- data.table(dlist[[3]], ropls.result$loadingMN)
     x <- "p1"
-    y <- "p1"
+    y <- "p2"
   } else if (ropls.result$typeC %in% c("OPLS", "OPLS-DA")) {
-    temp.scores <- bind_cols(data.table(dlist[[2]]), data.table(ropls.result$scoreMN), data.table(ropls.result$orthoScoreMN))
-    temp.loadings <- bind_cols(data.table(dlist[[3]]), data.table(ropls.result$loadingMN), data.table(ropls.result$orthoLoadingMN))
+    temp.scores <- data.table(dlist[[2]], ropls.result$scoreMN, ropls.result$orthoScoreMN)
+    temp.loadings <- data.table(dlist[[3]], ropls.result$loadingMN, ropls.result$orthoLoadingMN, OrthoVIP = ropls.result$orthoVipVn, VIP = ropls.result$vipVn)
     x <- "p1"
     y <- "o1"
-    Vips10 <- data.table("RowID" = names(ropls.result$orthoVipVn),
-                         "Var" = as.numeric(ropls.result$orthoVipVn)) %>%
-      top_n(10, Var)
   } else { stop("TypeC not recognized, please use the ropls package or dlist.opls.min to perform the multivariate analysis.
              TypeC must be any of : PCA, PLS, PLS-DA, OPLS or OPLS-DA") }
-
-  Vips10 <- ifelse(exists("Vips10"), Vips10, "")
-  opls.y <- ifelse("opls.y" %in% names(ropls.result), ropls.result$opls.y, "")
+  opls.y <- ifelse("opls.y" %in% names(ropls.result), ropls.result$opls.y, NULL)
   return(list("x" = x,
               "y" = y,
               "TypeC" = ropls.result$typeC,
@@ -1607,10 +1602,55 @@ dlist.opls.data <- function(dlist, ropls.result) {
                                        "subtitle" = paste0(ropls.result$descriptionMC[2], " variables (", ropls.result$descriptionMC[3], " excluded)"),
                                        "x" = paste0(x, " (", ropls.result$modelDF$R2X[1]*100, " %)"),
                                        "y" = paste0(y, " (", ropls.result$modelDF$R2X[2]*100, " %)")),
-              "Vips10" = Vips10,
               "Opls.Y" = opls.y
   ))
 }
+
+
+#' Plot ropls results
+#'
+#' Plot ropls results using ggplot2
+#' @param plot.opls.data Result of dlist.opls.data function
+#' @param group Group name for colors
+#' @keywords ropls, ggplot
+#' @return A grob, use grid::grid.draw() to plot
+#' @export
+#' @examples
+#' plot.ropls()
+plot.ropls <- function(plot.opls.data, group = NULL) {
+  require(gridExtra) ; require(ggplot2) ; require(data.table) ; require(magrittr)
+  plot.data <- plot.opls.data
+  temp.scores <- plot.data$scores
+  x <- plot.data$x
+  y <- plot.data$y
+  labels.scores <- plot.data$labels_scores
+  temp.loadings <- data.table(plot.data$loadings, key = "Variable")
+  if(!is.null(plot.opls.data$orthoVipVn)) {
+    temp.vips <- data.frame(VIP = plot.opls.data$orthoVipVn) %>%
+      data.table(keep.rownames = T, key = "rn")
+    temp.loadings <- merge(temp.loadings, temp.vips, by.x = "Variable", by.y = "rn")
+  }
+  labels.loadings <- plot.data$labels_loadings
+  return(arrangeGrob(
+    ggplot(temp.scores, aes(get(x), get(y))) +
+      geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
+      geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
+      geom_point() +
+      labs(c(labels.scores, color = "")) +
+      theme_bw() +
+      list(if(!is.null(group)){aes(color = get(group))} else { NULL })
+    ,
+    ggplot(temp.loadings, aes(get(x), get(y))) +
+      geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
+      geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
+      labs(labels.loadings) +
+      SDjoygret:::ggplot_SD.theme +
+      list(if(nchar(plot.data$Opls.Y) > 0) { geom_point(data = temp.loadings[order(-VIP)][VIP >= 1][1:1000], color = "red", alpha = 0.5) },
+           if(temp.loadings[,.N] > 100) { geom_density2d(color = "black")} else { geom_point(alpha = 0.8) })
+  ))
+}
+
+
 
 
 
