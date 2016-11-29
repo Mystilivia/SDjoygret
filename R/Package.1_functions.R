@@ -1588,7 +1588,7 @@ dlist.ropls.data <- function(dlist, ropls.result) {
     y <- "o1"
   } else { stop("TypeC not recognized, please use the ropls package or dlist.opls.min to perform the multivariate analysis.
              TypeC must be any of : PCA, PLS, PLS-DA, OPLS or OPLS-DA") }
-  opls.y <- ifelse("opls.y" %in% names(ropls.result), ropls.result$opls.y, NULL)
+  opls.y <- ifelse("opls.y" %in% names(ropls.result), ropls.result$opls.y, "NULL")
   return(list("x" = x,
               "y" = y,
               "TypeC" = ropls.result$typeC,
@@ -1624,28 +1624,23 @@ plot.ropls <- function(plot.opls.data, group = NULL) {
   x <- plot.data$x
   y <- plot.data$y
   labels.scores <- plot.data$labels_scores
-  temp.loadings <- data.table(plot.data$loadings, key = "Variable")
-  if(!is.null(plot.opls.data$orthoVipVn)) {
-    temp.vips <- data.frame(VIP = plot.opls.data$orthoVipVn) %>%
-      data.table(keep.rownames = T, key = "rn")
-    temp.loadings <- merge(temp.loadings, temp.vips, by.x = "Variable", by.y = "rn")
-  }
+  temp.loadings <- data.table(plot.data$loadings)
   labels.loadings <- plot.data$labels_loadings
   return(arrangeGrob(
     ggplot(temp.scores, aes(get(x), get(y))) +
       geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
       geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
       geom_point() +
-      labs(c(labels.scores, color = "")) +
       theme_bw() +
-      list(if(!is.null(group)){aes(color = get(group))} else { NULL })
+      list(if(!is.null(group)){aes(color = get(group))} else { NULL }) +
+      labs(c(labels.scores, color = ""))
     ,
     ggplot(temp.loadings, aes(get(x), get(y))) +
       geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
       geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
       labs(labels.loadings) +
       SDjoygret:::ggplot_SD.theme +
-      list(if(nchar(plot.data$Opls.Y) > 0) { geom_point(data = temp.loadings[order(-VIP)][VIP >= 1][1:1000], color = "red", alpha = 0.5) },
+      list(if(!plot.data$Opls.Y == "NULL") { geom_point(data = temp.loadings[order(-VIP)][VIP >= 1][1:1000], color = "red", alpha = 0.5) },
            if(temp.loadings[,.N] > 100) { geom_density2d(color = "black")} else { geom_point(alpha = 0.8) })
   ))
 }
