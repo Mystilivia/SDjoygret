@@ -4,20 +4,17 @@
 \alias{importWorksheets.xls}
 \title{Import Excel file to list}
 \usage{
-importWorksheets.xls(Data.path, fcolL = F)
+importWorksheets.xls(Data.path)
 }
 \arguments{
 \item{Data.path}{Path to the excel file to import}
-
-\item{fcolL}{Logical to specify if th first column should be use for rownames (must contains unique names)}
 }
 \value{
 A list of dataframe
 }
 \description{
-Import each sheet of an excel file to a list. This function use the readxl package, which seems
-to handle large files. By default, NA is set to "NA" first column to rownames and first
-row to column names. Rownames can be override with fcolL argument.
+Import each sheet of an excel file to a list as tibbles. This function use the readxl package, which seems
+to handle large files.
 }
 \examples{
 importWorksheets.xls()

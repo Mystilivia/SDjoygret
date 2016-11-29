@@ -736,41 +736,33 @@ to.data.table <- function(dlist, rownamesL = F) {
 #' @examples
 #' dlist.class()
 dlist.class <- function(dlist) {
-  require("data.table")
-  return(data.table("ListLevel" = names(dlist),
-                    "class.m" = lapply(dlist, function(x) {any(class(x) == "matrix")}),
-                    "class.d.t" = lapply(dlist, function(x) {any(class(x) == "data.table")}),
-                    "class.d.f" = lapply(dlist, function(x) {any(class(x) == "data.frame")}),
-                    "class.t" = lapply(dlist, function(x) {any(class(x) == "tbl")}),
-                    "rows" = lapply(dlist, function(x) {dim(x)[1]}),
-                    "cols" = lapply(dlist, function(x) {dim(x)[2]})
-                    )
-  )
+  require(tibble)
+  return(tibble("ListLevel" = names(dlist),
+                    "class.m" = sapply(dlist, function(x) {any(class(x) == "matrix")}),
+                    "class.d.t" = sapply(dlist, function(x) {any(class(x) == "data.table")}),
+                    "class.d.f" = sapply(dlist, function(x) {any(class(x) == "data.frame")}),
+                    "class.t" = sapply(dlist, function(x) {any(class(x) == "tbl")}),
+                    "rows" = sapply(dlist, function(x) {dim(x)[1]}),
+                    "cols" = sapply(dlist, function(x) {dim(x)[2]})))
 }
 
 
 #' Import Excel file to list
 #'
-#' Import each sheet of an excel file to a list. This function use the readxl package, which seems
-#' to handle large files. By default, NA is set to "NA" first column to rownames and first
-#' row to column names. Rownames can be override with fcolL argument.
+#' Import each sheet of an excel file to a list as tibbles. This function use the readxl package, which seems
+#' to handle large files.
 #' @param Data.path Path to the excel file to import
-#' @param fcolL Logical to specify if th first column should be use for rownames (must contains unique names)
 #' @return A list of dataframe
 #' @keywords list, import, excel
 #' @export
 #' @examples
 #' importWorksheets.xls()
-importWorksheets.xls <- function(Data.path, fcolL = F) {
-  require ("readxl")
+importWorksheets.xls <- function(Data.path) {
+  require ("readxl") ; require("dplyr")
   Sheet.names <- excel_sheets(Data.path)
   data.list <- list()
   for (i in Sheet.names) {
-    data.list[[i]] <- data.frame(read_excel(Data.path, sheet = i, col_names = T, na = "NA"))
-    if(isTRUE(fcolL)) {
-    rownames(data.list[[i]]) <- data.list[[i]][[1]]
-    data.list[[i]] <- data.list[[i]][-1]
-    }
+    data.list[[i]] <- tbl_df(read_excel(Data.path, sheet = i, col_names = T, na = "NA"))
   }
   return(data.list)
 }
