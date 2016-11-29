@@ -649,7 +649,8 @@ check.list.format <- function (dlist, rownamesL = F, tibbleL = F) {
     message("Data are stored as tibbles, well done !")
     return(dlist)
   } else if(all(temp.data.str[,"class.d.t"] == T)) { ## all are data.table
-    if(tibbleL == F) {stop("Data are stored as data.table, to convert to tibbles : set args tibbleL to TRUE.")}
+    if(tibbleL == F) {message("Data are stored as data.table, to convert to tibbles : set args tibbleL to TRUE.")
+      return(dlist)}
     if(tibbleL == T) {
       if(rownamesL == T) {stop("Data are stored as data.table, there shouldn't be any rownames, please check and set argument rownamesL to FALSE.")}
       if(rownamesL == F) {
@@ -660,7 +661,9 @@ check.list.format <- function (dlist, rownamesL = F, tibbleL = F) {
       }
     }
   } else if(all(temp.data.str[,"class.d.f"] == T)) { ## all are data.frame
-    if(tibbleL == F) {stop("Data are stored as data.frame, to convert to tibbles : set args tibbleL to TRUE.")}
+    if(tibbleL == F) {
+      message("Data are stored as data.frame, to convert to tibbles : set args tibbleL to TRUE.")
+      return(dlist)}
     if(tibbleL == T) {
       if(rownamesL == T) {
         temp.list <- lapply(dlist, function(x) {tbl_df(rownames_to_column(x))})
