@@ -784,20 +784,22 @@ importWorksheets.xls <- function(Data.path) {
 #' @examples
 #' dlist.subset()
 dlist.subset <- function (dlist, Var.sel = NULL, Sple.sel = NULL) {
-  require(data.table) ; require(dplyr) ; require(dtplyr)
+  require(data.table)
+  require(dplyr)
+  require(dtplyr)
   dlist <- lapply(dlist, data.table)
+  SpleID <- names(dlist[[2]])[1]
   if (!is.null(Sple.sel)) {
-    SpleID <- names(dlist[[2]])[1]
     setkeyv(dlist[[2]], SpleID)
     setkeyv(dlist[[1]], SpleID)
-    dlist[[2]] <- dlist[[2]][Sple.sel]
-    dlist[[1]] <- dlist[[1]][Sple.sel]
+    dlist[[2]] <- dlist[[2]][get(SpleID) %in% Sple.sel]
+    dlist[[1]] <- dlist[[1]][get(SpleID) %in% Sple.sel]
   }
   if (!is.null(Var.sel)) {
     VareID <- names(dlist[[3]])[1]
     setkeyv(dlist[[3]], VareID)
-    dlist[[3]] <- dlist[[3]][Var.sel]
-    dlist[[1]] <- dlist[[1]][,Var.sel, with = F]
+    dlist[[3]] <- dlist[[3]][get(VareID) %in% Var.sel]
+    dlist[[1]] <- dlist[[1]][, c(SpleID, Var.sel), with = F]
   }
   return(dlist)
 }
