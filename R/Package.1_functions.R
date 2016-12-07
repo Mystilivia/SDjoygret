@@ -772,6 +772,28 @@ importWorksheets.xls <- function(Data.path) {
 }
 
 
+#' Import Excel's sheets to a list
+#'
+#' Import each sheet of an excel file to a list as a data.frame. This function use the readxl package, which seems
+#' to handle large files.
+#' @param Data.path Path to the excel file to import
+#' @return A list of dataframe
+#' @keywords list, import, excel
+#' @export
+#' @examples
+#' import.xls.2()
+import.xls.2 <- function(Data.path) {
+  require ("readxl") ; require("dplyr")
+  Sheet.names <- excel_sheets(Data.path)
+  data.list <- list()
+  for (i in Sheet.names) {
+    data.list[[i]] <- data.table(read_excel(Data.path, sheet = i, col_names = T, na = "NA"))
+  }
+  return(data.list)
+}
+
+
+
 #' Subset list
 #'
 #' Subset a three level list by variables and/or samples.
@@ -783,23 +805,22 @@ importWorksheets.xls <- function(Data.path) {
 #' @export
 #' @examples
 #' dlist.subset()
-dlist.subset <- function (dlist, Var.sel = NULL, Sple.sel = NULL) {
+dlist.subset <- function (dlist, Var.sel = NULL, Sple.sel = NULL)
+{
   require(data.table)
-  require(dplyr)
-  require(dtplyr)
   dlist <- lapply(dlist, data.table)
-  SpleID <- names(dlist[[2]])[1]
+  temp_SpleID <- names(dlist[[2]])[1]
   if (!is.null(Sple.sel)) {
-    setkeyv(dlist[[2]], SpleID)
-    setkeyv(dlist[[1]], SpleID)
-    dlist[[2]] <- dlist[[2]][get(SpleID) %in% Sple.sel]
-    dlist[[1]] <- dlist[[1]][get(SpleID) %in% Sple.sel]
+    setkeyv(dlist[[2]], temp_SpleID)
+    setkeyv(dlist[[1]], temp_SpleID)
+    dlist[[2]] <- dlist[[2]][Sple.sel]
+    dlist[[1]] <- dlist[[1]][Sple.sel]
   }
   if (!is.null(Var.sel)) {
-    VareID <- names(dlist[[3]])[1]
-    setkeyv(dlist[[3]], VareID)
-    dlist[[3]] <- dlist[[3]][get(VareID) %in% Var.sel]
-    dlist[[1]] <- dlist[[1]][, c(SpleID, Var.sel), with = F]
+    temp.varID <- names(dlist[[3]])[1]
+    setkeyv(dlist[[3]], temp.varID)
+    dlist[[3]] <- dlist[[3]][Var.sel]
+    dlist[[1]] <- dlist[[1]][, c(temp_SpleID, Var.sel), with = F]
   }
   return(dlist)
 }
@@ -960,175 +981,67 @@ plotheme.auto <- function(Samples.grp = NULL,
   return(opls.ggplotheme.auto)
 }
 
-
-#' Overview of 3 level datas
+#' dlist summary
 #'
-#' Perform a quick analysis of a 3 levels list by showing for each variables : the average value,
-#' the Coefficient of Variation, the skew and the percentage of zero values. Calculations is done by
-#' grouping factors for each variables and returned in a list with the plot.
-#' @param var2.names vector of grouping factors names
-#' @param IC Logical for IC95 calculation (could be slow if true)
-#' @param plotL Logical for generating plot
-#' @param alpha Transparency value of graphs
-#' @param labels list of graph labels (title, x, y)
-#' @param x.labL Logical for showing point labels
+#' Calculate dlist summary data using data.table structure
+#'
+#' @param var2names List of grouping factor, if blank calculation while be done for eache variables.
+#' @param plotL Should summary plot be drown (return a grob, use plot or grid::grid.draw to show)
+#' @param alpha Set the plot transparency
+#' @param size Set the points sizes
+#' @inheritParams dlist.summary
 #' @inheritParams dlist.subset
-#' @keywords summary, graph
-#' @return Return a list with the calculations results as a data frame and the plot if asked.
+#' @keywords summary
+#' @return a data.table with summary results (length, NA count, Zero count, Perc of zero, mean, median, sum, min, max, SD, CV, IC95 and skewness)
 #' @export
 #' @examples
 #' dlist.summary()
-dlist.summary <- function(dlist,
-                               var2.names = NULL,
-                               IC = F,
-                               plotL = F,
-                               alpha = 0.2,
-                               labels = list(title = "", x = "", y = ""),
-                               x.labL = F) {
-  require(reshape2) ; require(plyr) ; require(dplyr)
-  check.list.format(dlist)
-  temp.data.0 <- merge(dlist[[2]][var2.names], dlist[[1]], by = 0)
-  temp.data <- melt(temp.data.0[-1], id.vars = var2.names, value.name = "value", variable.name = "variable")
-  if(IC == T){
-    temp.data.summary <- ddply(temp.data, c(var2.names, "variable"), summarise,
-                               "N" = length(value),
-                               "NA" = length(which(is.na(temp.data[[1]]) == T)),
-                               "Zero" = length(which(value == 0)),
-                               "Perc_Zero" = round(Zero * 100 / N, 3),
-                               "Avg" = round(mean(value, na.rm = T), 3),
-                               "Median" = round(median(value, na.rm = T), 3),
-                               "Sum" = round(sum(value, na.rm = T), 3),
-                               "Min" = round(min(value, na.rm = T), 3),
-                               "Max" = round(max(value, na.rm = T), 3),
-                               "SD" = round(sd(value, na.rm = T), 3),
-                               "CV" = round(SD*100/Avg, 3),
-                               "IC95_min_manual" = round(Avg-2*(SD/N), 3),
-                               "IC95_max_manual" = round(Avg+2*(SD/N), 3),
-                               "Skew" = round(e1071::skewness(value, na.rm = T), 3),
-                               "Avg_IC95_min" = round(t.test(na.omit(value))$conf.int[1], 3),
-                               "Avg_IC95_max" = round(t.test(na.omit(value))$conf.int[2], 3),
-                               "Quant1" = round(quantile(value, na.rm = T)[1], 3),
-                               "Quant2" = round(quantile(value, na.rm = T)[2], 3),
-                               "Quant3" = round(quantile(value, na.rm = T)[3], 3),
-                               "Quant4" = round(quantile(value, na.rm = T)[4], 3)
+dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size = 0.4){
+  require("data.table") ; require("magrittr") ; require("e1071") ; require("gridExtra")
+  dlist <- lapply(dlist, data.table)
+  ## Check that no duplicates is created between new variables and var2names
+  if(any(var2names %in% c("N", "NA", "Zero", "Perc_Zero", "Avg", "Median", "Sum", "Min", "Max", "SD", "CV", "IC95_min_manual", "IC95_max_manual", "Skew"))) { stop("var2names conflict with calculated variable. Must be different than : N, NA, Zero, Perc_Zero, Avg, Median, Sum, Min, Max, SD, CV, IC95_min_manual, IC95_max_manual, Skew")}
+  temp.data <- data.table(dlist[[2]], dlist[[1]][, -1, with = F]) %>%
+    melt(id.vars = names(dlist[[2]]))
+  temp.summary <- temp.data[,.(
+    "N"               = round(length(value), 3),
+    "NA"              = round(length(which(is.na(value[[1]]) == T)), 3),
+    "Zero"            = round(length(which(value == 0)), 3),
+    "Perc_Zero"       = round(length(which(value == 0)) * 100 / length(value), 3),
+    "Avg"             = round(mean(value, na.rm = T), 3),
+    "Median"          = round(median(value, na.rm = T), 3),
+    "Sum"             = round(sum(value, na.rm = T), 3),
+    "Min"             = round(min(value, na.rm = T), 3),
+    "Max"             = round(max(value, na.rm = T), 3),
+    "SD"              = round(sd(value, na.rm = T), 3),
+    "CV"              = round(sd(value, na.rm = T)*100/mean(value, na.rm = T), 3),
+    "IC95_min_manual" = round(mean(value, na.rm = T)-2*(sd(value, na.rm = T)/length(value)), 3),
+    "IC95_max_manual" = round(mean(value, na.rm = T)+2*(sd(value, na.rm = T)/length(value)), 3),
+    "Skew"            = round(e1071::skewness(value, na.rm = T), 3)
+  ), by = c("variable", var2names)]
+  ## create summary plot if asked
+  if(plotL) {
+    temp.plot <- melt(temp.summary, id.vars = c("variable", var2names), variable.name = "Measure")
+    temp.plot[,variable := factor(variable, levels = unique(temp.plot[Measure == "Sum"][order(value), variable]))]
+    temp.plot <- temp.plot[Measure %in% c("Avg", "Perc_Zero", "Skew", "CV")][, Measure := factor(Measure, levels = c("Avg", "CV", "Skew", "Perc_Zero"), labels = c("Average", "Coeff of var (%)", "Skewness", "Perc of zero"))]
+    temp.plot$Measure <- droplevels(temp.plot$Measure)
+    yline <- rbind(data.frame("Measure" = "Skewness", "yint" = c(-1,1)),
+                   data.frame("Measure" = "Perc of zero", "yint" = c(50, 100)),
+                   data.frame("Measure" = "Coeff of var (%)", "yint" = c(10, 25, 50, 100)))
+    plot1 <- arrangeGrob(
+      ggplot(temp.plot, aes(variable, value, ymin = 0, ymax = value)) +
+        geom_hline(yintercept = 0, linetype = 1, alpha = 0.5) +
+        geom_hline(data = yline, aes(yintercept = yint), color = "black", linetype = 2, alpha = 0.3) +
+        geom_pointrange(alpha = alpha, size = size) +
+        facet_grid(Measure~., scale = "free_y") +
+        SDjoygret:::ggplot_SD.theme +
+        SDjoygret:::ggplot_SD_lab90 +
+        labs(title = "", x = "", y = "")
     )
-  } else {
-    temp.data.summary <- ddply(temp.data, c(var2.names, "variable"), summarise,
-                               "N" = length(value),
-                               "NA" = length(which(is.na(temp.data[[1]]) == T)),
-                               "Zero" = length(which(value == 0)),
-                               "Perc_Zero" = round(Zero * 100 / N, 3),
-                               "Avg" = round(mean(value, na.rm = T), 3),
-                               "Median" = round(median(value, na.rm = T), 3),
-                               "Sum" = round(sum(value, na.rm = T), 3),
-                               "Min" = round(min(value, na.rm = T), 3),
-                               "Max" = round(max(value, na.rm = T), 3),
-                               "SD" = round(sd(value, na.rm = T), 3),
-                               "CV" = round(SD*100/Avg, 3),
-                               "IC95_min_manual" = round(Avg-2*(SD/N), 3),
-                               "IC95_max_manual" = round(Avg+2*(SD/N), 3),
-                               "Skew" = round(e1071::skewness(value, na.rm = T), 3)
-    )
+    return(list("Data.summary" = temp.summary, "Plot" = plot1))
   }
-  if(plotL == T) {
-    require(ggplot2)
-    # Data prep
-    temp.data.1 <- subset(temp.data.summary, select = c("variable", "Avg", "CV", "Skew", "Perc_Zero"))
-    temp.plot <- melt(temp.data.1, variable.name = "Measure")
-    temp.plot$variable <- factor(temp.plot$variable, levels = levels(reorder(temp.data.summary$variable, temp.data.summary$Avg)))
-    # plot variables
-    x <- "variable"
-    y <- "value"
-    group <- "Measure"
-    yline <- rbind(data.frame("Measure" = "Skew", "yint" = c(0,-1,1), "color_var" = c("black", "red", "blue")),
-                   data.frame("Measure" = "Perc_Zero", "yint" = c(50, 0, 100), "color_var" = c("black", "red", "blue")))
-    # plot
-    plot1 <- ggplot(temp.plot, aes(x = get(x), y = get(y), ymin = 0, ymax = get(y), color = get(group))) +
-      geom_hline(data = yline, aes(yintercept = yint), color = yline$color_var, linetype = 2, alpha = alpha) +
-      geom_pointrange(alpha = alpha, size = 0.02) +
-      facet_grid(paste0(group, "~."), scale = "free_y") +
-      ggplot_SD.theme +
-      theme(legend.position = 0) +
-      labs(labels)
-    if(x.labL == F){
-      plot1 <- plot1 + ggplot_SD_nox_lab
-    } else {
-      plot1 <- plot1 + ggplot_SD_lab90
-    }
-    return(list("Data" = temp.data.summary, "Plot" = plot1))
-  }
-  return(list("Data" = temp.data.summary))
+  return(list("Data.summary" = temp.summary))
 }
-
-
-#' dlist.summary.2
-#'
-#' Description of the function
-#'
-#' @param var2names List of grouping factor, if blank calculation while be done for eache variables.
-#' @inheritParams dlist.summary
-#' @inheritParams dlist.subset
-#' @keywords x1, x2, x3
-#' @return result of the function
-#' @export
-#' @examples
-#' dlist.summary.2()
-dlist.summary.2 <- function(dlist,
-                            var2names = NULL,
-                            plotL = F,
-                            alpha = 0.2,
-                            labels = list(title = "", x = "", y = ""),
-                            x.labL = F){
-  require(dplyr) ; require(tidyr) ; require(e1071) ## Load packages
-  check.list.format(dlist)
-  dlist <- lapply(dlist, tbl_df) ## transform data to tbl class
-  if(length(which(var2names %in% c("N", "NA", "Zero", "Perc_Zero", "Avg", "Median",
-                                   "Sum", "Min", "Max", "SD", "CV", "IC95_min_manual",
-                                   "IC95_max_manual", "Skew") == T)) > 0) {
-    stop("var2names conflict with calculated variable. Must be different than : N, NA, Zero, Perc_Zero, Avg, Median, Sum, Min, Max, SD, CV, IC95_min_manual, IC95_max_manual, Skew")}
-  temp.summary <- bind_cols(dlist[[2]], dlist[[1]]) %>%
-    gather_("variable", "value", names(dlist[[1]])) %>%
-    group_by_(.dots = c(var2names, "variable")) %>%
-    summarise("N" = length(value),
-              "NA" = length(which(is.na(value[[1]]) == T)),
-              "Zero" = length(which(value == 0)),
-              "Perc_Zero" = round(Zero * 100 / N, 3),
-              "Avg" = round(mean(value, na.rm = T), 3),
-              "Median" = round(median(value, na.rm = T), 3),
-              "Sum" = round(sum(value, na.rm = T), 3),
-              "Min" = round(min(value, na.rm = T), 3),
-              "Max" = round(max(value, na.rm = T), 3),
-              "SD" = round(sd(value, na.rm = T), 3),
-              "CV" = round(SD*100/Avg, 3),
-              "IC95_min_manual" = round(Avg-2*(SD/N), 3),
-              "IC95_max_manual" = round(Avg+2*(SD/N), 3),
-              "Skew" = round(e1071::skewness(value, na.rm = T), 3))
-  if(plotL == T) {
-    require(ggplot2)
-    temp.plot <- select(ungroup(temp.summary), variable, Avg, CV, Skew, Perc_Zero) %>%
-      arrange(Avg) %>%
-      mutate(variable = factor(variable, variable)) %>%
-      gather("Measure", "value", -variable) %>%
-      group_by(Measure)
-    yline <- rbind(data.frame("Measure" = "Skew", "yint" = c(0,-1,1), "color_var" = c("black", "red", "blue")),
-                   data.frame("Measure" = "Perc_Zero", "yint" = c(50, 0, 100), "color_var" = c("black", "red", "blue")))
-    plot1 <- ggplot(temp.plot, aes(variable, value, ymin = 0, ymax = value, color = Measure)) +
-      geom_hline(data = yline, aes(yintercept = yint), color = yline$color_var, linetype = 2, alpha = alpha) +
-      geom_pointrange(alpha = alpha, size = 0.02) +
-      facet_grid(Measure~., scale = "free_y") +
-      ggplot_SD.theme +
-      theme(legend.position = 0) +
-      labs(labels)
-    if(x.labL == F){
-      plot1 <- plot1 + ggplot_SD_nox_lab
-    } else {
-      plot1 <- plot1 + ggplot_SD_lab90
-    }
-    return(list("Data" = temp.summary, "Plot" = plot1))
-  }
-  return(list("Data" = temp.summary))
-}
-
 
 #' Perform PCA and custom plot
 #'

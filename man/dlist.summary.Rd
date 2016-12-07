@@ -2,37 +2,30 @@
 % Please edit documentation in R/Package.1_functions.R
 \name{dlist.summary}
 \alias{dlist.summary}
-\title{Overview of 3 level datas}
+\title{dlist summary}
 \usage{
-dlist.summary(dlist, var2.names = NULL, IC = F, plotL = F, alpha = 0.2,
-  labels = list(title = "", x = "", y = ""), x.labL = F)
+dlist.summary(dlist, var2names = NULL, plotL = F, alpha = 0.8,
+  size = 0.4)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
-\item{var2.names}{vector of grouping factors names}
+\item{var2names}{List of grouping factor, if blank calculation while be done for eache variables.}
 
-\item{IC}{Logical for IC95 calculation (could be slow if true)}
+\item{plotL}{Should summary plot be drown (return a grob, use plot or grid::grid.draw to show)}
 
-\item{plotL}{Logical for generating plot}
+\item{alpha}{Set the plot transparency}
 
-\item{alpha}{Transparency value of graphs}
-
-\item{labels}{list of graph labels (title, x, y)}
-
-\item{x.labL}{Logical for showing point labels}
+\item{size}{Set the points sizes}
 }
 \value{
-Return a list with the calculations results as a data frame and the plot if asked.
+a data.table with summary results (length, NA count, Zero count, Perc of zero, mean, median, sum, min, max, SD, CV, IC95 and skewness)
 }
 \description{
-Perform a quick analysis of a 3 levels list by showing for each variables : the average value,
-the Coefficient of Variation, the skew and the percentage of zero values. Calculations is done by
-grouping factors for each variables and returned in a list with the plot.
+Calculate dlist summary data using data.table structure
 }
 \examples{
 dlist.summary()
 }
-\keyword{graph}
-\keyword{summary,}
+\keyword{summary}
 
