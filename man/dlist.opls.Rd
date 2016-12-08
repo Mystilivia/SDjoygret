@@ -22,7 +22,7 @@ dlist.opls(dlist, Opls.y, Samples.grp = NULL, Variables.grp = NULL,
 
 \item{LabelsL}{Logical to show labels on plot}
 
-\item{ShowPlot}{Logical to directly draw the plot or return the grobs (faster)}
+\item{ShowPlot}{Logical to draw plots in graphic device}
 }
 \value{
 A list with (OPLS, Plot, VIPS)

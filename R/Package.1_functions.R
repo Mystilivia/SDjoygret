@@ -1099,7 +1099,6 @@ dlist.pca.old <- function (dlist,
   }
 }
 
-
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
@@ -1156,7 +1155,6 @@ dlist.pca <- function (dlist,
   }
 }
 
-
 #' Transform a datamatrix and replace zero
 #'
 #' Do any of the two following function : Replace zero by the minimum value divided by 2 and/or tranform data
@@ -1181,7 +1179,6 @@ dataframe.transform <- function(data,
   return(temp.data)
 }
 
-
 #' Transform function for dlist
 #'
 #' Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).
@@ -1200,6 +1197,57 @@ dlist.transform <- function(dlist,
   return(dlist)
 }
 
+#' 2 dimension plot with density
+#'
+#' Draw a 2 dimensions plot with density graph on each axis
+#' @param Data Long format data to plot
+#' @param x Column name for x values as string
+#' @param y Column name for x values as string
+#' @param group Column name for grouping factor as string
+#' @param color Point color (default is "black")
+#' @param alpha alpha value of point (default is 0.5)
+#' @param labels List for labels with (title, x, y)
+#' @param ShowPlot Logical to directly draw the plot or return the grobs (faster)
+#' @keywords ggplot
+#' @return a ggplot
+#' @export
+#' @examples
+#' densplot()
+densplot <- function(Data,
+                     x,
+                     y,
+                     group = NULL,
+                     color = "black",
+                     alpha = 0.5,
+                     labels = list(title = "", x = "", y = ""),
+                     ShowPlot = T) {
+  plot1 <- ggplot(Data, aes_string(x = x, fill = group)) +
+    geom_density(adjust = 1/5, alpha = 0.25, color = color) +
+    labs(list(title = labels[[1]], x = "", y = "density")) +
+    theme_bw()
+  plot2 <- ggplot(Data, aes_string(x = y, fill = group)) +
+    geom_density(adjust = 1/10, alpha = 0.25, color = color) +
+    labs(list(title = "", x = "", y = "density")) +
+    theme_bw() +
+    coord_flip()
+  plot3 <- ggplot(Data, aes_string(x = x, y = y)) +
+    geom_point(size = 0.5, aes_string(fill = group), alpha = alpha) +
+    labs(list(title = "", x = labels[[2]], y = labels[[3]])) +
+    theme_bw()
+  if(any(!is.null(group) & group %in% names(Data)) == T) {
+    plot4 <- g_legend(plot1)
+  } else {
+    plot4 <- ggplot() + theme(plot.background = element_blank(), panel.background = element_blank()) + theme(legend.position = "none")
+  }
+  plot <- arrangeGrob(plot1 + theme(legend.position = "none"),
+                      plot4,
+                      plot3 + theme(legend.position = "none"),
+                      plot2 + theme(legend.position = "none"),
+                      ncol = 2,
+                      heights = c(0.7,2),
+                      widths = c(2,0.7))
+  if(ShowPlot == T) {return(plot(plot))} else {return(plot)}
+}
 
 #' Perform OPLS and custom plots
 #'
@@ -1210,7 +1258,7 @@ dlist.transform <- function(dlist,
 #' @param Legend.L Logical to draw legends
 #' @param colorL Logical to use colors instead of black & white
 #' @param LabelsL Logical to show labels on plot
-#' @param ShowPlot
+#' @param ShowPlot Logical to draw plots in graphic device
 #' @inheritParams densplot
 #' @inheritParams dlist.subset
 #' @keywords opls, ggplot
@@ -1278,57 +1326,6 @@ dlist.opls <- function (dlist,
 }
 
 
-#' 2 dimension plot with density
-#'
-#' Draw a 2 dimensions plot with density graph on each axis
-#' @param Data Long format data to plot
-#' @param x Column name for x values as string
-#' @param y Column name for x values as string
-#' @param group Column name for grouping factor as string
-#' @param color Point color (default is "black")
-#' @param alpha alpha value of point (default is 0.5)
-#' @param labels List for labels with (title, x, y)
-#' @param ShowPlot Logical to directly draw the plot or return the grobs (faster)
-#' @keywords ggplot
-#' @return a ggplot
-#' @export
-#' @examples
-#' densplot()
-densplot <- function(Data,
-                     x,
-                     y,
-                     group = NULL,
-                     color = "black",
-                     alpha = 0.5,
-                     labels = list(title = "", x = "", y = ""),
-                     ShowPlot = T) {
-  plot1 <- ggplot(Data, aes_string(x = x, fill = group)) +
-    geom_density(adjust = 1/5, alpha = 0.25, color = color) +
-    labs(list(title = labels[[1]], x = "", y = "density")) +
-    theme_bw()
-  plot2 <- ggplot(Data, aes_string(x = y, fill = group)) +
-    geom_density(adjust = 1/10, alpha = 0.25, color = color) +
-    labs(list(title = "", x = "", y = "density")) +
-    theme_bw() +
-    coord_flip()
-  plot3 <- ggplot(Data, aes_string(x = x, y = y)) +
-    geom_point(size = 0.5, aes_string(fill = group), alpha = alpha) +
-    labs(list(title = "", x = labels[[2]], y = labels[[3]])) +
-    theme_bw()
-  if(any(!is.null(group) & group %in% names(Data)) == T) {
-    plot4 <- g_legend(plot1)
-  } else {
-    plot4 <- ggplot() + theme(plot.background = element_blank(), panel.background = element_blank()) + theme(legend.position = "none")
-  }
-  plot <- arrangeGrob(plot1 + theme(legend.position = "none"),
-               plot4,
-               plot3 + theme(legend.position = "none"),
-               plot2 + theme(legend.position = "none"),
-               ncol = 2,
-               heights = c(0.7,2),
-               widths = c(2,0.7))
-  if(ShowPlot == T) {return(plot(plot))} else {return(plot)}
-}
 
 
 #' 3 levels t-test
@@ -1531,8 +1528,8 @@ dlist.ropls.data <- function(dlist, ropls.result) {
 #' @return A grob, use grid::grid.draw() to plot
 #' @export
 #' @examples
-#' plot.ropls()
-plot.ropls <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels = c("none", "scores", "loadings", "both")) {
+#' ggplot.ropls()
+ggplot.ropls <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels = c("none", "scores", "loadings", "both")) {
   require(gridExtra) ; require(ggplot2) ; require(ggrepel) ; require(data.table) ; require(magrittr)
   plot.data <- plot.opls.data
   x <- plot.data$x
