@@ -1528,8 +1528,8 @@ dlist.ropls.data <- function(dlist, ropls.result) {
 #' @return A grob, use grid::grid.draw() to plot
 #' @export
 #' @examples
-#' ggplot.ropls()
-ggplot.ropls <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels = c("none", "scores", "loadings", "both")) {
+#' roplsplot()
+roplsplot <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels = c("none", "scores", "loadings", "both")) {
   require(gridExtra) ; require(ggplot2) ; require(ggrepel) ; require(data.table) ; require(magrittr)
   plot.data <- plot.opls.data
   x <- plot.data$x
