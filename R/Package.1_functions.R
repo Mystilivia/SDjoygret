@@ -1028,8 +1028,7 @@ dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size 
     yline <- rbind(data.frame("Measure" = "Skewness", "yint" = c(-1,1)),
                    data.frame("Measure" = "Perc of zero", "yint" = c(50, 100)),
                    data.frame("Measure" = "Coeff of var (%)", "yint" = c(10, 25, 50, 100)))
-    plot1 <- arrangeGrob(
-      ggplot(temp.plot, aes(variable, value, ymin = 0, ymax = value)) +
+    plot1 <- ggplot(temp.plot, aes(variable, value, ymin = 0, ymax = value)) +
         geom_hline(yintercept = 0, linetype = 1, alpha = 0.5) +
         geom_hline(data = yline, aes(yintercept = yint), color = "black", linetype = 2, alpha = 0.3) +
         geom_pointrange(alpha = alpha, size = size) +
@@ -1037,7 +1036,6 @@ dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size 
         SDjoygret:::ggplot_SD.theme +
         SDjoygret:::ggplot_SD_lab90 +
         labs(title = "", x = "", y = "")
-    )
     return(list("Data.summary" = temp.summary, "Plot" = plot1))
   }
   return(list("Data.summary" = temp.summary))
