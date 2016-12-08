@@ -1509,7 +1509,7 @@ dlist.ropls.data <- function(dlist, ropls.result) {
               "loadings" = temp.loadings,
               "labels_scores" = list("title" = paste0(ropls.result$typeC, " : Scores plot"),
                                      "subtitle" = paste0(ropls.result$descriptionMC[1], " samples (", ropls.result$descriptionMC[4], " missing values)"),
-                                     "x" = paste0(x, opls.y, " (", ropls.result$modelDF$R2X[1]*100, " %)"),
+                                     "x" = paste0(x, " ", opls.y, " (", ropls.result$modelDF$R2X[1]*100, " %)"),
                                      "y" = paste0(y, " (", ropls.result$modelDF$R2X[2]*100, " %)")),
               "labels_loadings" = list("title" = paste0(ropls.result$typeC, " : Loadings plot"),
                                        "subtitle" = paste0(ropls.result$descriptionMC[2], " variables (", ropls.result$descriptionMC[3], " excluded)"),
@@ -1524,37 +1524,46 @@ dlist.ropls.data <- function(dlist, ropls.result) {
 #'
 #' Plot ropls results using ggplot2
 #' @param plot.opls.data Result of dlist.opls.data function
-#' @param group Group name for colors
+#' @param group.spl Scores group name for colors
+#' @param group.var Loadings group name for colors
+#' @param labels string to show labels on plots
 #' @keywords ropls, ggplot
 #' @return A grob, use grid::grid.draw() to plot
 #' @export
 #' @examples
 #' plot.ropls()
-plot.ropls <- function(plot.opls.data, group = NULL) {
-  require(gridExtra) ; require(ggplot2) ; require(data.table) ; require(magrittr)
+plot.ropls <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels = c("none", "scores", "loadings", "both")) {
+  require(gridExtra) ; require(ggplot2) ; require(ggrepel) ; require(data.table) ; require(magrittr)
   plot.data <- plot.opls.data
-  temp.scores <- plot.data$scores
   x <- plot.data$x
   y <- plot.data$y
-  labels.scores <- plot.data$labels_scores
+  temp.scores <- data.table(plot.data$scores)
   temp.loadings <- data.table(plot.data$loadings)
+  labels.scores <- plot.data$labels_scores
   labels.loadings <- plot.data$labels_loadings
-  return(arrangeGrob(
-    ggplot(temp.scores, aes(get(x), get(y))) +
-      geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
-      geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
-      geom_point() +
-      theme_bw() +
-      list(if(!is.null(group)){aes(color = get(group))} else { NULL }) +
-      labs(c(labels.scores, color = ""))
-    ,
-    ggplot(temp.loadings, aes(get(x), get(y))) +
-      geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
-      geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
-      labs(labels.loadings) +
-      SDjoygret:::ggplot_SD.theme +
-      list(if(nchar(plot.data$Opls.Y) > 0) { geom_point(data = temp.loadings[order(-VIP)][VIP >= 1][1:1000], color = "red", alpha = 0.5) },
-           if(temp.loadings[,.N] > 100) { geom_density2d(color = "black")} else { geom_point(alpha = 0.8) })
+  return(list("Scores.plot" = ggplot(temp.scores, aes(get(x), get(y))) +
+                geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
+                geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
+                geom_point() +
+                theme_bw() +
+                labs(labels.scores) +
+                list(if(!is.null(group.spl)){list(aes(color = as.factor(get(group.spl))),
+                                                  labs(color = ""),
+                                                  theme(legend.position = "bottom"))} else { NULL },
+                     if(labels %in% c("scores", "both")) {geom_text_repel(aes(label = temp.scores[,1,with = F][[1]]), show.legend = F)} else { NULL })
+              ,
+              "Loadings.plot" = ggplot(temp.loadings, aes(get(x), get(y))) +
+                geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
+                geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
+                labs(labels.loadings) +
+                theme_bw() +
+                labs(labels.loadings) +
+                list(if(plot.data$TypeC %in% c("OPLS", "OPLS-DA")) { geom_point(data = temp.loadings[order(-VIP)][VIP >= 1][1:1000], color = "red", alpha = 0.5) },
+                     if(temp.loadings[,.N] > 100) { geom_density2d(color = "black")} else { geom_point(alpha = 0.8) },
+                     if(!is.null(group.var)){list(aes(color = as.factor(get(group.var))),
+                                                  labs(color = ""),
+                                                  theme(legend.position = "bottom"))} else { NULL },
+                     if(labels %in% c("loadings", "both")) {geom_text_repel(aes(label = temp.loadings[,1,with = F][[1]]), show.legend = F)} else { NULL })
   ))
 }
 

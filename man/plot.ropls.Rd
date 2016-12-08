@@ -4,12 +4,17 @@
 \alias{plot.ropls}
 \title{Plot ropls results}
 \usage{
-\method{plot}{ropls}(plot.opls.data, group = NULL)
+\method{plot}{ropls}(plot.opls.data, group.spl = NULL, group.var = NULL,
+  labels = c("none", "scores", "loadings", "both"))
 }
 \arguments{
 \item{plot.opls.data}{Result of dlist.opls.data function}
 
-\item{group}{Group name for colors}
+\item{group.spl}{Scores group name for colors}
+
+\item{group.var}{Loadings group name for colors}
+
+\item{labels}{string to show labels on plots}
 }
 \value{
 A grob, use grid::grid.draw() to plot
