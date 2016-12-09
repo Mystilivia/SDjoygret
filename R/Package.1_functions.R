@@ -642,12 +642,10 @@ check.list.format <- function (dlist, rownamesL = F, data.tableL = F) {
     if(any(duplicated(x[,1]))){message(paste0('First column has duplicates (see below), a new column "rn" contains rownames./n', which(duplicated(x[,1])))) ; return(data.table(x, keep.rownames = T))}
     else {message('First column has no duplicates and is used as row IDs') ; return(data.table(x, keep.rownames = F))}
   })
-
   if(!dim(dlist[[1]])[1] == dim(dlist[[2]])[1]) {stop("Datamatrix and Sample.Metadata must have the same number of rows.")}
   if(!dim(dlist[[1]])[2]-1 == dim(dlist[[3]])[1]) {stop("Variables number should be the same between datamatrix column and VariableMetadata rows.")}
   if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])) {stop("Datamatrix and Sample.Metadata first column must be identical (same names and order)")}
   if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])) {stop("Datamatrix column names and Variable.Metadata rows ID must be identical (same names and order)")}
-
   if(all(temp.data.str[,"class.t"] == T)) {
     message("Data are stored as tibble. SDjoygret function better with data.table (use data.table::as.data.table to convert).")
   } else if(all(temp.data.str[,"class.d.t"] == T)) { ## all are data.table
@@ -983,7 +981,7 @@ dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size 
     melt(id.vars = names(dlist[[2]]))
   temp.summary <- temp.data[,.(
     "N"               = round(length(value), 3),
-    "NA"              = round(length(which(is.na(value[[1]]) == T)), 3),
+    "NA"              = round(length(which(is.na(value))), 3),
     "Zero"            = round(length(which(value == 0)), 3),
     "Perc_Zero"       = round(length(which(value == 0)) * 100 / length(value), 3),
     "Avg"             = round(mean(value, na.rm = T), 3),
@@ -1001,19 +999,21 @@ dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size 
   if(plotL) {
     temp.plot <- melt(temp.summary, id.vars = c("variable", var2names), variable.name = "Measure")
     temp.plot[,variable := factor(variable, levels = unique(temp.plot[Measure == "Sum"][order(value), variable]))]
-    temp.plot <- temp.plot[Measure %in% c("Avg", "Perc_Zero", "Skew", "CV")][, Measure := factor(Measure, levels = c("Avg", "CV", "Skew", "Perc_Zero"), labels = c("Average", "Coeff of var (%)", "Skewness", "Perc of zero"))]
+    temp.plot <- temp.plot[Measure %in% c("Avg", "Perc_Zero", "Skew", "CV", "NA")][, Measure := factor(Measure, levels = c("Avg", "CV", "Skew", "Perc_Zero", "NA"), labels = c("Average", "Coeff of var (%)", "Skewness", "Zeros (%)", "NAs (%)"))]
     temp.plot$Measure <- droplevels(temp.plot$Measure)
     yline <- rbind(data.frame("Measure" = "Skewness", "yint" = c(-1,1)),
-                   data.frame("Measure" = "Perc of zero", "yint" = c(50, 100)),
-                   data.frame("Measure" = "Coeff of var (%)", "yint" = c(10, 25, 50, 100)))
+                   data.frame("Measure" = "Zeros (%)", "yint" = c(50, 100)),
+                   data.frame("Measure" = "Coeff of var (%)", "yint" = c(10, 25, 50, 100)),
+                   data.frame("Measure" = "NAs (%)", "yint" = c(50, 100))
+    )
     plot1 <- ggplot(temp.plot, aes(variable, value, ymin = 0, ymax = value)) +
-        geom_hline(yintercept = 0, linetype = 1, alpha = 0.5) +
-        geom_hline(data = yline, aes(yintercept = yint), color = "black", linetype = 2, alpha = 0.3) +
-        geom_pointrange(alpha = alpha, size = size) +
-        facet_grid(Measure~., scale = "free_y") +
-        SDjoygret:::ggplot_SD.theme +
-        SDjoygret:::ggplot_SD_lab90 +
-        labs(title = "", x = "", y = "")
+      geom_hline(yintercept = 0, linetype = 1, alpha = 0.5) +
+      geom_hline(data = yline, aes(yintercept = yint), color = "black", linetype = 2, alpha = 0.3) +
+      geom_pointrange(alpha = alpha, size = size) +
+      facet_grid(Measure~., scale = "free_y") +
+      SDjoygret:::ggplot_SD.theme +
+      SDjoygret:::ggplot_SD_lab90 +
+      labs(title = "", x = "", y = "")
     return(list("Data.summary" = temp.summary, "Plot" = plot1))
   }
   return(list("Data.summary" = temp.summary))
@@ -1156,6 +1156,37 @@ dataframe.transform <- function(data,
   if(isTRUE(TransL)) {return(Trans.fun(data, ...))}
   return(temp.data)
 }
+
+
+#' Transform a datamatrix and replace zero
+#'
+#' Do any of the two following function : Replace zero by the minimum value divided by 2 and/or tranform data
+#' with Trans.fun function (by default log2).
+#' @param data a data.table with first column as row IDs
+#' @param ZvalL Should Zero val column be deleted ?
+#' @param PercZ Prop of zero value above which deletion is made
+#' @param RepZeroL Should remaining zero be replaced by half of minimum value ?
+#' @param Log2L Should log2 transform be done
+#' @keywords transform
+#' @return The resulting data.table only
+#' @export
+#' @examples
+#' d.t.transform()
+d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = F, Log2L = T) {
+  if(!is.data.table(data)){stop("Function optimized for data.table.")}
+  if(ZvalL){
+    data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){
+      PercZ <- length(x[x==0])/length(x)
+      if(PercZ >= ZvalS){return(NULL)} else {x}
+    }), .SDcols=-1])
+  }
+  if(RepZeroL){data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}), .SDcols=-1])}
+  if(Log2L){data <- data.table(data[,1,with = F], data[,lapply(.SD, log2), .SDcols=-1])}
+  return(data)
+}
+
+
+
 
 #' Transform function for dlist
 #'
