@@ -4,7 +4,7 @@
 \alias{check.list.format}
 \title{Check format of dlist}
 \usage{
-check.list.format(dlist, rownamesL = F, tibbleL = F)
+check.list.format(dlist, rownamesL = F, data.tableL = F)
 }
 \arguments{
 \item{dlist}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}

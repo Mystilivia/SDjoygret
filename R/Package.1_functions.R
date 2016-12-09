@@ -631,53 +631,31 @@ get_sign = function(model) {
 #' @export
 #' @examples
 #' check.list.format()
-check.list.format <- function (dlist, rownamesL = F, tibbleL = F) {
+check.list.format <- function (dlist, rownamesL = F, data.tableL = F) {
   require("tibble") ; require("tidyverse")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   temp.data.str <- dlist.class(dlist)
   if(all(temp.data.str[,"class.d.t"] == F) & all(temp.data.str[,"class.t"] == F) & all(temp.data.str[,"class.d.f"] == F)) {stop("List levels should be data.frame, tibble or data.table") }
-  if(rownamesL == F){
-    if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-    if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
-  } else if(rownamesL == T){
-    if(!identical(rownames(dlist[[1]]), rownames(dlist[[2]]))){stop("Datamatrix rownames should be identical of Sample.Metadata rownames")}
-    if(!identical(names(dlist[[1]]), rownames(dlist[[3]]))){stop("Datamatrix colnames should be identical of Variable.Metadata rownames")}
-    message("Data are well structured.")
-    return(dlist)
-  }
+
+  ## transform data to data.table and add a column for rownames if duplicates are found in the first column
+  temp.data <- lapply(dlist, function(x) {
+    if(any(duplicated(x[,1]))){message(paste0('First column has duplicates (see below), a new column "rn" contains rownames./n', which(duplicated(x[,1])))) ; return(data.table(x, keep.rownames = T))}
+    else {message('First column has no duplicates and is used as row IDs') ; return(data.table(x, keep.rownames = F))}
+  })
+
+  if(!dim(dlist[[1]])[1] == dim(dlist[[2]])[1]) {stop("Datamatrix and Sample.Metadata must have the same number of rows.")}
+  if(!dim(dlist[[1]])[2]-1 == dim(dlist[[3]])[1]) {stop("Variables number should be the same between datamatrix column and VariableMetadata rows.")}
+  if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])) {stop("Datamatrix and Sample.Metadata first column must be identical (same names and order)")}
+  if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])) {stop("Datamatrix column names and Variable.Metadata rows ID must be identical (same names and order)")}
+
   if(all(temp.data.str[,"class.t"] == T)) {
-    message("Data are stored as tibbles, well done !")
-    return(dlist)
+    message("Data are stored as tibble. SDjoygret function better with data.table (use data.table::as.data.table to convert).")
   } else if(all(temp.data.str[,"class.d.t"] == T)) { ## all are data.table
-    if(tibbleL == F) {message("Data are stored as data.table, to convert to tibbles : set args tibbleL to TRUE.")
-      return(dlist)}
-    if(tibbleL == T) {
-      if(rownamesL == T) {stop("Data are stored as data.table, there shouldn't be any rownames, please check and set argument rownamesL to FALSE.")}
-      if(rownamesL == F) {
-        temp.list <- lapply(dlist, function(x) {tbl_df(x)})
-        names(temp.list) <- names(dlist)
-        message("Data were stored as data.table and were converted to tibbles.")
-        return(temp.list)
-      }
-    }
+    message("Data are stored as data.table, well done !")
   } else if(all(temp.data.str[,"class.d.f"] == T)) { ## all are data.frame
-    if(tibbleL == F) {
-      message("Data are stored as data.frame, to convert to tibbles : set args tibbleL to TRUE.")
-      return(dlist)}
-    if(tibbleL == T) {
-      if(rownamesL == T) {
-        temp.list <- lapply(dlist, function(x) {tbl_df(rownames_to_column(x))})
-        names(temp.list) <- names(dlist)
-        message("Data were stored as data.frame and were converted to tibbles, rownames were added as first column.")
-        return(temp.list)
-      } else if(rownamesL == F) {
-        temp.list <- lapply(dlist, function(x) {tbl_df(x)})
-        names(temp.list) <- names(dlist)
-        message("Data were stored as data.frame and were converted to tibbles.")
-        return(temp.list)
-      }
-    }
+    message("Data are stored as data.frame. SDjoygret function better with data.table (use data.table::as.data.table to convert).")
   } else {stop("Data class isn't recognized as data.frame, tibble or data.table.")}
+  if(isTRUE(data.tableL)){return(temp.data)}
 }
 
 
@@ -998,7 +976,7 @@ plotheme.auto <- function(Samples.grp = NULL,
 #' dlist.summary()
 dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size = 0.4){
   require("data.table") ; require("magrittr") ; require("e1071") ; require("gridExtra")
-  dlist <- lapply(dlist, data.table)
+  check.list.format(dlist)
   ## Check that no duplicates is created between new variables and var2names
   if(any(var2names %in% c("N", "NA", "Zero", "Perc_Zero", "Avg", "Median", "Sum", "Min", "Max", "SD", "CV", "IC95_min_manual", "IC95_max_manual", "Skew"))) { stop("var2names conflict with calculated variable. Must be different than : N, NA, Zero, Perc_Zero, Avg, Median, Sum, Min, Max, SD, CV, IC95_min_manual, IC95_max_manual, Skew")}
   temp.data <- data.table(dlist[[2]], dlist[[1]][, -1, with = F]) %>%
@@ -1128,7 +1106,7 @@ dlist.pca <- function (dlist,
                          psize = 0.8,
                          ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(dplyr)
-  check.list.format(dlist, to.data.table.L = F, return.dlist = F)
+  check.list.format(dlist)
   temp.pca <- opls(dlist[[1]][,-1, with = F], predI = 2, plotL = F)
   temp.scores <- bind_cols(dlist[[2]], data.frame(temp.pca$scoreMN))
   limits1 <- find.limits(temp.scores$p1, temp.scores$p2)
@@ -1276,7 +1254,7 @@ dlist.opls <- function (dlist,
                         LabelsL = F,
                         ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table) ; require(dtplyr)
-  check.list.format(dlist, to.data.table.L = F, return.dlist = F)
+  check.list.format(dlist)
   temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], orthoI = NA, plotL = F)
   temp.scores <- bind_cols(dlist[[2]], data.table(temp.opls$scoreMN), data.table(temp.opls$orthoScoreMN))
   limits1 <- find.limits(temp.scores$p1, temp.scores$o1)
@@ -1403,6 +1381,7 @@ xcmsSet.Result.List <- function(x) {
 #' dlist.ropls.min()
 dlist.ropls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
   require(dtplyr) ; require(data.table) ; require(ropls)
+  check.list.format(dlist)
   if(!is.null(opls.y)) {opls.yV <- dlist[[2]][,get(opls.y)]} else {opls.yV <- NULL}
   temp.result <- ropls::opls(dlist[[1]][,-1,with=F], y = opls.yV, plotL = plotL, ...)
   if (min == T) {
@@ -1485,6 +1464,7 @@ size <- function(data) {
 #' dlist.ropls.data()
 dlist.ropls.data <- function(dlist, ropls.result) {
   require(dtplyr) ; require(data.table)
+  check.list.format(dlist)
   ## Get scores
   if (ropls.result$typeC %in% c("PCA", "PLS", "PLS-DA")) {
     temp.scores <- data.table(dlist[[2]], ropls.result$scoreMN)
