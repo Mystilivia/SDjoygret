@@ -5,7 +5,8 @@
 \title{Plot ropls results}
 \usage{
 roplsplot(plot.opls.data, group.spl = NULL, group.var = NULL,
-  labels = c("none", "scores", "loadings", "both"))
+  labels = c("none", "scores", "loadings", "both"), density = c(F, T),
+  pathL = c(F, T))
 }
 \arguments{
 \item{plot.opls.data}{Result of dlist.opls.data function}
@@ -15,6 +16,10 @@ roplsplot(plot.opls.data, group.spl = NULL, group.var = NULL,
 \item{group.var}{Loadings group name for colors}
 
 \item{labels}{string to show labels on plots}
+
+\item{density}{should loadings points be replaced by density plot (useful when there are many variables)}
+
+\item{pathL}{should path between samples group be drawn}
 }
 \value{
 A grob, use grid::grid.draw() to plot

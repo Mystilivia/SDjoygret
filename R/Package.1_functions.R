@@ -1535,12 +1535,14 @@ dlist.ropls.data <- function(dlist, ropls.result) {
 #' @param group.spl Scores group name for colors
 #' @param group.var Loadings group name for colors
 #' @param labels string to show labels on plots
+#' @param density should loadings points be replaced by density plot (useful when there are many variables)
+#' @param pathL should path between samples group be drawn
 #' @keywords ropls, ggplot
 #' @return A grob, use grid::grid.draw() to plot
 #' @export
 #' @examples
 #' roplsplot()
-roplsplot <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels = c("none", "scores", "loadings", "both")) {
+roplsplot <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels = c("none", "scores", "loadings", "both"), density = c(F, T), pathL = c(F,T)) {
   require(gridExtra) ; require(ggplot2) ; require(ggrepel) ; require(data.table) ; require(magrittr)
   plot.data <- plot.opls.data
   x <- plot.data$x
@@ -1557,7 +1559,8 @@ roplsplot <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels
                 labs(labels.scores) +
                 list(if(!is.null(group.spl)){list(aes(color = as.factor(get(group.spl))),
                                                   labs(color = ""),
-                                                  theme(legend.position = "bottom"))} else { NULL },
+                                                  theme(legend.position = "bottom"),
+                                                  if(isTRUE(pathL)){geom_path(aes(group = get(group.spl)))})} else { NULL },
                      if(labels %in% c("scores", "both")) {geom_text_repel(aes(label = temp.scores[,1,with = F][[1]]), show.legend = F)} else { NULL })
               ,
               "Loadings.plot" = ggplot(temp.loadings, aes(get(x), get(y))) +
@@ -1567,7 +1570,7 @@ roplsplot <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels
                 theme_bw() +
                 labs(labels.loadings) +
                 list(if(plot.data$TypeC %in% c("OPLS", "OPLS-DA")) { geom_point(data = temp.loadings[order(-VIP)][VIP >= 1][1:1000], color = "red", alpha = 0.5) },
-                     if(temp.loadings[,.N] > 100) { geom_density2d(color = "black")} else { geom_point(alpha = 0.8) },
+                     if(isTRUE(density)) { geom_density2d(color = "black")} else { geom_point(alpha = 0.8) },
                      if(!is.null(group.var)){list(aes(color = as.factor(get(group.var))),
                                                   labs(color = ""),
                                                   theme(legend.position = "bottom"))} else { NULL },
