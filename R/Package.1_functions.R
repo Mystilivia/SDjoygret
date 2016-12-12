@@ -1413,7 +1413,10 @@ xcmsSet.Result.List <- function(x) {
 dlist.ropls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
   require(dtplyr) ; require(data.table) ; require(ropls)
   check.list.format(dlist)
-  if(!is.null(opls.y)) {opls.yV <- dlist[[2]][,get(opls.y)]} else {opls.yV <- NULL}
+  if(!is.null(opls.y)) {
+    if(is.vector(opls.y)){
+      opls.yV <- dlist[[2]][,get(opls.y)]} else { opls.yV <- paste0(unlist(dimnames(opls.y)))}
+  } else {opls.yV <- NULL}
   temp.result <- ropls::opls(dlist[[1]][,-1,with=F], y = opls.yV, plotL = plotL, ...)
   if (min == T) {
     return(c(temp.result[c("typeC", "descriptionMC", "modelDF", "summaryDF", "orthoVipVn", "scoreMN", "loadingMN", "orthoScoreMN", "orthoLoadingMN", "fitted", "orthoVipVn", "vipVn")],
