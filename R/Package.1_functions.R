@@ -965,6 +965,7 @@ plotheme.auto <- function(Samples.grp = NULL,
 #' @param plotL Should summary plot be drown (return a grob, use plot or grid::grid.draw to show)
 #' @param alpha Set the plot transparency
 #' @param size Set the points sizes
+#' @param Class Column names for grouping variables
 #' @inheritParams dlist.summary
 #' @inheritParams dlist.subset
 #' @keywords summary
@@ -972,7 +973,7 @@ plotheme.auto <- function(Samples.grp = NULL,
 #' @export
 #' @examples
 #' dlist.summary()
-dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size = 0.4){
+dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size = 0.4, Class = NULL){
   require("data.table") ; require("magrittr") ; require("e1071") ; require("gridExtra")
   check.list.format(dlist)
   ## Check that no duplicates is created between new variables and var2names
@@ -998,6 +999,7 @@ dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size 
   ## create summary plot if asked
   if(plotL) {
     temp.plot <- melt(temp.summary, id.vars = c("variable", var2names), variable.name = "Measure")
+    temp.plot <- merge(temp.plot, dlist[[3]], by.x = "variable", by.y = names(dlist[[3]])[1])
     temp.plot[,variable := factor(variable, levels = unique(temp.plot[Measure == "Sum"][order(value), variable]))]
     temp.plot <- temp.plot[Measure %in% c("Avg", "Perc_Zero", "Skew", "CV", "NA")][, Measure := factor(Measure, levels = c("Avg", "CV", "Skew", "Perc_Zero", "NA"), labels = c("Average", "Coeff of var (%)", "Skewness", "Zeros (%)", "NAs (%)"))]
     temp.plot$Measure <- droplevels(temp.plot$Measure)
@@ -1010,7 +1012,7 @@ dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size 
       geom_hline(yintercept = 0, linetype = 1, alpha = 0.5) +
       geom_hline(data = yline, aes(yintercept = yint), color = "black", linetype = 2, alpha = 0.3) +
       geom_pointrange(alpha = alpha, size = size) +
-      facet_grid(Measure~., scale = "free_y") +
+      list(if(!is.null(Class)){facet_grid(Measure~Class, scale = "free", space = "free_x")} else {facet_grid(Measure~., scale = "free_y")}) +
       SDjoygret:::ggplot_SD.theme +
       SDjoygret:::ggplot_SD_lab90 +
       labs(title = "", x = "", y = "")
@@ -1545,7 +1547,12 @@ dlist.ropls.data <- function(dlist, ropls.result) {
 #' @export
 #' @examples
 #' roplsplot()
-roplsplot <- function(plot.opls.data, group.spl = NULL, group.var = NULL, labels = c("none", "scores", "loadings", "both"), density = c(F, T), pathL = c(F,T)) {
+roplsplot <- function(plot.opls.data,
+                      group.spl = NULL,
+                      group.var = NULL,
+                      labels = c("none", "scores", "loadings", "both"),
+                      density = c(F, T),
+                      pathL = c(F,T)) {
   require(gridExtra) ; require(ggplot2) ; require(ggrepel) ; require(data.table) ; require(magrittr)
   plot.data <- plot.opls.data
   x <- plot.data$x

@@ -5,7 +5,7 @@
 \title{dlist summary}
 \usage{
 dlist.summary(dlist, var2names = NULL, plotL = F, alpha = 0.8,
-  size = 0.4)
+  size = 0.4, Class = NULL)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
@@ -17,6 +17,8 @@ dlist.summary(dlist, var2names = NULL, plotL = F, alpha = 0.8,
 \item{alpha}{Set the plot transparency}
 
 \item{size}{Set the points sizes}
+
+\item{Class}{Column names for grouping variables}
 }
 \value{
 a data.table with summary results (length, NA count, Zero count, Perc of zero, mean, median, sum, min, max, SD, CV, IC95 and skewness)
