@@ -1504,12 +1504,12 @@ dlist.ropls.data <- function(dlist, ropls.result) {
   ## Get scores
   if (ropls.result$typeC %in% c("PCA", "PLS", "PLS-DA")) {
     temp.scores <- data.table(dlist[[2]], ropls.result$scoreMN)
-    temp.loadings <- data.table(dlist[[3]], ropls.result$loadingMN)
+    temp.loadings <- merge(dlist[[3]], as.data.table(ropls.result$loadingMN, keep.rownames = T), by.x = names(dlist[[3]])[1], by.y = "rn")
     x <- "p1"
     y <- "p2"
   } else if (ropls.result$typeC %in% c("OPLS", "OPLS-DA")) {
     temp.scores <- data.table(dlist[[2]], ropls.result$scoreMN, ropls.result$orthoScoreMN)
-    temp.loadings <- data.table(dlist[[3]], ropls.result$loadingMN, ropls.result$orthoLoadingMN, OrthoVIP = ropls.result$orthoVipVn, VIP = ropls.result$vipVn)
+    temp.loadings <- data.table(merge(dlist[[3]], as.data.table(ropls.result$loadingMN, keep.rownames = T), by.x = names(dlist[[3]])[1], by.y = "rn"), ropls.result$orthoLoadingMN, OrthoVIP = ropls.result$orthoVipVn, VIP = ropls.result$vipVn)
     x <- "p1"
     y <- "o1"
   } else { stop("TypeC not recognized, please use the ropls package or dlist.opls.min to perform the multivariate analysis.
