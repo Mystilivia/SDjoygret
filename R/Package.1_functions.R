@@ -984,6 +984,7 @@ dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size 
     "N"               = round(length(value), 3),
     "NA"              = round(length(which(is.na(value))), 3),
     "Zero"            = round(length(which(value == 0)), 3),
+    "Perc_NA"        = round(length(which(is.na(value))) * 100 / length(value), 3),
     "Perc_Zero"       = round(length(which(value == 0)) * 100 / length(value), 3),
     "Avg"             = round(mean(value, na.rm = T), 3),
     "Median"          = round(median(value, na.rm = T), 3),
@@ -1001,7 +1002,7 @@ dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size 
     temp.plot <- melt(temp.summary, id.vars = c("variable", var2names), variable.name = "Measure")
     temp.plot <- merge(temp.plot, dlist[[3]], by.x = "variable", by.y = names(dlist[[3]])[1])
     temp.plot[,variable := factor(variable, levels = unique(temp.plot[Measure == "Sum"][order(value), variable]))]
-    temp.plot <- temp.plot[Measure %in% c("Avg", "Perc_Zero", "Skew", "CV", "NA")][, Measure := factor(Measure, levels = c("Avg", "CV", "Skew", "Perc_Zero", "NA"), labels = c("Average", "Coeff of var (%)", "Skewness", "Zeros (%)", "NAs (%)"))]
+    temp.plot <- temp.plot[Measure %in% c("Avg", "Perc_Zero", "Skew", "CV", "Perc_NA")][, Measure := factor(Measure, levels = c("Avg", "CV", "Skew", "Perc_Zero", "Perc_NA"), labels = c("Average", "Coeff of var (%)", "Skewness", "Zeros (%)", "NAs (%)"))]
     temp.plot$Measure <- droplevels(temp.plot$Measure)
     yline <- rbind(data.frame("Measure" = "Skewness", "yint" = c(-1,1)),
                    data.frame("Measure" = "Zeros (%)", "yint" = c(50, 100)),
