@@ -978,14 +978,12 @@ dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name 
   if (any(class(dlist) == "list")) {
     check.list.format(dlist)
     temp.data <- data.table(dlist[[2]], dlist[[1]][, -1, with = F]) %>%
-      melt(id.vars = names(dlist[[2]]), value.name = "Value")
+      melt(id.vars = names(dlist[[2]]))
   } else if (any(class(dlist) %in% c("data.table", "data.frame"))){
     temp.data <- as.data.table(dlist)
   }
   ## Check that no duplicates is created between new variables and var2names
   if(any(var2names %in% c("N", "NA", "Zero", "Perc_Zero", "Avg", "Median", "Sum", "Min", "Max", "SD", "CV", "IC95_min_manual", "IC95_max_manual", "Skew"))) { stop("var2names conflict with calculated variable. Must be different than : N, NA, Zero, Perc_Zero, Avg, Median, Sum, Min, Max, SD, CV, IC95_min_manual, IC95_max_manual, Skew")}
-  temp.data <- data.table(dlist[[2]], dlist[[1]][, -1, with = F]) %>%
-    melt(id.vars = names(dlist[[2]]))
   temp.summary <- temp.data[,.(
     "N"               = round(length(get(val.name)), 3),
     "NA"              = round(length(which(is.na(get(val.name)))), 3),
