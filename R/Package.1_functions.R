@@ -973,30 +973,36 @@ plotheme.auto <- function(Samples.grp = NULL,
 #' @export
 #' @examples
 #' dlist.summary()
-dlist.summary <- function(dlist, var2names = NULL, plotL = F, alpha = 0.8, size = 0.4, Class = NULL){
+dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name = "variable", plotL = F, alpha = 0.8, size = 0.4, Class = NULL){
   require("data.table") ; require("magrittr") ; require("e1071") ; require("gridExtra")
-  check.list.format(dlist)
+  if (any(class(dlist) == "list")) {
+    check.list.format(dlist)
+    temp.data <- data.table(dlist[[2]], dlist[[1]][, -1, with = F]) %>%
+      melt(id.vars = names(dlist[[2]]), value.name = "Value")
+  } else if (any(class(dlist) %in% c("data.table", "data.frame"))){
+    temp.data <- as.data.table(dlist)
+  }
   ## Check that no duplicates is created between new variables and var2names
   if(any(var2names %in% c("N", "NA", "Zero", "Perc_Zero", "Avg", "Median", "Sum", "Min", "Max", "SD", "CV", "IC95_min_manual", "IC95_max_manual", "Skew"))) { stop("var2names conflict with calculated variable. Must be different than : N, NA, Zero, Perc_Zero, Avg, Median, Sum, Min, Max, SD, CV, IC95_min_manual, IC95_max_manual, Skew")}
   temp.data <- data.table(dlist[[2]], dlist[[1]][, -1, with = F]) %>%
     melt(id.vars = names(dlist[[2]]))
   temp.summary <- temp.data[,.(
-    "N"               = round(length(value), 3),
-    "NA"              = round(length(which(is.na(value))), 3),
-    "Zero"            = round(length(which(value == 0)), 3),
-    "Perc_NA"        = round(length(which(is.na(value))) * 100 / length(value), 3),
-    "Perc_Zero"       = round(length(which(value == 0)) * 100 / length(value), 3),
-    "Avg"             = round(mean(value, na.rm = T), 3),
-    "Median"          = round(median(value, na.rm = T), 3),
-    "Sum"             = round(sum(value, na.rm = T), 3),
-    "Min"             = round(min(value, na.rm = T), 3),
-    "Max"             = round(max(value, na.rm = T), 3),
-    "SD"              = round(sd(value, na.rm = T), 3),
-    "CV"              = round(sd(value, na.rm = T)*100/mean(value, na.rm = T), 3),
-    "IC95_min_manual" = round(mean(value, na.rm = T)-2*(sd(value, na.rm = T)/length(value)), 3),
-    "IC95_max_manual" = round(mean(value, na.rm = T)+2*(sd(value, na.rm = T)/length(value)), 3),
-    "Skew"            = round(e1071::skewness(value, na.rm = T), 3)
-  ), by = c("variable", var2names)]
+    "N"               = round(length(get(val.name)), 3),
+    "NA"              = round(length(which(is.na(get(val.name)))), 3),
+    "Zero"            = round(length(which(get(val.name) == 0)), 3),
+    "Perc_NA"         = round(length(which(is.na(get(val.name)))) * 100 / length(get(val.name)), 3),
+    "Perc_Zero"       = round(length(which(get(val.name) == 0)) * 100 / length(get(val.name)), 3),
+    "Avg"             = round(mean(get(val.name), na.rm = T), 3),
+    "Median"          = round(median(get(val.name), na.rm = T), 3),
+    "Sum"             = round(sum(get(val.name), na.rm = T), 3),
+    "Min"             = round(min(get(val.name), na.rm = T), 3),
+    "Max"             = round(max(get(val.name), na.rm = T), 3),
+    "SD"              = round(sd(get(val.name), na.rm = T), 3),
+    "CV"              = round(sd(get(val.name), na.rm = T)*100/mean(get(val.name), na.rm = T), 3),
+    "IC95_min_manual" = round(mean(get(val.name), na.rm = T)-2*(sd(get(val.name), na.rm = T)/length(get(val.name))), 3),
+    "IC95_max_manual" = round(mean(get(val.name), na.rm = T)+2*(sd(get(val.name), na.rm = T)/length(get(val.name))), 3),
+    "Skew"            = round(e1071::skewness(get(val.name), na.rm = T), 3)
+  ), by = c(var.name, var2names)]
   ## create summary plot if asked
   if(plotL) {
     temp.plot <- melt(temp.summary, id.vars = c("variable", var2names), variable.name = "Measure")
