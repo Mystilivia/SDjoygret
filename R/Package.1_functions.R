@@ -957,6 +957,30 @@ plotheme.auto <- function(Samples.grp = NULL,
   return(opls.ggplotheme.auto)
 }
 
+#' dlist plot table
+#'
+#' Generate a long table with sample metadata as id variables for plots
+#'
+#' @param var2names List of grouping factor, if blank calculation while be done for eache variables.
+#' @param plotL Should summary plot be drown (return a grob, use plot or grid::grid.draw to show)
+#' @param alpha Set the plot transparency
+#' @param size Set the points sizes
+#' @param Class Column names for grouping variables
+#' @inheritParams dlist.summary
+#' @inheritParams dlist.subset
+#' @keywords summary
+#' @return a data.table in long format (melted) with sample metadata as id variables.
+#' @export
+#' @examples
+#' dlist.plot.table()
+dlist.plot.table <- function(dlist) {
+  require(data.table)
+  temp.x.name <- names(dlist[[2]])
+  temp.y.name <- names(dlist[[1]])
+  temp <- merge(dlist[[2]], dlist[[1]], by.x = temp.x.name[1], by.y = temp.y.name[1])
+  return(melt(temp, id.vars = temp.x.name))
+}
+
 #' dlist summary
 #'
 #' Calculate dlist summary data using data.table structure
