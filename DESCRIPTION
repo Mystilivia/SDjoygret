@@ -9,4 +9,4 @@ Description: Testing R packaging
 License: none
 LazyData: TRUE
 RoxygenNote: 5.0.1
-Imports: ggplot2, readxl, ropls, gridExtra, readxl, grDevices, data.table, tidyverse
+Imports: tidyverse, readxl, ropls, gridExtra, readxl, grDevices, data.table
