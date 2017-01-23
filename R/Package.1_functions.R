@@ -978,7 +978,7 @@ dlist.plot.table <- function(dlist) {
   temp.x.name <- names(dlist[[2]])
   temp.y.name <- names(dlist[[1]])
   temp <- merge(dlist[[2]], dlist[[1]], by.x = temp.x.name[1], by.y = temp.y.name[1])
-  return(melt(temp, id.vars = temp.x.name))
+  return(as.data.table(melt(temp, id.vars = temp.x.name)))
 }
 
 #' dlist summary
