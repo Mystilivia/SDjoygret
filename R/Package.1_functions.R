@@ -717,7 +717,7 @@ to.data.table <- function(dlist, rownamesL = F) {
 #' dlist.class()
 dlist.class <- function(dlist) {
   require(tibble)
-  return(tibble("ListLevel" = names(dlist),
+  return(tibble("ListLevel" = 1:length(dlist),
                     "class.m" = sapply(dlist, function(x) {any(class(x) == "matrix")}),
                     "class.d.t" = sapply(dlist, function(x) {any(class(x) == "data.table")}),
                     "class.d.f" = sapply(dlist, function(x) {any(class(x) == "data.frame")}),
