@@ -1156,7 +1156,7 @@ dlist.pca <- function (dlist,
                                                             labels1, geom_path = T, labelsL = Samp.lab.L)
   plot2 <- ggplot(temp.loadings, aes(p1, p2, label =  names(temp.loadings)[1])) +
     plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2,
-                  Legend.L, colorL, labels1, geom_path = F, labelsL = Var.lab.L, palpha = palpha, psize = psize)
+                  Legend.L, colorL, labels2, geom_path = F, labelsL = Var.lab.L, palpha = palpha, psize = psize)
   if(ShowPlot == T) {
     return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
   } else {
