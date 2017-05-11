@@ -35,4 +35,3 @@ dlist.opls()
 }
 \keyword{ggplot}
 \keyword{opls,}
-

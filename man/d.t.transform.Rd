@@ -28,4 +28,3 @@ with Trans.fun function (by default log2).
 d.t.transform()
 }
 \keyword{transform}
-

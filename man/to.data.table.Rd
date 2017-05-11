@@ -26,4 +26,3 @@ to.data.table()
 \keyword{check,}
 \keyword{data.table}
 \keyword{list,}
-

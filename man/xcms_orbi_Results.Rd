@@ -25,4 +25,3 @@ This function generate peak_table, STDs EIC across samples, PCA (optional) and r
 }
 \keyword{orbitrap}
 \keyword{xcms,}
-

@@ -22,4 +22,3 @@ find.limits()
 }
 \keyword{ggplot}
 \keyword{scales,}
-

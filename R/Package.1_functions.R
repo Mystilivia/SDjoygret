@@ -1139,18 +1139,18 @@ dlist.pca <- function (dlist,
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(dplyr)
   check.list.format(dlist)
   temp.pca <- opls(dlist[[1]][,-1, with = F], predI = 2, plotL = F, printL = F)
-  temp.scores <- bind_cols(dlist[[2]], data.frame(temp.pca$scoreMN))
+  temp.scores <- bind_cols(dlist[[2]], data.frame(temp.pca@scoreMN))
   limits1 <- find.limits(temp.scores$p1, temp.scores$p2)
-  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.pca$loadingMN))
+  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.pca@loadingMN))
   limits2 <- find.limits(temp.loadings$p1, temp.loadings$p2)
-  labels1 <- list(title = paste0("Scores plot ", temp.pca$descriptionMC[1],
-                                 " samples\n(", temp.pca$descriptionMC[4], " missing values)"),
-                  x = paste0("p1 (", temp.pca$modelDF$R2X[1] * 100, " %)"),
-                  y = paste0("p2 (", temp.pca$modelDF$R2X[2] * 100, " %)"))
-  labels2 <- list(title = paste0("Loadings plot\n", temp.pca$descriptionMC[2],
-                                 " variables (", temp.pca$descriptionMC[3], " excluded)"),
-                  x = paste0("p1 (", temp.pca$modelDF$R2X[1] * 100, " %)"),
-                  y = paste0("p2 (", temp.pca$modelDF$R2X[2] * 100, " %)"))
+  labels1 <- list(title = paste0("Scores plot ", temp.pca@descriptionMC[1],
+                                 " samples\n(", temp.pca@descriptionMC[4], " missing values)"),
+                  x = paste0("p1 (", temp.pca@modelDF$R2X[1] * 100, " %)"),
+                  y = paste0("p2 (", temp.pca@modelDF$R2X[2] * 100, " %)"))
+  labels2 <- list(title = paste0("Loadings plot\n", temp.pca@descriptionMC[2],
+                                 " variables (", temp.pca@descriptionMC[3], " excluded)"),
+                  x = paste0("p1 (", temp.pca@modelDF$R2X[1] * 100, " %)"),
+                  y = paste0("p2 (", temp.pca@modelDF$R2X[2] * 100, " %)"))
   plot1 <- ggplot(temp.scores, aes(p1, p2)) + plotheme.auto(Samples.grp,
                                                             Variables.grp = NULL, limits = limits1, Legend.L, colorL,
                                                             labels1, geom_path = T, labelsL = Samp.lab.L)

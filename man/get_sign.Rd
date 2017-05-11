@@ -18,4 +18,3 @@ get_sign(model)
 }
 \keyword{glm,}
 \keyword{significance}
-

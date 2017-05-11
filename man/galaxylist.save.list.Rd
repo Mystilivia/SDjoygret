@@ -25,4 +25,3 @@ galaxylist.save.list()
 \keyword{export}
 \keyword{galaxy,}
 \keyword{list,}
-

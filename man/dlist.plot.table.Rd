@@ -29,4 +29,3 @@ Generate a long table with sample metadata as id variables for plots
 dlist.plot.table()
 }
 \keyword{summary}
-

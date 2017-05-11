@@ -21,4 +21,3 @@ Return a list for plotting ropls results
 dlist.ropls.data()
 }
 \keyword{ropls}
-

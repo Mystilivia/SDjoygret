@@ -21,4 +21,3 @@ dlist.class()
 \keyword{check,}
 \keyword{data.table}
 \keyword{list,}
-

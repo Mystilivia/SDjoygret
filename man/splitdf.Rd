@@ -25,4 +25,3 @@ splitdf()
 \keyword{dataframe,}
 \keyword{subset}
 \keyword{training,}
-

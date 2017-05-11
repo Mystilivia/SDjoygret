@@ -21,4 +21,3 @@ size()
 \keyword{x1,}
 \keyword{x2,}
 \keyword{x3}
-

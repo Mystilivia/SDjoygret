@@ -21,4 +21,3 @@ Perform t-test on a 3 levels list between groups
 data.ttest()
 }
 \keyword{t-test}
-

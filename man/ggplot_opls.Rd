@@ -24,4 +24,3 @@ ggplot_opls()
 }
 \keyword{ggplot,}
 \keyword{opls}
-

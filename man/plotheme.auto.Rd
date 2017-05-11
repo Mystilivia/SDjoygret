@@ -41,4 +41,3 @@ plotheme.auto()
 }
 \keyword{ggplot}
 \keyword{scales,}
-

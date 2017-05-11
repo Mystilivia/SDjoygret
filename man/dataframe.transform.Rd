@@ -28,4 +28,3 @@ with Trans.fun function (by default log2).
 dataframe.transform()
 }
 \keyword{transform}
-

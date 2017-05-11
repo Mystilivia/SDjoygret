@@ -20,4 +20,3 @@ g_legend()
 }
 \keyword{ggplot}
 \keyword{legend,}
-

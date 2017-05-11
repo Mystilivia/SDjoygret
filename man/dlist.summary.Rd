@@ -31,4 +31,3 @@ Calculate dlist summary data using data.table structure
 dlist.summary()
 }
 \keyword{summary}
-

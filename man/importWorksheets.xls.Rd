@@ -22,4 +22,3 @@ importWorksheets.xls()
 \keyword{excel}
 \keyword{import,}
 \keyword{list,}
-

@@ -23,4 +23,3 @@ write.csv3()
 \keyword{dataframe,}
 \keyword{excel,}
 \keyword{save}
-

@@ -27,4 +27,3 @@ check.list.format()
 }
 \keyword{check}
 \keyword{list,}
-

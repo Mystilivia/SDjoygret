@@ -21,4 +21,3 @@ dlist.subset()
 }
 \keyword{list}
 \keyword{subset,}
-

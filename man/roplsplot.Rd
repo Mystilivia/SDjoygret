@@ -32,4 +32,3 @@ roplsplot()
 }
 \keyword{ggplot}
 \keyword{ropls,}
-

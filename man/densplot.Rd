@@ -34,4 +34,3 @@ Draw a 2 dimensions plot with density graph on each axis
 densplot()
 }
 \keyword{ggplot}
-
