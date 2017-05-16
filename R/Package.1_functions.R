@@ -24,6 +24,7 @@ xcms_orbi_GRT <- function(File_list,
                           profStep_param = 0.5,
                           Sample.Metadata,
                           Grouping.factor = 1){
+
   ## Package requirement
   require("xcms")
   require("ropls")
@@ -1318,17 +1319,17 @@ dlist.opls <- function (dlist,
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table) ; require(dtplyr)
   check.list.format(dlist)
   temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], orthoI = NA, plotL = F)
-  temp.scores <- bind_cols(dlist[[2]], data.table(temp.opls$scoreMN), data.table(temp.opls$orthoScoreMN))
+  temp.scores <- bind_cols(dlist[[2]], data.table(temp.opls@scoreMN), data.table(temp.opls@orthoScoreMN))
   limits1 <- find.limits(temp.scores$p1, temp.scores$o1)
-  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.opls$loadingMN, data.table(temp.opls$orthoLoadingMN)))
+  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN)))
   limits2 <- find.limits(temp.loadings$p1, temp.loadings$o1)
   ## var
-  labels1 <- list(title = paste0("Scores plot ", temp.opls$descriptionMC[1], " samples\n(", temp.opls$descriptionMC[4], " missing values)"),
-                  x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls$modelDF$R2X[1]*100, " %)"),
-                  y = paste0("o1 (", temp.opls$modelDF$R2X[2]*100, " %)"))
-  labels2 <- list(title = paste0("Loadings plot\n", temp.opls$descriptionMC[2], " variables (", temp.opls$descriptionMC[3], " excluded)"),
-                  x = paste0("p1 (", temp.opls$modelDF$R2X[1]*100, " %)"),
-                  y = paste0("o1 (", temp.opls$modelDF$R2X[2]*100, " %)"))
+  labels1 <- list(title = paste0("Scores plot ", temp.opls@descriptionMC[1], " samples\n(", temp.opls@descriptionMC[4], " missing values)"),
+                  x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls@modelDF$R2X[1]*100, " %)"),
+                  y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
+  labels2 <- list(title = paste0("Loadings plot\n", temp.opls@descriptionMC[2], " variables (", temp.opls@descriptionMC[3], " excluded)"),
+                  x = paste0("p1 (", temp.opls@modelDF$R2X[1]*100, " %)"),
+                  y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
   ## plots
   plot1 <- ggplot(temp.scores, aes(p1, o1)) +
     plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
@@ -1343,10 +1344,10 @@ dlist.opls <- function (dlist,
                 "Plots" = list("ScoresPlot" = plot1,
                                "LoadingsPlot" = plot2,
                                "VipsPlot" = temp.VIPs$Plot,
-                               "SummaryTable" = tableGrob(temp.opls$summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm")))),
+                               "SummaryTable" = tableGrob(temp.opls@summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm")))),
                 "DrawPlots" = grid.arrange(plot1,
                                            plot2,
-                                           tableGrob(temp.opls$summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm"))),
+                                           tableGrob(temp.opls@summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm"))),
                                            temp.VIPs$Plot,
                                            nrow = 2, heights = c(3,1)),
                 "VIPs" = temp.VIPs$VIPs))
@@ -1355,10 +1356,10 @@ dlist.opls <- function (dlist,
                 "Plots" = list("ScoresPlot" = plot1,
                                "LoadingsPlot" = plot2,
                                "VipsPlot" = temp.VIPs$Plot,
-                               "SummaryTable" = tableGrob(temp.opls$summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm")))),
+                               "SummaryTable" = tableGrob(temp.opls@summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm")))),
                 "DrawPlots" = arrangeGrob(plot1,
                                           plot2,
-                                          tableGrob(temp.opls$summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm"))),
+                                          tableGrob(temp.opls@summaryDF, theme = ttheme_minimal(base_size = 10, padding = unit(c(2,2), "mm"))),
                                           temp.VIPs$Plot,
                                           nrow = 2, heights = c(3,1)),
                 "VIPs" = temp.VIPs$VIPs))
@@ -1432,7 +1433,6 @@ xcmsSet.Result.List <- function(x) {
 #' Perform multivariate analysis with ropls package and return a minimal object with results
 #' for plots.
 #' @param opls.y Name of SampleMetadata column to use as y response (quoted).
-#' @param min Logical to get full resulting object of minimal.
 #' @param plotL Logical to draw summary plot as in ropls package.
 #' @param ... Any argument used by ropls::opls function.
 #' @inheritParams check.list.format
@@ -1441,7 +1441,7 @@ xcmsSet.Result.List <- function(x) {
 #' @export
 #' @examples
 #' dlist.ropls.min()
-dlist.ropls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
+dlist.ropls.min <- function(dlist, opls.y = NULL, plotL = F, ...) {
   require(dtplyr) ; require(data.table) ; require(ropls)
   check.list.format(dlist)
   if(!is.null(opls.y)) {
@@ -1449,13 +1449,8 @@ dlist.ropls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
       opls.yV <- dlist[[2]][,get(opls.y)]} else { opls.yV <- paste0(unlist(dimnames(opls.y)))}
   } else {opls.yV <- NULL}
   temp.result <- ropls::opls(dlist[[1]][,-1,with=F], y = opls.yV, plotL = plotL, ...)
-  if (min == T) {
-    return(c(temp.result[c("typeC", "descriptionMC", "modelDF", "summaryDF", "orthoVipVn", "scoreMN", "loadingMN", "orthoScoreMN", "orthoLoadingMN", "fitted", "orthoVipVn", "vipVn")],
-             "opls.y" = opls.y))
-  } else {
-    return(c(temp.result,
-             "opls.y" = opls.y))
-  }
+  return(c(temp.result,
+           "opls.y" = opls.y))
 }
 
 
@@ -1474,11 +1469,11 @@ dlist.ropls.min <- function(dlist, opls.y = NULL, min = T, plotL = F, ...) {
 ggplot_opls <- function(data, VIP.thr = 1, ShowPlot = T) {
   # Test
   if(class(data) != "opls"){print("Optimized for ropls::opls resulting object") ; stop()}
-  if(!data$typeC %in% c("OPLS", "OPLS-DA")){print("Optimized for OPLS-DA results") ; stop()}
+  if(!data@typeC %in% c("OPLS", "OPLS-DA")){print("Optimized for OPLS-DA results") ; stop()}
   # Data prep
-  temp.plot <- data.frame("Vip" = data$vipVn)
-  pos.list  <- subset(data.frame(data$loadingMN), p1 > 0)
-  neg.list  <- subset(data.frame(data$loadingMN), p1 < 0)
+  temp.plot <- data.frame("Vip" = data@vipVn)
+  pos.list  <- subset(data.frame(data@loadingMN), p1 > 0)
+  neg.list  <- subset(data.frame(data@loadingMN), p1 < 0)
   temp.plot[rownames(temp.plot) %in% rownames(neg.list),] <- temp.plot[rownames(temp.plot) %in% rownames(neg.list),] * -1
   ## Plot var
   plot.data <- temp.plot
@@ -1486,7 +1481,7 @@ ggplot_opls <- function(data, VIP.thr = 1, ShowPlot = T) {
   y <- "Vip"
   VIP.subset<- subset(temp.plot, abs(Vip) >= VIP.thr)
   Select.var.VIP <- rownames(VIP.subset)
-  labels <- list(title = "", x = paste0("Variables (", data$descriptionMC[2], " of which ", length(Select.var.VIP), " have a VIP > ", VIP.thr, ")"), y = "Score VIP")
+  labels <- list(title = "", x = paste0("Variables (", data@descriptionMC[2], " of which ", length(Select.var.VIP), " have a VIP > ", VIP.thr, ")"), y = "Score VIP")
   # Plot
   plot1 <- ggplot(plot.data, aes(x = reorder(x, get(y)), y = get(y), ymin = 0, ymax = get(y))) +
     geom_hline(yintercept = c(-1,-2,-VIP.thr, VIP.thr, 2), alpha = 0.4, linetype = 2) +

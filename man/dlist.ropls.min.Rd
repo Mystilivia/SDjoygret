@@ -4,14 +4,12 @@
 \alias{dlist.ropls.min}
 \title{Perform pca, pls(da) or opls(da) with ropls}
 \usage{
-dlist.ropls.min(dlist, opls.y = NULL, min = T, plotL = F, ...)
+dlist.ropls.min(dlist, opls.y = NULL, plotL = F, ...)
 }
 \arguments{
 \item{dlist}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}
 
 \item{opls.y}{Name of SampleMetadata column to use as y response (quoted).}
-
-\item{min}{Logical to get full resulting object of minimal.}
 
 \item{plotL}{Logical to draw summary plot as in ropls package.}
 
