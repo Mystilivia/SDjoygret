@@ -1526,32 +1526,32 @@ dlist.ropls.data <- function(dlist, ropls.result) {
   require(dtplyr) ; require(data.table)
   check.list.format(dlist)
   ## Get scores
-  if (ropls.result$typeC %in% c("PCA", "PLS", "PLS-DA")) {
-    temp.scores <- data.table(dlist[[2]], ropls.result$scoreMN)
-    temp.loadings <- merge(dlist[[3]], as.data.table(ropls.result$loadingMN, keep.rownames = T), by.x = names(dlist[[3]])[1], by.y = "rn")
+  if (ropls.result@typeC %in% c("PCA", "PLS", "PLS-DA")) {
+    temp.scores <- data.table(dlist[[2]], ropls.result@scoreMN)
+    temp.loadings <- merge(dlist[[3]], as.data.table(ropls.result@loadingMN, keep.rownames = T), by.x = names(dlist[[3]])[1], by.y = "rn")
     x <- "p1"
     y <- "p2"
-  } else if (ropls.result$typeC %in% c("OPLS", "OPLS-DA")) {
-    temp.scores <- data.table(dlist[[2]], ropls.result$scoreMN, ropls.result$orthoScoreMN)
-    temp.loadings <- data.table(merge(dlist[[3]], as.data.table(ropls.result$loadingMN, keep.rownames = T), by.x = names(dlist[[3]])[1], by.y = "rn"), ropls.result$orthoLoadingMN, OrthoVIP = ropls.result$orthoVipVn, VIP = ropls.result$vipVn)
+  } else if (ropls.result@typeC %in% c("OPLS", "OPLS-DA")) {
+    temp.scores <- data.table(dlist[[2]], ropls.result@scoreMN, ropls.result@orthoScoreMN)
+    temp.loadings <- data.table(merge(dlist[[3]], as.data.table(ropls.result@loadingMN, keep.rownames = T), by.x = names(dlist[[3]])[1], by.y = "rn"), ropls.result@orthoLoadingMN, OrthoVIP = ropls.result@orthoVipVn, VIP = ropls.result@vipVn)
     x <- "p1"
     y <- "o1"
   } else { stop("TypeC not recognized, please use the ropls package or dlist.opls.min to perform the multivariate analysis.
              TypeC must be any of : PCA, PLS, PLS-DA, OPLS or OPLS-DA") }
-  opls.y <- ifelse("opls.y" %in% names(ropls.result), ropls.result$opls.y, "")
+  opls.y <- ifelse("opls.y" %in% names(ropls.result), ropls.result@opls.y, "")
   return(list("x" = x,
               "y" = y,
-              "TypeC" = ropls.result$typeC,
+              "TypeC" = ropls.result@typeC,
               "scores" = temp.scores,
               "loadings" = temp.loadings,
-              "labels_scores" = list("title" = paste0(ropls.result$typeC, " : Scores plot"),
-                                     "subtitle" = paste0(ropls.result$descriptionMC[1], " samples (", ropls.result$descriptionMC[4], " missing values)"),
-                                     "x" = paste0(x, " ", opls.y, " (", ropls.result$modelDF$R2X[1]*100, " %)"),
-                                     "y" = paste0(y, " (", ropls.result$modelDF$R2X[2]*100, " %)")),
-              "labels_loadings" = list("title" = paste0(ropls.result$typeC, " : Loadings plot"),
-                                       "subtitle" = paste0(ropls.result$descriptionMC[2], " variables (", ropls.result$descriptionMC[3], " excluded)"),
-                                       "x" = paste0(x, " (", ropls.result$modelDF$R2X[1]*100, " %)"),
-                                       "y" = paste0(y, " (", ropls.result$modelDF$R2X[2]*100, " %)")),
+              "labels_scores" = list("title" = paste0(ropls.result@typeC, " : Scores plot"),
+                                     "subtitle" = paste0(ropls.result@descriptionMC[1], " samples (", ropls.result@descriptionMC[4], " missing values)"),
+                                     "x" = paste0(x, " ", opls.y, " (", ropls.result@modelDF$R2X[1]*100, " %)"),
+                                     "y" = paste0(y, " (", ropls.result@modelDF$R2X[2]*100, " %)")),
+              "labels_loadings" = list("title" = paste0(ropls.result@typeC, " : Loadings plot"),
+                                       "subtitle" = paste0(ropls.result@descriptionMC[2], " variables (", ropls.result@descriptionMC[3], " excluded)"),
+                                       "x" = paste0(x, " (", ropls.result@modelDF$R2X[1]*100, " %)"),
+                                       "y" = paste0(y, " (", ropls.result@modelDF$R2X[2]*100, " %)")),
               "Opls.Y" = opls.y
   ))
 }
