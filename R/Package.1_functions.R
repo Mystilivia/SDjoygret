@@ -1613,7 +1613,32 @@ roplsplot <- function(plot.opls.data,
 }
 
 
+#' Statistical test and letters
+#'
+#' Description of the function
+#' @param formula formula y ~ a with y the response value and a the factor (or group of factor) to test (as in ggpubr::compare_means())
+#' @param data the input data with a metadata and values
+#' @param method on of method accepted by ggpubr::compare_means()
+#' @param group.by the grouping variables to use (optional)
+#' @keywords significance
+#' @return a data.table with the same structure as input data with statisticals results column added and significant levels letters by groups
+#' @export
+#' @examples
+#' compare_means_letters()
 
+compare_means_letters <- function(formula, data, method = "t.test", group.by = NULL) {
+  #formula <- value~Feuille ; data <- temp.plot ; method <- "t.test" ; group.by <- c("variable", "Age")
+  form.fact <- labels(terms(formula))
+  data[, (form.fact) := as.factor(get(form.fact))]
+  temp.stat <- data.table::as.data.table(ggpubr::compare_means(formula, data = data, method = method, group.by = group.by))
+  temp.letter <- temp.stat[!is.na(p.format),
+                           .(Fact = names(multcompView::multcompLetters(setNames(p.format, as.factor(paste0(group1, "-", group2))))[[1]]),
+                             Letters = multcompView::multcompLetters(setNames(p.format, as.factor(paste0(group1, "-", group2))))[[1]]),
+                           by = eval(group.by)]
+  data.table::setnames(temp.letter, 'Fact', form.fact)
+  temp.letter[, (form.fact) := as.factor(get(form.fact))]
+  return(merge(data, temp.letter, by = c(group.by, form.fact)))
+}
 
 
 
