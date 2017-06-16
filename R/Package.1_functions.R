@@ -976,11 +976,11 @@ plotheme.auto <- function(Samples.grp = NULL,
 #' dlist.plot.table()
 dlist.plot.table <- function(dlist) {
   require(data.table)
-  temp.x.name <- names(dlist[[2]])
-  temp.y.name <- names(dlist[[1]])
-  temp <- merge(dlist[[2]], dlist[[1]], by.x = temp.x.name[1], by.y = temp.y.name[1])
+  SDjoygret::check.list.format(dlist)
+  temp <- merge(dlist[[2]], dlist[[1]], by.x = names(dlist[[2]])[1], by.y = names(dlist[[1]])[1])
   return(as.data.table(melt(temp, id.vars = temp.x.name)))
 }
+
 
 #' dlist summary
 #'
