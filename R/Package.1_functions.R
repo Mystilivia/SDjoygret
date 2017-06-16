@@ -978,7 +978,7 @@ dlist.plot.table <- function(dlist) {
   require(data.table)
   SDjoygret::check.list.format(dlist)
   temp <- merge(dlist[[2]], dlist[[1]], by.x = names(dlist[[2]])[1], by.y = names(dlist[[1]])[1])
-  return(as.data.table(melt(temp, id.vars = temp.x.name)))
+  return(as.data.table(melt(temp, id.vars = names(dlist[[2]]))))
 }
 
 
