@@ -1492,9 +1492,10 @@ ggplot_opls_vips <- function(data, VIP.thr = 1, xlabsL = T, ShowPlot = T) {
     geom_pointrange(alpha = 0.6, size = 0.1, aes(color = abs(get(y)) >= VIP.thr)) +
     labs(labels) +
     ggplot_theme_sly +
+    ggplot_SD_lab90 +
     theme(legend.position = 0)
 
-  if(!xlabsL) {plot1 <- plot1 + ggplot_SD_nox_lab + ggplot_SD_lab90}
+  if(!xlabsL) {plot1 <- plot1 + ggplot_SD_nox_lab}
 
   if(ShowPlot == T) {
     return(list(VIPs = VIP.subset, Plot = grid.arrange(plot1)))
