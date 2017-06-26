@@ -4,7 +4,7 @@
 \alias{ggplot_opls}
 \title{Plot OPLS results with VIPs}
 \usage{
-ggplot_opls(data, VIP.thr = 1, ShowPlot = T)
+ggplot_opls(data, VIP.thr = 1, xlabsL = T, ShowPlot = T)
 }
 \arguments{
 \item{data}{Result of ropls with opls method}

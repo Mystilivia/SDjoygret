@@ -1331,7 +1331,7 @@ dlist.opls <- function (dlist,
                   x = paste0("p1 (", temp.opls@modelDF$R2X[1]*100, " %)"),
                   y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
   ## plots
-  plot1 <- ggplot(temp.scores, aes(p1, o1)) +
+  plot1 <- ggplot(temp.scores, aes(p1, o1, label = names(temp.scores)[1])) +
     plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
   plot2 <- ggplot(temp.loadings, aes(p1, o1, label = names(temp.loadings)[1])) +
     plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
@@ -1466,7 +1466,7 @@ dlist.ropls.min <- function(dlist, opls.y = NULL, plotL = F, ...) {
 #' @export
 #' @examples
 #' ggplot_opls()
-ggplot_opls <- function(data, VIP.thr = 1, ShowPlot = T) {
+ggplot_opls <- function(data, VIP.thr = 1, xlabsL = T, ShowPlot = T) {
   # Test
   if(class(data) != "opls"){print("Optimized for ropls::opls resulting object") ; stop()}
   if(!data@typeC %in% c("OPLS", "OPLS-DA")){print("Optimized for OPLS-DA results") ; stop()}
@@ -1488,8 +1488,10 @@ ggplot_opls <- function(data, VIP.thr = 1, ShowPlot = T) {
     geom_pointrange(alpha = 0.6, size = 0.1, aes(color = abs(get(y)) >= VIP.thr)) +
     labs(labels) +
     ggplot_theme_sly +
-    ggplot_SD_nox_lab +
     theme(legend.position = 0)
+
+  plot1 <- ifelse(xlabsL, plot1, plot1 + ggplot_SD_nox_lab)
+
   if(ShowPlot == T) {
     return(list(VIPs = VIP.subset, Plot = grid.arrange(plot1)))
   } else {
