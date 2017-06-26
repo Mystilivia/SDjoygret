@@ -1321,7 +1321,7 @@ dlist.opls <- function (dlist,
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
 
   SDjoygret::check.list.format(dlist)
-  temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], orthoI = NA, plotL = F)
+  temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], orthoI = NA, predI = 1, plotL = F)
   temp.scores <- data.table(dlist[[2]], data.table(temp.opls@scoreMN), data.table(temp.opls@orthoScoreMN))
   limits1 <- SDjoygret::find.limits(temp.scores$p1, temp.scores$o1)
   temp.loadings <- data.table(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN), VIP = temp.opls@vipVn))
