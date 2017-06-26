@@ -1317,12 +1317,13 @@ dlist.opls <- function (dlist,
                         LabelsL = F,
                         ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table) ; require(dtplyr)
-  check.list.format(dlist)
+  # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
+  SDjoygret::check.list.format(dlist)
   temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], orthoI = NA, plotL = F)
   temp.scores <- bind_cols(dlist[[2]], data.table(temp.opls@scoreMN), data.table(temp.opls@orthoScoreMN))
-  limits1 <- find.limits(temp.scores$p1, temp.scores$o1)
-  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN)))
-  limits2 <- find.limits(temp.loadings$p1, temp.loadings$o1)
+  limits1 <- SDjoygret::find.limits(temp.scores$p1, temp.scores$o1)
+  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN), VIP = temp.opls@vipVn))
+  limits2 <- SDjoygret::find.limits(temp.loadings$p1, temp.loadings$o1)
   ## var
   labels1 <- list(title = paste0("Scores plot ", temp.opls@descriptionMC[1], " samples\n(", temp.opls@descriptionMC[4], " missing values)"),
                   x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls@modelDF$R2X[1]*100, " %)"),
@@ -1330,14 +1331,17 @@ dlist.opls <- function (dlist,
   labels2 <- list(title = paste0("Loadings plot\n", temp.opls@descriptionMC[2], " variables (", temp.opls@descriptionMC[3], " excluded)"),
                   x = paste0("p1 (", temp.opls@modelDF$R2X[1]*100, " %)"),
                   y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
-  ## plots
-  plot1 <- ggplot(temp.scores, aes(p1, o1, label = names(temp.scores)[1])) +
-    plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
-  plot2 <- ggplot(temp.loadings, aes(p1, o1, label = names(temp.loadings)[1])) +
-    plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
 
-  ##
-  temp.VIPs <- ggplot_opls(temp.opls, VIP.thr = VIP.thr, ShowPlot = F)
+
+  ## vips
+  temp.VIPs <- SDjoygret::ggplot_opls_vips(temp.opls, VIP.thr = VIP.thr, xlabsL = T, ShowPlot = F)
+
+  ## plots
+  plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]])) +
+    SDjoygret::plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = LabelsL)
+  plot2 <- ggplot(temp.loadings, aes(p1, o1, label = temp.loadings[[1]], color = VIP>VIP.thr)) +
+    SDjoygret::plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = LabelsL)
+
   ## Result
   if(ShowPlot == T) {
     return(list("OPLS" = temp.opls,
@@ -1465,8 +1469,8 @@ dlist.ropls.min <- function(dlist, opls.y = NULL, plotL = F, ...) {
 #' @return Return a list with Plot and VIPs
 #' @export
 #' @examples
-#' ggplot_opls()
-ggplot_opls <- function(data, VIP.thr = 1, xlabsL = T, ShowPlot = T) {
+#' ggplot_opls_vips()
+ggplot_opls_vips <- function(data, VIP.thr = 1, xlabsL = T, ShowPlot = T) {
   # Test
   if(class(data) != "opls"){print("Optimized for ropls::opls resulting object") ; stop()}
   if(!data@typeC %in% c("OPLS", "OPLS-DA")){print("Optimized for OPLS-DA results") ; stop()}
