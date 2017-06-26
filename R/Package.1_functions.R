@@ -1490,7 +1490,7 @@ ggplot_opls <- function(data, VIP.thr = 1, xlabsL = T, ShowPlot = T) {
     ggplot_theme_sly +
     theme(legend.position = 0)
 
-  plot1 <- ifelse(xlabsL, plot1, plot1 + ggplot_SD_nox_lab)
+  if(!xlabsL) {plot1 <- plot1 + ggplot_SD_nox_lab}
 
   if(ShowPlot == T) {
     return(list(VIPs = VIP.subset, Plot = grid.arrange(plot1)))
