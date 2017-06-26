@@ -1639,7 +1639,7 @@ compare_means_letters <- function(formula, data, method = "t.test", group.by = N
   #formula <- value~Feuille ; data <- temp.plot ; method <- "t.test" ; group.by <- c("variable", "Age")
   form.fact <- labels(terms(formula))
   data[, (form.fact) := as.factor(get(form.fact))]
-  temp.stat <- data.table::as.data.table(ggpubr::compare_means(formula, data = data, method = method, group.by = group.by))
+  temp.stat <- data.table::as.data.table(ggpubr::compare_means(formula, data = as.data.frame(data), method = method, group.by = group.by))
   temp.letter <- temp.stat[!is.na(p.format),
                            .(Fact = names(multcompView::multcompLetters(setNames(p.format, as.factor(paste0(group1, "-", group2))))[[1]]),
                              Letters = multcompView::multcompLetters(setNames(p.format, as.factor(paste0(group1, "-", group2))))[[1]]),
