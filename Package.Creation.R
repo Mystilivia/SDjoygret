@@ -24,8 +24,8 @@
 #' devtools::install_github("Mystilivia/SDjoygret")
 
 ```{r}
-require(devtools)
-document()
+require(devtools) ; require(roxygen2)
+devtools::document()
 ```
 
 ```{r}
