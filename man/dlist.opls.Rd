@@ -4,13 +4,16 @@
 \alias{dlist.opls}
 \title{Perform OPLS and custom plots}
 \usage{
-dlist.opls(dlist, Opls.y, Samples.grp = NULL, Variables.grp = NULL,
-  Legend.L = T, colorL = F, VIP.thr = 1, LabelsL = F, ShowPlot = T)
+dlist.opls(dlist, Opls.y = NA, ..., Samples.grp = NULL,
+  Variables.grp = NULL, Legend.L = T, colorL = F, VIP.thr = 1,
+  LabelsL = F, ShowPlot = T)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
 \item{Opls.y}{Name of the grouping factor used in OPLS}
+
+\item{...}{Arguments to pass to opls function}
 
 \item{Samples.grp}{Vector of samples grouping factor (for plot color only)}
 

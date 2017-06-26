@@ -1294,6 +1294,7 @@ densplot <- function(Data,
 #'
 #' Perform an OPLS analysis using "ropls" package and plot results if asked (scores, loadings, VIPs & summary).
 #' @param Opls.y Name of the grouping factor used in OPLS
+#' @param ... Arguments to pass to opls function
 #' @param Samples.grp Vector of samples grouping factor (for plot color only)
 #' @param Variables.grp Vector of variable grouping factor (for plot color only)
 #' @param Legend.L Logical to draw legends
@@ -1308,7 +1309,8 @@ densplot <- function(Data,
 #' @examples
 #' dlist.opls()
 dlist.opls <- function (dlist,
-                        Opls.y,
+                        Opls.y = NA,
+                        ...,
                         Samples.grp = NULL,
                         Variables.grp = NULL,
                         Legend.L = T,
@@ -1321,7 +1323,7 @@ dlist.opls <- function (dlist,
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
 
   SDjoygret::check.list.format(dlist)
-  temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], orthoI = NA, predI = 1, plotL = F)
+  temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], plotL = F, ...)
   temp.scores <- data.table(dlist[[2]], data.table(temp.opls@scoreMN), data.table(temp.opls@orthoScoreMN))
   limits1 <- SDjoygret::find.limits(temp.scores$p1, temp.scores$o1)
   temp.loadings <- data.table(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN), VIP = temp.opls@vipVn))
