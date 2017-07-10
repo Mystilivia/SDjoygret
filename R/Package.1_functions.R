@@ -1649,6 +1649,21 @@ compare_means_letters <- function(formula, data, method = "t.test", group.by = N
   return(merge(data, temp.letter, by = c(group.by, form.fact)))
 }
 
+#' Extract legend from ggplot2 graph
+#'
+#' This function extract the legend of a ggplot2 graph. Useful for plotting 2 plots sharing the same legend and showing it once.
+#' @param a.gplot a ggplot2 plot
+#' @keywords ggplot2, legend
+#' @return a grobs containing only the plot legend
+#' @export
+#' @examples
+#' g_legend()
+g_legend <- function(a.gplot){
+  require(ggplot2)
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
 
 
 #' TITLE
