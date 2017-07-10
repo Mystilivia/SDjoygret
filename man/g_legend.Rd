@@ -2,21 +2,33 @@
 % Please edit documentation in R/Package.1_functions.R
 \name{g_legend}
 \alias{g_legend}
+\alias{g_legend}
 \title{Get legend of a ggplot}
 \usage{
 galaxy.save.list(data.list)
+
+g_legend(a.gplot)
 }
 \arguments{
 \item{a.gplot}{A ggplot}
+
+\item{a.gplot}{a ggplot2 plot}
 }
 \value{
 Write 3 csv file on disk
+
+a grobs containing only the plot legend
 }
 \description{
 Get the legend of a ggplot to draw it externaly & draw it as grob.
+
+This function extract the legend of a ggplot2 graph. Useful for plotting 2 plots sharing the same legend and showing it once.
 }
 \examples{
 g_legend()
+g_legend()
 }
 \keyword{ggplot}
+\keyword{ggplot2,}
+\keyword{legend}
 \keyword{legend,}
