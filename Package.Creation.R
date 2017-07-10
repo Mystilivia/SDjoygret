@@ -29,7 +29,7 @@ devtools::document()
 ```
 
 ```{r}
-install_github("Mystilivia/SDjoygret")
+install_github("sdechaumet/SDjoygret")
 require(SDjoygret)
 ```
 
