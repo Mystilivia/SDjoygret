@@ -1681,6 +1681,7 @@ g_legend <- function(a.gplot){
 #' dlist_stat_table()
 dlist_stat_table <- function(data, formula, group.by = NULL, ...) {
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
+  formula <- as.formula(formula)
   form.fact <- labels(terms(formula))
   SDjoygret::check.list.format(data)
   t.data <- SDjoygret::dlist.plot.table(data)
