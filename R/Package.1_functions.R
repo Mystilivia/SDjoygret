@@ -1682,14 +1682,14 @@ g_legend <- function(a.gplot){
 dlist_stat_table <- function(data, formula, group.by = NULL, ...) {
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
   form.fact <- labels(terms(formula))
-  check.list.format(data)
+  SDjoygret::check.list.format(data)
   t.data <- SDjoygret::dlist.plot.table(data)
   t.stat <- as.data.table(ggpubr::compare_means(formula = formula, data = t.data, group.by = group.by, ...))
   t.letters <- t.stat[!is.na(p.format), .(
     Feuille = names(multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]),
     Letters = multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]
   ),
-  by = eval(group.by)]
+  by = group.by]
   t.letters[, (form.fact) := as.factor(get(form.fact))]
   t.data[, (form.fact) := as.factor(get(form.fact))]
   return(merge(as.data.table(t.data), as.data.table(t.letters), by = c(group.by, form.fact)))
