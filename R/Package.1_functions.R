@@ -1684,7 +1684,7 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ...) {
   form.fact <- labels(terms(formula))
   SDjoygret::check.list.format(data)
   t.data <- SDjoygret::dlist.plot.table(data)
-  t.stat <- as.data.table(ggpubr::compare_means(formula = formula, data = t.data, group.by = group.by, ...))
+  t.stat <- as.data.table(ggpubr::compare_means(formula = formula, data = as.data.frame(t.data), group.by = group.by, ...))
   t.letters <- t.stat[!is.na(p.format), .(
     Feuille = names(multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]),
     Letters = multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]
