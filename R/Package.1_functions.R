@@ -1632,7 +1632,6 @@ roplsplot <- function(plot.opls.data,
 #' @param group.by the grouping variables to use (optional)
 #' @keywords significance
 #' @return a data.table with the same structure as input data with statisticals results column added and significant levels letters by groups
-#' @export
 #' @examples
 #' compare_means_letters()
 
@@ -1681,16 +1680,19 @@ g_legend <- function(a.gplot){
 #' @examples
 #' dlist_stat_table()
 dlist_stat_table <- function(data, formula, group.by = NULL, ...) {
+  pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
+  form.fact <- labels(terms(formula))
   check.list.format(data)
-  pacman::p_load(data.table, ggpubr, SDjoygret)
   t.data <- SDjoygret::dlist.plot.table(data)
   t.stat <- as.data.table(ggpubr::compare_means(formula = formula, data = t.data, group.by = group.by, ...))
   t.letters <- t.stat[!is.na(p.format), .(
-    Feuille = names(multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]),
+    Feuille = names(multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]),
     Letters = multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]
   ),
-  by = group.by]
-  return(t.letters)
+  by = eval(group.by)]
+  t.letters[, (form.fact) := as.factor(get(form.fact))]
+  t.data[, (form.fact) := as.factor(get(form.fact))]
+  return(merge(as.data.table(t.data), as.data.table(t.letters), by = c(group.by, form.fact)))
 }
 
 
