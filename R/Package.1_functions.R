@@ -1693,7 +1693,7 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ...) {
   by = group.by]
   t.letters[, (form.fact) := as.factor(get(form.fact))]
   t.data[, (form.fact) := as.factor(get(form.fact))]
-  return(merge(as.data.table(t.data), as.data.table(t.letters), by = c(group.by, form.fact)))
+  return(merge(as.data.table(t.data), as.data.table(t.letters), by = c(group.by, form.fact), all = T))
 }
 
 
