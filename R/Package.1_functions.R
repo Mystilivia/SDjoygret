@@ -1522,7 +1522,7 @@ dlist.ropls.data <- function(dlist, ropls.result) {
     y <- "o1"
   } else { stop("TypeC not recognized, please use the ropls package or dlist.opls.min to perform the multivariate analysis.
              TypeC must be any of : PCA, PLS, PLS-DA, OPLS or OPLS-DA") }
-  opls.y <- ifelse("opls.y" %in% names(ropls.result), ropls.result$opls.y, NULL)
+  opls.y <- ropls.result$opls.y
   return(list("x" = x,
               "y" = y,
               "TypeC" = ropls.result[[1]]@typeC,
