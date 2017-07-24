@@ -1036,14 +1036,20 @@ dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name 
   if(debug) {message("dlist.summary : Format resulting dlist")}
   if(is.null(var2names)) {
     temp <- dcast(temp.summary, paste0(".~", paste(var.name)), value.var = "Avg")
+    temp.dlist <- list(
+      data.table(ID = 1:temp[,.N], temp[,-1]),
+      data.table(ID = 1:temp[,.N], temp[,1]),
+      dlist[[3]]
+    )
   } else {
-  temp <- dcast(temp.summary, paste0(paste(var2names, collapse = "+"), "~", paste(var.name)), value.var = "Avg")
+    temp <- dcast(temp.summary, paste0(paste(var2names, collapse = "+"), "~", paste(var.name)), value.var = "Avg")
+    temp.dlist <- list(
+      data.table(ID = 1:temp[,.N], temp[,-var2names, with=F]),
+      data.table(ID = 1:temp[,.N], temp[,var2names, with=F]),
+      dlist[[3]]
+    )
   }
-  temp.dlist <- list(
-    data.table(ID = 1:temp[,.N], temp[,-var2names, with=F]),
-    data.table(ID = 1:temp[,.N], temp[,var2names, with=F]),
-    dlist[[3]]
-  )
+
   names(temp.dlist) <- names(dlist)
   ## create summary plot if asked
   if(plotL) {
