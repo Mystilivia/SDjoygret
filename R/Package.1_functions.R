@@ -999,8 +999,11 @@ dlist.plot.table <- function(dlist) {
 #' @export
 #' @examples
 #' dlist.summary()
-dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name = "variable", plotL = F, alpha = 0.8, size = 0.4, Class = NULL){
+dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name = "variable", plotL = F, alpha = 0.8, size = 0.4, Class = NULL, debug = F){
+  # dlist <- Data ; var2names = c("Feuille", "Age") ; var.name = "variable" ; val.name = "value"
+  if(debug) {message("dlist.summary : Loading packages ")}
   require("data.table") ; require("magrittr") ; require("e1071") ; require("gridExtra")
+  if(debug) {message("dlist.summary : Checking input format ")}
   if (any(class(dlist) == "list")) {
     check.list.format(dlist)
     temp.data <- data.table(dlist[[2]], dlist[[1]][, -1, with = F]) %>%
@@ -1009,8 +1012,10 @@ dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name 
     temp.data <- as.data.table(dlist)
   }
   ## Check that no duplicates is created between new variables and var2names
+  if(debug) {message("dlist.summary : Checking input names overlap with function")}
   if(any(var2names %in% c("N", "NA", "Zero", "Perc_Zero", "Avg", "Median", "Sum", "Min", "Max", "SD", "CV", "IC95_min_manual", "IC95_max_manual", "Skew"))) { stop("var2names conflict with calculated variable. Must be different than : N, NA, Zero, Perc_Zero, Avg, Median, Sum, Min, Max, SD, CV, IC95_min_manual, IC95_max_manual, Skew")}
-  temp.summary <- temp.data[,.(
+  if(debug) {message("dlist.summary : Compute summary table")}
+  temp.summary <- temp.data[, .(
     "N"               = round(length(get(val.name)), 3),
     "NA"              = round(length(which(is.na(get(val.name)))), 3),
     "Zero"            = round(length(which(get(val.name) == 0)), 3),
@@ -1027,8 +1032,18 @@ dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name 
     "IC95_max_manual" = round(mean(get(val.name), na.rm = T)+2*(sd(get(val.name), na.rm = T)/length(get(val.name))), 3),
     "Skew"            = round(e1071::skewness(get(val.name), na.rm = T), 3)
   ), by = c(var.name, var2names)]
+  ## Create summarized dlist
+  if(debug) {message("dlist.summary : Format resulting dlist")}
+  temp <- dcast(temp.summary, paste0(paste(var2names, collapse = "+"), "~", paste(var.name)), value.var = "Avg")
+  temp.dlist <- list(
+    data.table(ID = 1:temp[,.N], temp[,-c(1:2)]),
+    data.table(ID = 1:temp[,.N], temp[,1:2]),
+    dlist[[3]]
+  )
+  names(temp.dlist) <- names(dlist)
   ## create summary plot if asked
   if(plotL) {
+    if(debug) {message("dlist.summary : Creating Plot")}
     temp.plot <- melt(temp.summary, id.vars = c("variable", var2names), variable.name = "Measure")
     temp.plot <- merge(temp.plot, dlist[[3]], by.x = "variable", by.y = names(dlist[[3]])[1])
     temp.plot[,variable := factor(variable, levels = unique(temp.plot[Measure == "Sum"][order(value), variable]))]
@@ -1047,9 +1062,11 @@ dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name 
       SDjoygret:::ggplot_SD.theme +
       SDjoygret:::ggplot_SD_lab90 +
       labs(title = "", x = "", y = "")
-    return(list("Data.summary" = temp.summary, "Plot" = plot1))
+    if(debug) {message("dlist.summary : [Done]")}
+    return(list("Data.summary" = temp.summary, "Plot" = plot1, "dlist" = temp.dlist))
   }
-  return(list("Data.summary" = temp.summary))
+  if(debug) {message("dlist.summary : [Done]")}
+  return(list("Data.summary" = temp.summary, "dlist" = temp.dlist))
 }
 
 #' Perform PCA and custom plot

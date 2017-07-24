@@ -6,7 +6,7 @@
 \usage{
 dlist.summary(dlist, var2names = NULL, val.name = "value",
   var.name = "variable", plotL = F, alpha = 0.8, size = 0.4,
-  Class = NULL)
+  Class = NULL, debug = F)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
