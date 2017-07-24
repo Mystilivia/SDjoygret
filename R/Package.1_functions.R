@@ -1034,10 +1034,14 @@ dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name 
   ), by = c(var.name, var2names)]
   ## Create summarized dlist
   if(debug) {message("dlist.summary : Format resulting dlist")}
+  if(is.null(var2names)) {
+    temp <- dcast(temp.summary, paste0(".~", paste(var.name)), value.var = "Avg")
+  } else {
   temp <- dcast(temp.summary, paste0(paste(var2names, collapse = "+"), "~", paste(var.name)), value.var = "Avg")
+  }
   temp.dlist <- list(
-    data.table(ID = 1:temp[,.N], temp[,-c(1:2)]),
-    data.table(ID = 1:temp[,.N], temp[,1:2]),
+    data.table(ID = 1:temp[,.N], temp[,-var2names, with=F]),
+    data.table(ID = 1:temp[,.N], temp[,var2names, with=F]),
     dlist[[3]]
   )
   names(temp.dlist) <- names(dlist)
