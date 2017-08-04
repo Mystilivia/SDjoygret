@@ -942,7 +942,7 @@ plotheme.auto <- function(Samples.grp = NULL,
   require(ggplot2)
   opls.ggplotheme.auto <- list(
      if(!is.null(Samples.grp) & geom_path){geom_path(alpha = 0.4)},
-     if(!is.null(Samples.grp) & geom_ellipse) {stat_ellipse(geom = "polygon", alpha = 1/2, aes(fill = class))},
+     if(!is.null(Samples.grp) & geom_ellipse) {stat_ellipse(type = "t", linetype = 3, alpha = 0.75)},
      if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
      if(!is.null(Samples.grp)){aes(group = as.factor(get(Samples.grp)), color = as.factor(get(Samples.grp)))},
      if(!is.null(Variables.grp)){aes(color = as.factor(get(Variables.grp)))},
