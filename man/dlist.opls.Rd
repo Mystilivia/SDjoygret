@@ -6,7 +6,7 @@
 \usage{
 dlist.opls(dlist, Opls.y = NA, ..., Samples.grp = NULL,
   Variables.grp = NULL, Legend.L = T, colorL = F, VIP.thr = 1,
-  LabelsL = F, ShowPlot = T, xlabsL = T)
+  LabelsL = F, ShowPlot = T, xlabsL = T, geom_ellipse = T)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
@@ -28,6 +28,8 @@ dlist.opls(dlist, Opls.y = NA, ..., Samples.grp = NULL,
 \item{ShowPlot}{Logical to draw plots in graphic device}
 
 \item{xlabsL}{Logical to show VIPs labels}
+
+\item{geom_ellipse}{Logical to draw ellipses}
 }
 \value{
 A list with (OPLS, Plot, VIPS)

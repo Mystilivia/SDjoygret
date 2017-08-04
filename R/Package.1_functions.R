@@ -919,6 +919,7 @@ find.limits <- function(x,
 #' @param colorL Logical to use color or grey scale
 #' @param labels list for titles (title, x, y)
 #' @param geom_path Logical for drawing path
+#' @param geom_ellipse Logical for drawing groups ellipses
 #' @param labelsL Add labels to points
 #' @param palpha Points transparency (between 0 and 1)
 #' @param psize Points size
@@ -934,26 +935,28 @@ plotheme.auto <- function(Samples.grp = NULL,
                           colorL = F,
                           labels = list(title = "", x = "", y = ""),
                           geom_path = F,
+                          geom_ellipse = F,
                           labelsL = F,
                           palpha = 0.8,
                           psize = 0.8) {
   require(ggplot2)
   opls.ggplotheme.auto <- list(
-    if(!is.null(Samples.grp) & geom_path == T){geom_path(alpha = 0.4)},
-    if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
-    if(!is.null(Samples.grp)){aes(group = as.factor(get(Samples.grp)), color = as.factor(get(Samples.grp)))},
-    if(!is.null(Variables.grp)){aes(color = as.factor(get(Variables.grp)))},
-    if(!is.null(Variables.grp)){labs(color = Variables.grp)},
-    if(colorL == F) {scale_colour_grey()},
-    geom_hline(yintercept = 0, linetype = 2, color = "grey"),
-    geom_vline(xintercept = 0, linetype = 2, color = "grey"),
-    geom_point(alpha = palpha, size = psize),
-    if(!is.null(limits)){xlim(limits[1,1], limits[1,2])},
-    if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
-    ggplot_SD.theme,
-    labs(labels),
-    if(labelsL == T){geom_text(vjust = -0.8)},
-    if(Legend.L == F){theme(legend.position = 0)} else {theme(legend.position = c(0.005,0.005), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
+     if(!is.null(Samples.grp) & geom_path){geom_path(alpha = 0.4)},
+     if(!is.null(Samples.grp) & geom_ellipse) {stat_ellipse(geom = "polygon", alpha = 1/2, aes(fill = class))},
+     if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
+     if(!is.null(Samples.grp)){aes(group = as.factor(get(Samples.grp)), color = as.factor(get(Samples.grp)))},
+     if(!is.null(Variables.grp)){aes(color = as.factor(get(Variables.grp)))},
+     if(!is.null(Variables.grp)){labs(color = Variables.grp)},
+     if(colorL) {scale_colour_grey()},
+     geom_hline(yintercept = 0, linetype = 2, color = "grey"),
+     geom_vline(xintercept = 0, linetype = 2, color = "grey"),
+     geom_point(alpha = palpha, size = psize),
+     if(!is.null(limits)){xlim(limits[1,1], limits[1,2])},
+     if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
+     ggplot_SD.theme,
+     labs(labels),
+     if(labelsL){geom_text(vjust = -0.8)},
+     if(!Legend.L){theme(legend.position = 0)} else {theme(legend.position = c(0.005,0.005), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
   )
   return(opls.ggplotheme.auto)
 }
@@ -1330,6 +1333,7 @@ densplot <- function(Data,
 #' @param LabelsL Logical to show labels on plot
 #' @param ShowPlot Logical to draw plots in graphic device
 #' @param xlabsL Logical to show VIPs labels
+#' @param geom_ellipse Logical to draw ellipses
 #' @inheritParams densplot
 #' @inheritParams dlist.subset
 #' @keywords opls, ggplot
@@ -1347,7 +1351,8 @@ dlist.opls <- function (dlist,
                         VIP.thr = 1,
                         LabelsL = F,
                         ShowPlot = T,
-                        xlabsL = T) {
+                        xlabsL = T,
+                        geom_ellipse = T) {
 
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
@@ -1371,7 +1376,7 @@ dlist.opls <- function (dlist,
 
   ## plots
   plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]])) +
-    SDjoygret::plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = F)
+    SDjoygret::plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = F, geom_ellipse = geom_ellipse)
   if (LabelsL) {plot1 <- plot1 + ggrepel::geom_text_repel()}
 
   plot2 <- ggplot(temp.loadings, aes(p1, o1, label = temp.loadings[[1]], color = VIP>VIP.thr)) +

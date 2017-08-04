@@ -6,7 +6,8 @@
 \usage{
 plotheme.auto(Samples.grp = NULL, Variables.grp = NULL, limits = NULL,
   Legend.L = T, colorL = F, labels = list(title = "", x = "", y = ""),
-  geom_path = F, labelsL = F, palpha = 0.8, psize = 0.8)
+  geom_path = F, geom_ellipse = F, labelsL = F, palpha = 0.8,
+  psize = 0.8)
 }
 \arguments{
 \item{Samples.grp}{Name of the grouping factor for samples}
@@ -22,6 +23,8 @@ plotheme.auto(Samples.grp = NULL, Variables.grp = NULL, limits = NULL,
 \item{labels}{list for titles (title, x, y)}
 
 \item{geom_path}{Logical for drawing path}
+
+\item{geom_ellipse}{Logical for drawing groups ellipses}
 
 \item{labelsL}{Add labels to points}
 
