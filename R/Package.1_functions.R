@@ -939,7 +939,7 @@ plotheme.auto <- function(Samples.grp = NULL,
                           labelsL = F,
                           palpha = 0.8,
                           psize = 0.8) {
-  require(ggplot2)
+  require(ggplot2) ; require(ggrepel)
   opls.ggplotheme.auto <- list(
      if(!is.null(Samples.grp) & geom_path){geom_path(alpha = 0.4)},
      if(!is.null(Samples.grp) & geom_ellipse) {stat_ellipse(type = "t", linetype = 3, alpha = 0.75)},
@@ -955,7 +955,7 @@ plotheme.auto <- function(Samples.grp = NULL,
      if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
      ggplot_SD.theme,
      labs(labels),
-     if(labelsL){geom_text(vjust = -0.8)},
+     if(labelsL){ggrepel::geom_text_repel()},
      if(!Legend.L){theme(legend.position = 0)} else {theme(legend.position = c(0.005,0.005), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
   )
   return(opls.ggplotheme.auto)
@@ -1367,14 +1367,10 @@ dlist.opls <- function (dlist,
   ## plots
   plotheme.auto.args1$Variables.grp <- NULL
   plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]])) +
-    do.call(SDjoygret::plotheme.auto, plotheme.auto.args1) +
-    if (LabelsL) {plot1 <- plot1 + ggrepel::geom_text_repel()}
-
+    do.call(SDjoygret::plotheme.auto, plotheme.auto.args1)
   plotheme.auto.args2$Samples.grp <- NULL
   plot2 <- ggplot(temp.loadings, aes(p1, o1, label = temp.loadings[[1]], color = VIP>VIP.thr)) +
-    do.call(SDjoygret::plotheme.auto, plotheme.auto.args2) +
-    if (LabelsL) {plot2 <- plot2 + ggrepel::geom_text_repel()}
-
+    do.call(SDjoygret::plotheme.auto, plotheme.auto.args2)
   ## Result
   if(ShowPlot == T) {
     return(list("OPLS" = temp.opls,
