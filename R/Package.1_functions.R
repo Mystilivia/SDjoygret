@@ -1326,6 +1326,7 @@ densplot <- function(Data,
 #' Perform an OPLS analysis using "ropls" package and plot results if asked (scores, loadings, VIPs & summary).
 #' @param Opls.y Name of the grouping factor used in OPLS
 #' @param ... Arguments to pass to opls function
+#' @param VIPxlabels Logical to show VIPs plot x labels
 #' @param VIP.thr Threshold for VIPs selestion and coloring
 #' @param ShowPlot Logical to draw plots in graphic device
 #' @param plotheme.auto.args List of arguments to pass to plotheme.auto
@@ -1339,9 +1340,10 @@ densplot <- function(Data,
 dlist.opls <- function (dlist,
                         Opls.y = NA,
                         ...,
+                        VIPxlabels = F,
                         VIP.thr = 1,
                         ShowPlot = T,
-                        plotheme.auto.args = list(Samples.grp=NULL, Variables.grp=NULL, xlabsL=T, geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F)) {
+                        plotheme.auto.args = list(Samples.grp=NULL, Variables.grp=NULL, geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F)) {
 
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
@@ -1361,7 +1363,7 @@ dlist.opls <- function (dlist,
                   y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
 
   ## vips
-  temp.VIPs <- SDjoygret::ggplot_opls_vips(temp.opls, VIP.thr = VIP.thr, xlabsL = xlabsL, ShowPlot = F)
+  temp.VIPs <- SDjoygret::ggplot_opls_vips(temp.opls, VIP.thr = VIP.thr, xlabsL = VIPxlabels, ShowPlot = F)
   ## plots
   plotheme.auto.args1$Variables.grp <- NULL
   plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]])) +

@@ -4,9 +4,10 @@
 \alias{dlist.opls}
 \title{Perform OPLS and custom plots}
 \usage{
-dlist.opls(dlist, Opls.y = NA, ..., VIP.thr = 1, ShowPlot = T,
-  plotheme.auto.args = list(Samples.grp = NULL, Variables.grp = NULL, xlabsL =
-  T, geom_ellipse = T, Legend.L = T, colorL = T, geom_path = F, labelsL = F))
+dlist.opls(dlist, Opls.y = NA, ..., VIPxlabels = F, VIP.thr = 1,
+  ShowPlot = T, plotheme.auto.args = list(Samples.grp = NULL, Variables.grp
+  = NULL, geom_ellipse = T, Legend.L = T, colorL = T, geom_path = F, labelsL =
+  F))
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
@@ -14,6 +15,8 @@ dlist.opls(dlist, Opls.y = NA, ..., VIP.thr = 1, ShowPlot = T,
 \item{Opls.y}{Name of the grouping factor used in OPLS}
 
 \item{...}{Arguments to pass to opls function}
+
+\item{VIPxlabels}{Logical to show VIPs plot x labels}
 
 \item{VIP.thr}{Threshold for VIPs selestion and coloring}
 
