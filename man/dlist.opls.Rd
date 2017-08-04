@@ -4,9 +4,9 @@
 \alias{dlist.opls}
 \title{Perform OPLS and custom plots}
 \usage{
-dlist.opls(dlist, Opls.y = NA, ..., Samples.grp = NULL,
-  Variables.grp = NULL, Legend.L = T, colorL = F, VIP.thr = 1,
-  LabelsL = F, ShowPlot = T, xlabsL = T, geom_ellipse = T)
+dlist.opls(dlist, Opls.y = NA, ..., VIP.thr = 1, ShowPlot = T,
+  plotheme.auto.args = list(Samples.grp = NULL, Variables.grp = NULL, xlabsL =
+  T, geom_ellipse = T, Legend.L = T, colorL = T, geom_path = F, labelsL = F))
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
@@ -15,21 +15,11 @@ dlist.opls(dlist, Opls.y = NA, ..., Samples.grp = NULL,
 
 \item{...}{Arguments to pass to opls function}
 
-\item{Samples.grp}{Vector of samples grouping factor (for plot color only)}
-
-\item{Variables.grp}{Vector of variable grouping factor (for plot color only)}
-
-\item{Legend.L}{Logical to draw legends}
-
-\item{colorL}{Logical to use colors instead of black & white}
-
-\item{LabelsL}{Logical to show labels on plot}
+\item{VIP.thr}{Threshold for VIPs selestion and coloring}
 
 \item{ShowPlot}{Logical to draw plots in graphic device}
 
-\item{xlabsL}{Logical to show VIPs labels}
-
-\item{geom_ellipse}{Logical to draw ellipses}
+\item{plotheme.auto.args}{List of arguments to pass to plotheme.auto}
 }
 \value{
 A list with (OPLS, Plot, VIPS)

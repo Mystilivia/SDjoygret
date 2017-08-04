@@ -1326,14 +1326,9 @@ densplot <- function(Data,
 #' Perform an OPLS analysis using "ropls" package and plot results if asked (scores, loadings, VIPs & summary).
 #' @param Opls.y Name of the grouping factor used in OPLS
 #' @param ... Arguments to pass to opls function
-#' @param Samples.grp Vector of samples grouping factor (for plot color only)
-#' @param Variables.grp Vector of variable grouping factor (for plot color only)
-#' @param Legend.L Logical to draw legends
-#' @param colorL Logical to use colors instead of black & white
-#' @param LabelsL Logical to show labels on plot
+#' @param VIP.thr Threshold for VIPs selestion and coloring
 #' @param ShowPlot Logical to draw plots in graphic device
-#' @param xlabsL Logical to show VIPs labels
-#' @param geom_ellipse Logical to draw ellipses
+#' @param plotheme.auto.args List of arguments to pass to plotheme.auto
 #' @inheritParams densplot
 #' @inheritParams dlist.subset
 #' @keywords opls, ggplot
@@ -1344,44 +1339,39 @@ densplot <- function(Data,
 dlist.opls <- function (dlist,
                         Opls.y = NA,
                         ...,
-                        Samples.grp = NULL,
-                        Variables.grp = NULL,
-                        Legend.L = T,
-                        colorL = F,
                         VIP.thr = 1,
-                        LabelsL = F,
                         ShowPlot = T,
-                        xlabsL = T,
-                        geom_ellipse = T) {
+                        plotheme.auto.args = list(Samples.grp=NULL, Variables.grp=NULL, xlabsL=T, geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F)) {
 
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
-
+  plotheme.auto.args2 <- plotheme.auto.args1 <- plotheme.auto.args
   SDjoygret::check.list.format(dlist)
-  temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], plotL = F, ...)
+  temp.opls <- opls(dlist[[1]][, -1, with = F], dlist[[2]][,get(Opls.y)], orthoI = NA, plotL = F, ...)
   temp.scores <- data.table(dlist[[2]], data.table(temp.opls@scoreMN), data.table(temp.opls@orthoScoreMN))
-  limits1 <- SDjoygret::find.limits(temp.scores$p1, temp.scores$o1)
+  plotheme.auto.args1$limits <- SDjoygret::find.limits(temp.scores$p1, temp.scores$o1)
   temp.loadings <- data.table(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN), VIP = temp.opls@vipVn))
-  limits2 <- SDjoygret::find.limits(temp.loadings$p1, temp.loadings$o1)
+  plotheme.auto.args2$limits <- SDjoygret::find.limits(temp.loadings$p1, temp.loadings$o1)
   ## var
-  labels1 <- list(title = paste0("Scores plot ", temp.opls@descriptionMC[1], " samples\n(", temp.opls@descriptionMC[4], " missing values)"),
+  plotheme.auto.args1$labels <- list(title = paste0("Scores plot ", temp.opls@descriptionMC[1], " samples\n(", temp.opls@descriptionMC[4], " missing values)"),
                   x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls@modelDF$R2X[1]*100, " %)"),
                   y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
-  labels2 <- list(title = paste0("Loadings plot\n", temp.opls@descriptionMC[2], " variables (", temp.opls@descriptionMC[3], " excluded)"),
+  plotheme.auto.args2$labels <- list(title = paste0("Loadings plot\n", temp.opls@descriptionMC[2], " variables (", temp.opls@descriptionMC[3], " excluded)"),
                   x = paste0("p1 (", temp.opls@modelDF$R2X[1]*100, " %)"),
                   y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
 
   ## vips
   temp.VIPs <- SDjoygret::ggplot_opls_vips(temp.opls, VIP.thr = VIP.thr, xlabsL = xlabsL, ShowPlot = F)
-
   ## plots
+  plotheme.auto.args1$Variables.grp <- NULL
   plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]])) +
-    SDjoygret::plotheme.auto(Samples.grp, Variables.grp = NULL, limits = limits1, Legend.L, colorL, labels1, geom_path = T, labelsL = F, geom_ellipse = geom_ellipse)
-  if (LabelsL) {plot1 <- plot1 + ggrepel::geom_text_repel()}
+    do.call(SDjoygret::plotheme.auto, plotheme.auto.args1) +
+    if (LabelsL) {plot1 <- plot1 + ggrepel::geom_text_repel()}
 
+  plotheme.auto.args2$Samples.grp <- NULL
   plot2 <- ggplot(temp.loadings, aes(p1, o1, label = temp.loadings[[1]], color = VIP>VIP.thr)) +
-    SDjoygret::plotheme.auto(Samples.grp = NULL, Variables.grp, limits = limits2, Legend.L, colorL, labels1, geom_path = F, labelsL = F)
-  if (LabelsL) {plot2 <- plot2 + ggrepel::geom_text_repel()}
+    do.call(SDjoygret::plotheme.auto, plotheme.auto.args2) +
+    if (LabelsL) {plot2 <- plot2 + ggrepel::geom_text_repel()}
 
   ## Result
   if(ShowPlot == T) {
