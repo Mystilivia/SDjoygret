@@ -1329,6 +1329,7 @@ densplot <- function(Data,
 #' @param colorL Logical to use colors instead of black & white
 #' @param LabelsL Logical to show labels on plot
 #' @param ShowPlot Logical to draw plots in graphic device
+#' @param xlabsL Logical to show VIPs labels
 #' @inheritParams densplot
 #' @inheritParams dlist.subset
 #' @keywords opls, ggplot
@@ -1345,7 +1346,8 @@ dlist.opls <- function (dlist,
                         colorL = F,
                         VIP.thr = 1,
                         LabelsL = F,
-                        ShowPlot = T) {
+                        ShowPlot = T,
+                        xlabsL = T) {
 
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
@@ -1365,7 +1367,7 @@ dlist.opls <- function (dlist,
                   y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
 
   ## vips
-  temp.VIPs <- SDjoygret::ggplot_opls_vips(temp.opls, VIP.thr = VIP.thr, xlabsL = T, ShowPlot = F)
+  temp.VIPs <- SDjoygret::ggplot_opls_vips(temp.opls, VIP.thr = VIP.thr, xlabsL = xlabsL, ShowPlot = F)
 
   ## plots
   plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]])) +
