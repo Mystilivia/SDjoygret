@@ -1355,11 +1355,11 @@ dlist.opls <- function (dlist,
   temp.loadings <- data.table(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN), VIP = temp.opls@vipVn))
   plotheme.auto.args2$limits <- SDjoygret::find.limits(temp.loadings$p1, temp.loadings$o1)
   ## var
-  if(is.na(otheme.auto.args1$labels)) {
+  if(is.na(plotheme.auto.args1$labels)) {
     plotheme.auto.args1$labels <- list(title = paste0("Scores plot ", temp.opls@descriptionMC[1], " samples\n(", temp.opls@descriptionMC[4], " missing values)"),
                                        x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls@modelDF$R2X[1]*100, " %)"),
                                        y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))}
-  if(is.na(otheme.auto.args2$labels)) {
+  if(is.na(plotheme.auto.args1$labels)) {
     plotheme.auto.args2$labels <- list(title = paste0("Loadings plot\n", temp.opls@descriptionMC[2], " variables (", temp.opls@descriptionMC[3], " excluded)"),
                                        x = paste0("p1 (", temp.opls@modelDF$R2X[1]*100, " %)"),
                                        y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))}
