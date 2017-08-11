@@ -449,7 +449,8 @@ xcms_orbi_A2 <- function(File_list,
 
 #' xcms_orbi_Results
 #'
-#' This function generate peak_table, STDs EIC across samples, PCA (optional) and return a list with [1] datamatrix, [2] sample.metadata and [3] variable.metadata.
+#' This function generate peak_table, STDs EIC across samples, PCA (optional)
+#' and return a list with [1] datamatrix, [2] sample.metadata and [3] variable.metadata.
 #' @param filled_peak_object An xcmsSet object with filled peaks
 #' @param STDs_mass Vector of STDs exact mass
 #' @param STDs_ppm  Deviation for STDs in ppm (try to increase if your STDs are not found)
@@ -1343,7 +1344,7 @@ dlist.opls <- function (dlist,
                         VIPxlabels = F,
                         VIP.thr = 1,
                         ShowPlot = T,
-                        plotheme.auto.args = list(Samples.grp=NULL, Variables.grp=NULL, geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F, labels=NA)) {
+                        plotheme.auto.args = list(Samples.grp=NULL, Variables.grp=NULL, geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F, labels=NULL)) {
 
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
@@ -1355,11 +1356,11 @@ dlist.opls <- function (dlist,
   temp.loadings <- data.table(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN), VIP = temp.opls@vipVn))
   plotheme.auto.args2$limits <- SDjoygret::find.limits(temp.loadings$p1, temp.loadings$o1)
   ## var
-  if(is.na(plotheme.auto.args1$labels)) {
+  if(is.null(plotheme.auto.args1$labels)) {
     plotheme.auto.args1$labels <- list(title = paste0("Scores plot ", temp.opls@descriptionMC[1], " samples\n(", temp.opls@descriptionMC[4], " missing values)"),
                                        x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls@modelDF$R2X[1]*100, " %)"),
                                        y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))}
-  if(is.na(plotheme.auto.args1$labels)) {
+  if(is.null(plotheme.auto.args1$labels)) {
     plotheme.auto.args2$labels <- list(title = paste0("Loadings plot\n", temp.opls@descriptionMC[2], " variables (", temp.opls@descriptionMC[3], " excluded)"),
                                        x = paste0("p1 (", temp.opls@modelDF$R2X[1]*100, " %)"),
                                        y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))}
@@ -1711,7 +1712,7 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ...) {
   form.fact <- labels(terms(formula))
   SDjoygret::check.list.format(data)
   t.data <- SDjoygret::dlist.plot.table(data)
-  t.stat <- as.data.table(ggpubr::compare_means(formula = formula, data = as.data.frame(t.data), group.by = group.by, ...))
+  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = formula, data = as.data.frame(t.data), group.by = group.by, ...))
   t.letters <- t.stat[!is.na(p.format), .(
     Feuille = names(multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]),
     Letters = multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]
@@ -1741,12 +1742,12 @@ test <- function(x) {
 
 
 require(ggplot2)
-ggplot_SD_lab90 <- theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 0.95))
-ggplot_labels_strip_0 <-   theme(strip.text.y = element_text(angle=0))
-ggplot_SD_nox_lab <- theme(axis.text.x = element_blank(), axis.ticks = element_blank())
-ggplot_SD_noy_lab <- theme(axis.text.y = element_blank(), axis.ticks = element_blank())
+ggplot_SD_lab90 <- ggplot2::theme(axis.text.x=element_text(angle = 90, vjust = 0.5, hjust = 0.95))
+ggplot_labels_strip_0 <-   ggplot2::theme(strip.text.y = element_text(angle=0))
+ggplot_SD_nox_lab <- ggplot2::theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+ggplot_SD_noy_lab <- ggplot2::theme(axis.text.y = element_blank(), axis.ticks = element_blank())
 ggplot_no_labels <- ggplot_SD_nox_lab + ggplot_SD_noy_lab
-ggplot_theme_sly <- theme_classic() +  theme(axis.line.x = element_line(), axis.line.y = element_line())
-ggplot_SD.theme <- theme_bw() + theme(panel.grid.minor = element_blank(),
+ggplot_theme_sly <- ggplot2::theme_classic() +  theme(axis.line.x = element_line(), axis.line.y = element_line())
+ggplot_SD.theme <- ggplot2::theme_bw() + theme(panel.grid.minor = element_blank(),
                                       panel.grid.major = element_blank())
 

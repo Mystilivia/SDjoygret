@@ -21,7 +21,8 @@ xcms_orbi_GRT()
 \item{PCA_group}{vector with samples metadata column to use for groups in ACP}
 }
 \description{
-This function generate peak_table, STDs EIC across samples, PCA (optional) and return a list with [1] datamatrix, [2] sample.metadata and [3] variable.metadata.
+This function generate peak_table, STDs EIC across samples, PCA (optional)
+and return a list with [1] datamatrix, [2] sample.metadata and [3] variable.metadata.
 }
 \keyword{orbitrap}
 \keyword{xcms,}
