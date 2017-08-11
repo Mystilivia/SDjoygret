@@ -1343,7 +1343,7 @@ dlist.opls <- function (dlist,
                         VIPxlabels = F,
                         VIP.thr = 1,
                         ShowPlot = T,
-                        plotheme.auto.args = list(Samples.grp=NULL, Variables.grp=NULL, geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F)) {
+                        plotheme.auto.args = list(Samples.grp=NULL, Variables.grp=NULL, geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F, labels=NA)) {
 
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
@@ -1355,22 +1355,26 @@ dlist.opls <- function (dlist,
   temp.loadings <- data.table(dlist[[3]], data.table(temp.opls@loadingMN, data.table(temp.opls@orthoLoadingMN), VIP = temp.opls@vipVn))
   plotheme.auto.args2$limits <- SDjoygret::find.limits(temp.loadings$p1, temp.loadings$o1)
   ## var
-  plotheme.auto.args1$labels <- list(title = paste0("Scores plot ", temp.opls@descriptionMC[1], " samples\n(", temp.opls@descriptionMC[4], " missing values)"),
-                  x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls@modelDF$R2X[1]*100, " %)"),
-                  y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
-  plotheme.auto.args2$labels <- list(title = paste0("Loadings plot\n", temp.opls@descriptionMC[2], " variables (", temp.opls@descriptionMC[3], " excluded)"),
-                  x = paste0("p1 (", temp.opls@modelDF$R2X[1]*100, " %)"),
-                  y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))
-
+  if(is.na(otheme.auto.args1$labels)) {
+    plotheme.auto.args1$labels <- list(title = paste0("Scores plot ", temp.opls@descriptionMC[1], " samples\n(", temp.opls@descriptionMC[4], " missing values)"),
+                                       x = paste0("pred. comp. 1 of ", Opls.y, " (", temp.opls@modelDF$R2X[1]*100, " %)"),
+                                       y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))}
+  if(is.na(otheme.auto.args2$labels)) {
+    plotheme.auto.args2$labels <- list(title = paste0("Loadings plot\n", temp.opls@descriptionMC[2], " variables (", temp.opls@descriptionMC[3], " excluded)"),
+                                       x = paste0("p1 (", temp.opls@modelDF$R2X[1]*100, " %)"),
+                                       y = paste0("o1 (", temp.opls@modelDF$R2X[2]*100, " %)"))}
   ## vips
   temp.VIPs <- SDjoygret::ggplot_opls_vips(temp.opls, VIP.thr = VIP.thr, xlabsL = VIPxlabels, ShowPlot = F)
   ## plots
   plotheme.auto.args1$Variables.grp <- NULL
+  if(is.null(plotheme.auto.args1$Samples.grp)) {plotheme.auto.args1$Samples.grp <- Opls.y}
   plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]])) +
     do.call(SDjoygret::plotheme.auto, plotheme.auto.args1)
+
   plotheme.auto.args2$Samples.grp <- NULL
   plot2 <- ggplot(temp.loadings, aes(p1, o1, label = temp.loadings[[1]], color = VIP>VIP.thr)) +
     do.call(SDjoygret::plotheme.auto, plotheme.auto.args2)
+
   ## Result
   if(ShowPlot == T) {
     return(list("OPLS" = temp.opls,
