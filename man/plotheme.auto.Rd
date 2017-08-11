@@ -4,16 +4,11 @@
 \alias{plotheme.auto}
 \title{Semi-automatic ggplot theme}
 \usage{
-plotheme.auto(Samples.grp = NULL, Variables.grp = NULL, limits = NULL,
-  Legend.L = T, colorL = F, labels = list(title = "", x = "", y = ""),
-  geom_path = F, geom_ellipse = F, labelsL = F, palpha = 0.8,
-  psize = 0.8)
+plotheme.auto(limits = NULL, Legend.L = T, colorL = F,
+  labels = list(title = "", x = "", y = ""), geom_path = F,
+  geom_ellipse = F, labelsL = F, palpha = 0.8, psize = 0.8)
 }
 \arguments{
-\item{Samples.grp}{Name of the grouping factor for samples}
-
-\item{Variables.grp}{Name of the grouping factor for variables}
-
 \item{limits}{Limits of the axis (returned by find.limits)}
 
 \item{Legend.L}{Logical to draw legend}

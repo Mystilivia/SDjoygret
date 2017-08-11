@@ -5,9 +5,8 @@
 \title{Perform OPLS and custom plots}
 \usage{
 dlist.opls(dlist, Opls.y = NA, ..., VIPxlabels = F, VIP.thr = 1,
-  ShowPlot = T, plotheme.auto.args = list(Samples.grp = NULL, Variables.grp
-  = NULL, geom_ellipse = T, Legend.L = T, colorL = T, geom_path = F, labelsL =
-  F, labels = NULL))
+  ShowPlot = T, plotheme.auto.args = list(geom_ellipse = T, Legend.L = T,
+  colorL = T, geom_path = F, labelsL = F, labels = NULL))
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}

@@ -913,8 +913,6 @@ find.limits <- function(x,
 #'
 #' Returns the ploting parameters according to input, with working default for missing ones.
 #' Used for custom ggplot of multivariate results (pca, pls, opls)
-#' @param Samples.grp Name of the grouping factor for samples
-#' @param Variables.grp Name of the grouping factor for variables
 #' @param limits Limits of the axis (returned by find.limits)
 #' @param Legend.L Logical to draw legend
 #' @param colorL Logical to use color or grey scale
@@ -929,9 +927,7 @@ find.limits <- function(x,
 #' @export
 #' @examples
 #' plotheme.auto()
-plotheme.auto <- function(Samples.grp = NULL,
-                          Variables.grp = NULL,
-                          limits = NULL,
+plotheme.auto <- function(limits = NULL,
                           Legend.L = T,
                           colorL = F,
                           labels = list(title = "", x = "", y = ""),
@@ -941,25 +937,20 @@ plotheme.auto <- function(Samples.grp = NULL,
                           palpha = 0.8,
                           psize = 0.8) {
   require(ggplot2) ; require(ggrepel)
-  opls.ggplotheme.auto <- list(
-     if(!is.null(Samples.grp) & geom_path){geom_path(alpha = 0.4)},
-     if(!is.null(Samples.grp) & geom_ellipse) {stat_ellipse(type = "t", linetype = 3, alpha = 0.75)},
-     if(!is.null(Samples.grp)){labs(colour = Samples.grp)},
-     if(!is.null(Samples.grp)){aes(group = as.factor(get(Samples.grp)), color = as.factor(get(Samples.grp)))},
-     if(!is.null(Variables.grp)){aes(color = as.factor(get(Variables.grp)))},
-     if(!is.null(Variables.grp)){labs(color = Variables.grp)},
-     if(!colorL) {scale_colour_grey()},
-     geom_hline(yintercept = 0, linetype = 2, color = "grey"),
-     geom_vline(xintercept = 0, linetype = 2, color = "grey"),
-     geom_point(alpha = palpha, size = psize),
-     if(!is.null(limits)){xlim(limits[1,1], limits[1,2])},
-     if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
-     ggplot_SD.theme,
-     labs(labels),
-     if(labelsL){ggrepel::geom_text_repel()},
-     if(!Legend.L){theme(legend.position = 0)} else {theme(legend.position = c(0.005,0.005), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
+  list(
+    if(geom_path){geom_path(alpha = 0.4)},
+    if(geom_ellipse) {stat_ellipse(type = "t", linetype = 3, alpha = 0.75)},
+    if(!colorL) {scale_colour_grey()},
+    geom_hline(yintercept = 0, linetype = 2, color = "grey"),
+    geom_vline(xintercept = 0, linetype = 2, color = "grey"),
+    geom_point(alpha = palpha, size = psize),
+    if(!is.null(limits)){xlim(limits[1,1], limits[1,2])},
+    if(!is.null(limits)){ylim(limits[2,1], limits[2,2])},
+    SDjoygret:::ggplot_SD.theme,
+    labs(labels),
+    if(labelsL){ggrepel::geom_text_repel()},
+    if(!Legend.L){theme(legend.position = 0)} else {theme(legend.position = c(0.005,0.005), legend.justification = c(0,0), legend.direction = "horizontal", legend.title = element_blank())}
   )
-  return(opls.ggplotheme.auto)
 }
 
 #' dlist plot table
@@ -1344,7 +1335,7 @@ dlist.opls <- function (dlist,
                         VIPxlabels = F,
                         VIP.thr = 1,
                         ShowPlot = T,
-                        plotheme.auto.args = list(Samples.grp=NULL, Variables.grp=NULL, geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F, labels=NULL)) {
+                        plotheme.auto.args = list(geom_ellipse=T,Legend.L=T, colorL=T, geom_path=F, labelsL=F, labels=NULL)) {
 
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(data.table)
   # dlist <- dlist ; Opls.y <- "N" ; Samples.grp <- "N" ; Legend.L = T ; colorL = F ; LabelsL = T ; VIP.thr = 1
@@ -1367,14 +1358,11 @@ dlist.opls <- function (dlist,
   ## vips
   temp.VIPs <- SDjoygret::ggplot_opls_vips(temp.opls, VIP.thr = VIP.thr, xlabsL = VIPxlabels, ShowPlot = F)
   ## plots
-  plotheme.auto.args1$Variables.grp <- NULL
-  if(is.null(plotheme.auto.args1$Samples.grp)) {plotheme.auto.args1$Samples.grp <- Opls.y}
-  plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]])) +
-    do.call(SDjoygret::plotheme.auto, plotheme.auto.args1)
-
-  plotheme.auto.args2$Samples.grp <- NULL
+  plot1 <- ggplot(temp.scores, aes(p1, o1, label = temp.scores[[1]], group = as.factor(get(Opls.y)), color = as.factor(get(Opls.y)))) +
+    do.call(plotheme.auto, plotheme.auto.args1)
+  plotheme.auto.args2$geom_ellipse <- F
   plot2 <- ggplot(temp.loadings, aes(p1, o1, label = temp.loadings[[1]], color = VIP>VIP.thr)) +
-    do.call(SDjoygret::plotheme.auto, plotheme.auto.args2)
+    do.call(plotheme.auto, plotheme.auto.args2)
 
   ## Result
   if(ShowPlot == T) {
