@@ -1175,9 +1175,14 @@ dlist.pca <- function (dlist,
                                  " variables (", temp.pca@descriptionMC[3], " excluded)"),
                   x = paste0("p1 (", temp.pca@modelDF$R2X[1] * 100, " %)"),
                   y = paste0("p2 (", temp.pca@modelDF$R2X[2] * 100, " %)"))
-  plot1 <- ggplot(temp.scores, aes(p1, p2, group=get(Samples.grp))) + plotheme.auto(limits = limits1, Legend.L, colorL,
-                                                                                    labels1, geom_path = T, labelsL = Samp.lab.L)
-  plot2 <- ggplot(temp.loadings, aes(p1, p2, label = names(temp.loadings)[1], group = get(Variables.grp))) +
+  plot1 <- ggplot(temp.scores) +
+    aes(p1, p2) +
+    aes_string(group=Samples.grp) +
+    plotheme.auto(limits = limits1, Legend.L, colorL,
+                  labels1, geom_path = T, labelsL = Samp.lab.L)
+  plot2 <- ggplot(temp.loadings) +
+    aes(p1, p2, label = names(temp.loadings)[1]) +
+    aes_string(group = Variables.grp) +
     plotheme.auto(limits = limits2, Legend.L, colorL, labels2, geom_path = F, labelsL = Var.lab.L, palpha = palpha, psize = psize)
   if(ShowPlot == T) {
     return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
