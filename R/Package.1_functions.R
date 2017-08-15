@@ -1187,7 +1187,7 @@ dlist.pca <- function (dlist,
   if(ShowPlot == T) {
     return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
   } else {
-    return(list(PCA = temp.pca, Plot = arrangeGrob(plot1, plot2, nrow = 1)))
+    return(list(PCA = temp.pca, Plot = list("ScoresPlot" = plot1, "LoadingsPlot" = plot2)))
   }
 }
 
