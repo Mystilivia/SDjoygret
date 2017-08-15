@@ -1177,17 +1177,17 @@ dlist.pca <- function (dlist,
                   y = paste0("p2 (", temp.pca@modelDF$R2X[2] * 100, " %)"))
   plot1 <- ggplot(temp.scores) +
     aes(p1, p2) +
-    aes_string(group=Samples.grp) +
+    aes_string(group=Samples.grp, color=Samples.grp) +
     plotheme.auto(limits = limits1, Legend.L, colorL,
                   labels1, geom_path = T, labelsL = Samp.lab.L)
   plot2 <- ggplot(temp.loadings) +
     aes(p1, p2, label = names(temp.loadings)[1]) +
-    aes_string(group = Variables.grp) +
+    aes_string(group=Variables.grp, color=Variables.grp) +
     plotheme.auto(limits = limits2, Legend.L, colorL, labels2, geom_path = F, labelsL = Var.lab.L, palpha = palpha, psize = psize)
   if(ShowPlot == T) {
     return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
   } else {
-    return(list(PCA = temp.pca, Plot = list("ScoresPlot" = plot1, "LoadingsPlot" = plot2)))
+    return(list(PCA = temp.pca, Plot = arrangeGrob(plot1, plot2, nrow = 1)))
   }
 }
 
