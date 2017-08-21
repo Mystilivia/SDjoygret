@@ -1650,6 +1650,7 @@ roplsplot <- function(plot.opls.data,
 #' @param group.by the grouping variables to use (optional)
 #' @keywords significance
 #' @return a data.table with the same structure as input data with statisticals results column added and significant levels letters by groups
+#' @export
 #' @examples
 #' compare_means_letters()
 compare_means_letters <- function(formula, data, method = "t.test", group.by = NULL) {

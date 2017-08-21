@@ -3,6 +3,7 @@
 export(SD_batch_list)
 export(SD_batch_set)
 export(check.list.format)
+export(compare_means_letters)
 export(d.t.transform)
 export(data.ttest)
 export(dataframe.transform)
