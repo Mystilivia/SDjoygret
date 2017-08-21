@@ -1652,7 +1652,6 @@ roplsplot <- function(plot.opls.data,
 #' @return a data.table with the same structure as input data with statisticals results column added and significant levels letters by groups
 #' @examples
 #' compare_means_letters()
-
 compare_means_letters <- function(formula, data, method = "t.test", group.by = NULL) {
   #formula <- value~Feuille ; data <- temp.plot ; method <- "t.test" ; group.by <- c("variable", "Age")
   form.fact <- labels(terms(formula))
@@ -1666,6 +1665,7 @@ compare_means_letters <- function(formula, data, method = "t.test", group.by = N
   temp.letter[, (form.fact) := as.factor(get(form.fact))]
   return(merge(data, temp.letter, by = c(group.by, form.fact)))
 }
+
 
 #' Extract legend from ggplot2 graph
 #'
