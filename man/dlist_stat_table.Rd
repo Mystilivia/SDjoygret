@@ -4,7 +4,7 @@
 \alias{dlist_stat_table}
 \title{Do pairwise statistical tests on dlist}
 \usage{
-dlist_stat_table(data, formula, group.by = NULL, ...)
+dlist_stat_table(data, formula, group.by = NULL, ..., debug = F)
 }
 \arguments{
 \item{data}{A dlist}
@@ -14,6 +14,8 @@ dlist_stat_table(data, formula, group.by = NULL, ...)
 \item{group.by}{Grouping variable for ggpubr::compare_means}
 
 \item{...}{Parameters to pass to ggpubr::compare_means}
+
+\item{debug}{Logical to show debugging messages}
 }
 \value{
 result of the function

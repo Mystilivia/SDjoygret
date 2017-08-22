@@ -1693,26 +1693,40 @@ g_legend <- function(a.gplot){
 #' @param group.by Grouping variable for ggpubr::compare_means
 #' @param formula The formula to use with ggpubr::compare_means
 #' @param ... Parameters to pass to ggpubr::compare_means
+#' @param debug Logical to show debugging messages
 #' @keywords statistical test, significance letters, dlist
 #' @return result of the function
 #' @export
 #' @examples
 #' dlist_stat_table()
-dlist_stat_table <- function(data, formula, group.by = NULL, ...) {
+dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
+  # data <- temp.data ; formula <- value~Stade ; method = "t.test" ; group.by = c('N', 'W', 'varID')
+  if(debug) {message("Loading packages: ", appendLF = F)}
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
+  if(debug) {message("OK", appendLF = T)}
+  if(debug) {message("Checking input: ", appendLF = F)}
   formula <- as.formula(formula)
   form.fact <- labels(terms(formula))
   SDjoygret::check.list.format(data)
+  if(debug) {message("OK", appendLF = T)}
+  if(debug) {message("Melting data: ", appendLF = F)}
   t.data <- SDjoygret::dlist.plot.table(data)
+  if(debug) {message(paste(names(t.data), collapse=" | "), appendLF = T)}
+  if(debug) {message("Compare means: ", appendLF = F)}
   t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = formula, data = as.data.frame(t.data), group.by = group.by, ...))
+  if(debug) {message("OK", appendLF = T)}
+  if(debug) {message("Adding letters: ", appendLF = F)}
   t.letters <- t.stat[!is.na(p.format), .(
-    Feuille = names(multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]),
+    Factor = names(multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]),
     Letters = multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]
-  ),
-  by = group.by]
+  ), by = group.by]
+  setnames(t.letters, "Factor", form.fact)
+  if(debug) {message(paste0(names(t.letters), collapse = " | "), appendLF = T)}
+  if(debug) {message("Formatting output: ", appendLF = F)}
   t.letters[, (form.fact) := as.factor(get(form.fact))]
   t.data[, (form.fact) := as.factor(get(form.fact))]
-  return(merge(as.data.table(t.data), as.data.table(t.letters), by = c(group.by, form.fact), all = T))
+  if(debug) {message("OK", appendLF = T)}
+  return(merge(as.data.table(t.data), as.data.table(t.letters)[, c(group.by, form.fact, "Letters"), with = F], by = c(group.by, form.fact), all = T))
 }
 
 
