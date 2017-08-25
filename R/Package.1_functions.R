@@ -1135,15 +1135,15 @@ dlist.pca.old <- function (dlist,
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
-#' @param Samples.grp Factor name used for grouping samples (affect plot only)
-#' @param Variables.grp Factor name used for grouping variables (affect plot only)
-#' @param Legend.L Logical for drawing legends
+#' @param group.spl Factor name used for grouping samples (affect plot only)
+#' @param group.var Factor name used for grouping variables (affect plot only)
+#' @param legendL Logical for drawing legends
 #' @param colorL Logical for using color or greyscale
-#' @param Samp.lab.L Logical for drawing Sample labels
-#' @param Var.lab.L Logical for drawing Variable labels
-#' @param palpha Transparency for loadings points (between 0 and 1)
-#' @param psize Loadings points size
-#' @inheritParams densplot
+#' @param labels String to show labels on scores, loadings or both plots
+#' @param pathL Loadings points size
+#' @param ellipseL Logical to show ellipse (95% type t which assumes a multivariate t-distribution)
+#' @param outliersL Logical to show outliers (below 1 percentile or above 99 percentile)
+#' @param ShowPlot Logical to draw plot or not
 #' @inheritParams dlist.subset
 #' @keywords pca, ggplot
 #' @return A list with [1] pca results, [2] plot as grobs.
@@ -1151,22 +1151,22 @@ dlist.pca.old <- function (dlist,
 #' @examples
 #' dlist.pca()
 dlist.pca <- function (dlist,
-                         Samples.grp = NULL,
-                         Variables.grp = NULL,
-                         Legend.L = F,
-                         colorL = F,
-                         Samp.lab.L = F,
-                         Var.lab.L = T,
-                         palpha = 0.8,
-                         psize = 0.8,
-                         ShowPlot = T) {
+                       group.spl = NULL,
+                       group.var = NULL,
+                       legendL = F,
+                       labels = c("scores", "loadings", "both"),
+                       pathL = F,
+                       ellipseL = F,
+                       outliersL = F,
+                       ShowPlot = T) {
   require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(dplyr)
-  check.list.format(dlist)
-  temp.pca <- opls(dlist[[1]][,-1, with = F], predI = 2, plotL = F, printL = F)
-  temp.scores <- bind_cols(dlist[[2]], data.frame(temp.pca@scoreMN))
-  limits1 <- find.limits(temp.scores$p1, temp.scores$p2)
-  temp.loadings <- bind_cols(dlist[[3]], data.table(temp.pca@loadingMN))
-  limits2 <- find.limits(temp.loadings$p1, temp.loadings$p2)
+  SDjoygret::check.list.format(dlist)
+  temp.pca <- ropls::opls(dlist[[1]][,-1, with = F], predI = 2, plotL = F, printL = F)
+  temp.scores <- dplyr::bind_cols(dlist[[2]], data.frame(temp.pca@scoreMN))
+  temp.scores[, outliers := !p1 %between% quantile(p1, probs = c(0.01,0.99), na.rm = T) & !p2 %between% quantile(p2, probs = c(0.01,0.99), na.rm = T)]
+  limits1 <- SDjoygret::find.limits(temp.scores$p1, temp.scores$p2)
+  temp.loadings <- dplyr::bind_cols(dlist[[3]], data.table(temp.pca@loadingMN))
+  limits2 <- SDjoygret::find.limits(temp.loadings$p1, temp.loadings$p2)
   labels1 <- list(title = paste0("Scores plot ", temp.pca@descriptionMC[1],
                                  " samples\n(", temp.pca@descriptionMC[4], " missing values)"),
                   x = paste0("p1 (", temp.pca@modelDF$R2X[1] * 100, " %)"),
@@ -1175,15 +1175,51 @@ dlist.pca <- function (dlist,
                                  " variables (", temp.pca@descriptionMC[3], " excluded)"),
                   x = paste0("p1 (", temp.pca@modelDF$R2X[1] * 100, " %)"),
                   y = paste0("p2 (", temp.pca@modelDF$R2X[2] * 100, " %)"))
-  plot1 <- ggplot(temp.scores) +
+  plot1 <- ggplot2::ggplot(temp.scores) +
     aes(p1, p2) +
-    aes_string(group=Samples.grp, color=Samples.grp) +
-    plotheme.auto(limits = limits1, Legend.L, colorL,
-                  labels1, geom_path = T, labelsL = Samp.lab.L)
-  plot2 <- ggplot(temp.loadings) +
-    aes(p1, p2, label = names(temp.loadings)[1]) +
-    aes_string(group=Variables.grp, color=Variables.grp) +
-    plotheme.auto(limits = limits2, Legend.L, colorL, labels2, geom_path = F, labelsL = Var.lab.L, palpha = palpha, psize = psize)
+    geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
+    geom_point() +
+    theme_bw() +
+    labs(labels1) +
+    list(
+      if(!is.null(group.spl) | outliersL){
+        list(
+          if (outliersL) {
+            list(
+              aes(color = outliers),
+              scale_color_manual(values = c("black", "red"), labels = c("normal", "outlier")),
+              labs(color = "Outliers"),
+              ggrepel::geom_text_repel(data = temp.scores[outliers == T], aes_string(label = names(temp.scores)[1]), show.legend = F)
+            )
+          } else {
+            list(
+              aes(color = as.factor(get(group.spl))),
+              if(pathL){geom_path(aes(group = get(group.spl)), alpha = 0.6)},
+              labs(color = paste(group.spl))
+            )
+          },
+          theme(legend.position = "bottom")
+        )},
+      if(labels %in% c("scores", "both")) {geom_text_repel(aes(label = temp.scores[,1,with = F][[1]]), show.legend = F)} else { NULL },
+      if(ellipseL) {stat_ellipse(type = "t", linetype = 3, size = 1, alpha = 0.6, level = 0.95)},
+      if(!legendL) {theme(legend.position = 0)}
+    )
+
+  plot2 <- ggplot2::ggplot(temp.loadings) +
+    aes(p1, p2) +
+    geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
+    geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
+    geom_point() +
+    theme_bw() +
+    labs(labels2) +
+    list(if(!is.null(group.var)){list(aes(color = as.factor(get(group.var))),
+                                      labs(color = ""),
+                                      theme(legend.position = "bottom"),
+                                      if(isTRUE(pathL)){geom_path(aes(group = get(group.var)))})} else { NULL },
+         if(labels %in% c("loadings", "both")) {geom_text_repel(aes(label = temp.loadings[,1,with = F][[1]]), show.legend = F)} else { NULL },
+         if(!legendL) {theme(legend.position = 0)})
+
   if(ShowPlot == T) {
     return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
   } else {

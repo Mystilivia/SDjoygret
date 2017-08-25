@@ -4,30 +4,30 @@
 \alias{dlist.pca}
 \title{Perform PCA and custom plot}
 \usage{
-dlist.pca(dlist, Samples.grp = NULL, Variables.grp = NULL, Legend.L = F,
-  colorL = F, Samp.lab.L = F, Var.lab.L = T, palpha = 0.8,
-  psize = 0.8, ShowPlot = T)
+dlist.pca(dlist, group.spl = NULL, group.var = NULL, legendL = F,
+  labels = c("scores", "loadings", "both"), pathL = F, ellipseL = F,
+  outliersL = F, ShowPlot = T)
 }
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
-\item{Samples.grp}{Factor name used for grouping samples (affect plot only)}
+\item{group.spl}{Factor name used for grouping samples (affect plot only)}
 
-\item{Variables.grp}{Factor name used for grouping variables (affect plot only)}
+\item{group.var}{Factor name used for grouping variables (affect plot only)}
 
-\item{Legend.L}{Logical for drawing legends}
+\item{legendL}{Logical for drawing legends}
+
+\item{labels}{String to show labels on scores, loadings or both plots}
+
+\item{pathL}{Loadings points size}
+
+\item{ellipseL}{Logical to show ellipse (95% type t which assumes a multivariate t-distribution)}
+
+\item{outliersL}{Logical to show outliers (below 1 percentile or above 99 percentile)}
+
+\item{ShowPlot}{Logical to draw plot or not}
 
 \item{colorL}{Logical for using color or greyscale}
-
-\item{Samp.lab.L}{Logical for drawing Sample labels}
-
-\item{Var.lab.L}{Logical for drawing Variable labels}
-
-\item{palpha}{Transparency for loadings points (between 0 and 1)}
-
-\item{psize}{Loadings points size}
-
-\item{ShowPlot}{Logical to directly draw the plot or return the grobs (faster)}
 }
 \value{
 A list with [1] pca results, [2] plot as grobs.
