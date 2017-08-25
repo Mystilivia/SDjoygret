@@ -1159,7 +1159,7 @@ dlist.pca <- function (dlist,
                        ellipseL = F,
                        outliersL = F,
                        ShowPlot = T) {
-  require(ropls) ; require(ggplot2) ; require(gridExtra) ; require(dplyr)
+  require(ropls) ; require(ggplot2) ; require(ggrepel) ; require(gridExtra) ; require(dplyr)
   SDjoygret::check.list.format(dlist)
   temp.pca <- ropls::opls(dlist[[1]][,-1, with = F], predI = 2, plotL = F, printL = F)
   temp.scores <- dplyr::bind_cols(dlist[[2]], data.frame(temp.pca@scoreMN))
@@ -1221,11 +1221,8 @@ dlist.pca <- function (dlist,
          if(labels %in% c("loadings", "both")) {geom_text_repel(aes(label = temp.loadings[,1,with = F][[1]]), show.legend = F)} else { NULL },
          if(!legendL) {theme(legend.position = 0)})
 
-  if(ShowPlot == T) {
-    return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1), scores_data = temp.scores, loadings_data = temp.loadings))
-  } else {
-    return(list(PCA = temp.pca, Plot = arrangeGrob(plot1, plot2, nrow = 1), scores_data = temp.scores, loadings_data = temp.loadings))
-  }
+  if(ShowPlot == T) {grid.arrange(plot1, plot2, nrow = 1)}
+    return(list(PCA = temp.pca, Plot = list("Scores" = plot1, "Loadings" = plot2), scores_data = temp.scores, loadings_data = temp.loadings))
 }
 
 
