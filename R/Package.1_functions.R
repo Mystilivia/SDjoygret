@@ -1132,6 +1132,7 @@ dlist.pca.old <- function (dlist,
   }
 }
 
+
 #' Perform PCA and custom plot
 #'
 #' Perform a PCA analysis on a 3 levels list and create custom plot.
@@ -1140,7 +1141,7 @@ dlist.pca.old <- function (dlist,
 #' @param legendL Logical for drawing legends
 #' @param labels String to show labels on scores, loadings or both plots
 #' @param pathL Loadings points size
-#' @param ellipseL Logical to show ellipse (95% type t which assumes a multivariate t-distribution)
+#' @param ellipseL Logical to show ellipse (0.95 type t which assumes a multivariate t-distribution)
 #' @param outliersL Logical to show outliers (below 1 percentile or above 99 percentile)
 #' @param ShowPlot Logical to draw plot or not
 #' @inheritParams dlist.subset
@@ -1174,6 +1175,7 @@ dlist.pca <- function (dlist,
                                  " variables (", temp.pca@descriptionMC[3], " excluded)"),
                   x = paste0("p1 (", temp.pca@modelDF$R2X[1] * 100, " %)"),
                   y = paste0("p2 (", temp.pca@modelDF$R2X[2] * 100, " %)"))
+
   plot1 <- ggplot2::ggplot(temp.scores) +
     aes(p1, p2) +
     geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
@@ -1220,11 +1222,12 @@ dlist.pca <- function (dlist,
          if(!legendL) {theme(legend.position = 0)})
 
   if(ShowPlot == T) {
-    return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1)))
+    return(list(PCA = temp.pca, Plot = grid.arrange(plot1, plot2, nrow = 1), scores_data = temp.scores, loadings_data = temp.loadings))
   } else {
-    return(list(PCA = temp.pca, Plot = arrangeGrob(plot1, plot2, nrow = 1)))
+    return(list(PCA = temp.pca, Plot = arrangeGrob(plot1, plot2, nrow = 1), scores_data = temp.scores, loadings_data = temp.loadings))
   }
 }
+
 
 #' Transform a datamatrix and replace zero
 #'

@@ -21,7 +21,7 @@ dlist.pca(dlist, group.spl = NULL, group.var = NULL, legendL = F,
 
 \item{pathL}{Loadings points size}
 
-\item{ellipseL}{Logical to show ellipse (95% type t which assumes a multivariate t-distribution)}
+\item{ellipseL}{Logical to show ellipse (0.95 type t which assumes a multivariate t-distribution)}
 
 \item{outliersL}{Logical to show outliers (below 1 percentile or above 99 percentile)}
 
