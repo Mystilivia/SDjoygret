@@ -1138,7 +1138,6 @@ dlist.pca.old <- function (dlist,
 #' @param group.spl Factor name used for grouping samples (affect plot only)
 #' @param group.var Factor name used for grouping variables (affect plot only)
 #' @param legendL Logical for drawing legends
-#' @param colorL Logical for using color or greyscale
 #' @param labels String to show labels on scores, loadings or both plots
 #' @param pathL Loadings points size
 #' @param ellipseL Logical to show ellipse (95% type t which assumes a multivariate t-distribution)

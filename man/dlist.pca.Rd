@@ -26,8 +26,6 @@ dlist.pca(dlist, group.spl = NULL, group.var = NULL, legendL = F,
 \item{outliersL}{Logical to show outliers (below 1 percentile or above 99 percentile)}
 
 \item{ShowPlot}{Logical to draw plot or not}
-
-\item{colorL}{Logical for using color or greyscale}
 }
 \value{
 A list with [1] pca results, [2] plot as grobs.
