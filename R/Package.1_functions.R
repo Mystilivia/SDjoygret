@@ -1273,7 +1273,7 @@ d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = T, Log2L = T) {
       if(PercZ >= ZvalS){return(NULL)} else {x}
     }), .SDcols=-1])
   }
-  if(RepZeroL){data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}), .SDcols=-1])}
+  if(RepZeroL){data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){x[x == 0 | is.na(x)] <- min(x[x!=0], na.rm = T)/2 ; x}), .SDcols=-1])}
   if(Log2L){data <- data.table(data[,1,with = F], data[,lapply(.SD, log2), .SDcols=-1])}
   return(data)
 }
