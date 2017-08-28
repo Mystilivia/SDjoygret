@@ -1228,7 +1228,7 @@ dlist.pca <- function (dlist,
 
 #' Transform a datamatrix and replace zero
 #'
-#' Do any of the two following function : Replace zero by the minimum value divided by 2 and/or tranform data
+#' New version available : see d.t.transform. Do any of the two following function : Replace zero by the minimum value divided by 2 and/or tranform data
 #' with Trans.fun function (by default log2).
 #' @param data a dataframe with value only to transform
 #' @param TransL Should transformation be made
@@ -1237,7 +1237,6 @@ dlist.pca <- function (dlist,
 #' @param ... Argument to pass to Trans.fun
 #' @keywords transform
 #' @return The resulting datamatrix only
-#' @export
 #' @examples
 #' dataframe.transform()
 dataframe.transform <- function(data,
@@ -1245,8 +1244,9 @@ dataframe.transform <- function(data,
                                 TransL = F,
                                 Trans.fun = log2,
                                 ...) {
-  if(isTRUE(ZeroL)) {temp.data <- data.frame(apply(data, 2, function(x) {x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}))}
-  if(isTRUE(TransL)) {return(Trans.fun(data, ...))}
+  temp.data <- data
+  if(ZeroL) {temp.data <- data.frame(apply(data, 2, function(x) {x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}))}
+  if(TransL) {temp.data <- Trans.fun(temp.data, ...)}
   return(temp.data)
 }
 
@@ -1277,8 +1277,6 @@ d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = F, Log2L = T) {
   if(Log2L){data <- data.table(data[,1,with = F], data[,lapply(.SD, log2), .SDcols=-1])}
   return(data)
 }
-
-
 
 
 #' Transform function for dlist
