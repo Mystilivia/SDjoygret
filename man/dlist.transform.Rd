@@ -9,7 +9,7 @@ dlist.transform(dlist, ...)
 \arguments{
 \item{dlist}{list of three dataframes : [[1]] Datamatrix, [[2]] SamplesMetadata [[3]] VariableMetadata.}
 
-\item{...}{Argument passed to dataframe.transform()}
+\item{...}{Argument passed to d.t.transform()}
 }
 \value{
 The resulting datamatrix only

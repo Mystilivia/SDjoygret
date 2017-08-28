@@ -1265,7 +1265,7 @@ dataframe.transform <- function(data,
 #' @export
 #' @examples
 #' d.t.transform()
-d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = F, Log2L = T) {
+d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = T, Log2L = T) {
   if(!is.data.table(data)){stop("Function optimized for data.table.")}
   if(ZvalL){
     data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){
@@ -1283,7 +1283,7 @@ d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = F, Log2L = T) {
 #'
 #' Replace zero by the minimum value / 2 and if checked, tranform data with Trans.fun function (by default log2).
 #' Same function as dataframe.transform(), but formatted for direct use on dlist.
-#' @param ... Argument passed to dataframe.transform()
+#' @param ... Argument passed to d.t.transform()
 #' @inheritParams dlist.subset
 #' @keywords transform, dlist
 #' @return The resulting datamatrix only
@@ -1293,7 +1293,7 @@ d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = F, Log2L = T) {
 dlist.transform <- function(dlist,
                             ...) {
   check.list.format(dlist)
-  dlist[[1]] <- dataframe.transform(dlist[[1]], ...)
+  dlist[[1]] <- d.t.transform(dlist[[1]], ...)
   return(dlist)
 }
 

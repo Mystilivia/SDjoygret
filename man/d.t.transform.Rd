@@ -4,7 +4,7 @@
 \alias{d.t.transform}
 \title{Transform a datamatrix and replace zero}
 \usage{
-d.t.transform(data, ZvalL = F, PercZ = 1, RepZeroL = F, Log2L = T)
+d.t.transform(data, ZvalL = F, PercZ = 1, RepZeroL = T, Log2L = T)
 }
 \arguments{
 \item{data}{a data.table with first column as row IDs}
