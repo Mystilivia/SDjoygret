@@ -1766,9 +1766,9 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
 
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Adding letters: ", appendLF = F)}
-  t.letters <- t.stat[!is.na(p.format), .(
-    Factor = names(multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]),
-    Letters = multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]
+  t.letters <- t.stat[!is.na(p), .(
+    Factor = names(multcompView::multcompLetters(setNames(as.numeric(p), as.factor(paste0(group1, "-", group2))))[[1]]),
+    Letters = multcompView::multcompLetters(setNames(as.numeric(p), as.factor(paste0(group1, "-", group2))))[[1]]
   ), by = group.by]
   setnames(t.letters, "Factor", form.fact)
 
