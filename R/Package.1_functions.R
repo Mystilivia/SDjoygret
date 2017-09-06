@@ -1733,7 +1733,7 @@ g_legend <- function(a.gplot){
 #' @examples
 #' dlist_stat_table()
 dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
-  # data <- temp.data ; formula <- value~Stade ; method = "t.test" ; group.by = c('N', 'W', 'varID')
+  # data <- temp.data.sub ; formula <- value~N ; method = "t.test" ; group.by = c('Stade', 'varID')
   if(debug) {message("Loading packages: ", appendLF = F)}
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
   if(debug) {message("OK", appendLF = T)}
@@ -1741,12 +1741,29 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
   formula <- as.formula(formula)
   form.fact <- labels(terms(formula))
   SDjoygret::check.list.format(data)
+
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Melting data: ", appendLF = F)}
   t.data <- SDjoygret::dlist.plot.table(data)
+
   if(debug) {message(paste(names(t.data), collapse=" | "), appendLF = T)}
+  if(debug) {message("Checking replicates: ", appendLF = F)}
+  t.data.na <- t.data[!is.na(value)]
+  t.data.na <- t.data.na[, group := do.call(paste0, .SD), .SDcols = group.by]
+  t.data.comb <- dcast(t.data.na, group~get(form.fact), value.var = 'value', fun.aggregate = length)
+  t.data.less2 <- t.data.comb[, .(Log = any(.SD <= 2)), .SDcols = -1, by = group][Log == T, group]
+  t.data <- t.data.na[!group %in% t.data.less2]
+  if(debug) {
+    if(length(t.data.less2) >= 1) {
+      message("Found combinations with not enough replicate:", appendLF = T)
+      message(paste(t.data.less2, collapse=" | "), appendLF = T)
+    } else {
+      message("Data is sufficient", appendLF = T)
+    }
+  }
   if(debug) {message("Compare means: ", appendLF = F)}
   t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = formula, data = as.data.frame(t.data), group.by = group.by, ...))
+
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Adding letters: ", appendLF = F)}
   t.letters <- t.stat[!is.na(p.format), .(
@@ -1754,12 +1771,16 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
     Letters = multcompView::multcompLetters(setNames(as.numeric(p.format), as.factor(paste0(group1, "-", group2))))[[1]]
   ), by = group.by]
   setnames(t.letters, "Factor", form.fact)
+
   if(debug) {message(paste0(names(t.letters), collapse = " | "), appendLF = T)}
   if(debug) {message("Formatting output: ", appendLF = F)}
   t.letters[, (form.fact) := as.factor(get(form.fact))]
   t.data[, (form.fact) := as.factor(get(form.fact))]
+
   if(debug) {message("OK", appendLF = T)}
-  return(merge(as.data.table(t.data), as.data.table(t.letters)[, c(group.by, form.fact, "Letters"), with = F], by = c(group.by, form.fact), all = T))
+  return(list(result_table = merge(as.data.table(t.data), as.data.table(t.letters)[, c(group.by, form.fact, "Letters"), with = F], by = c(group.by, form.fact), all = T),
+              excluded_table = t.data.na[group %in% t.data.less2])
+  )
 }
 
 
