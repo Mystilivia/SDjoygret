@@ -4,7 +4,8 @@
 \alias{d.t.transform}
 \title{Transform a datamatrix and replace zero}
 \usage{
-d.t.transform(data, ZvalL = F, PercZ = 1, RepZeroL = T, Log2L = T)
+d.t.transform(data, ZvalL = F, PercZ = 1, RepZeroL = T, RepNAL = F,
+  Log2L = T)
 }
 \arguments{
 \item{data}{a data.table with first column as row IDs}
@@ -14,6 +15,8 @@ d.t.transform(data, ZvalL = F, PercZ = 1, RepZeroL = T, Log2L = T)
 \item{PercZ}{Prop of zero value above which deletion is made}
 
 \item{RepZeroL}{Should remaining zero be replaced by half of minimum value ?}
+
+\item{RepNAL}{Should remaining NA be replaced by half of minimum value ?}
 
 \item{Log2L}{Should log2 transform be done}
 }

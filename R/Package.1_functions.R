@@ -1259,13 +1259,14 @@ dataframe.transform <- function(data,
 #' @param ZvalL Should Zero val column be deleted ?
 #' @param PercZ Prop of zero value above which deletion is made
 #' @param RepZeroL Should remaining zero be replaced by half of minimum value ?
+#' @param RepNAL Should remaining NA be replaced by half of minimum value ?
 #' @param Log2L Should log2 transform be done
 #' @keywords transform
 #' @return The resulting data.table only
 #' @export
 #' @examples
 #' d.t.transform()
-d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = T, Log2L = T) {
+d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = T, RepNAL = F, Log2L = T) {
   if(!is.data.table(data)){stop("Function optimized for data.table.")}
   if(ZvalL){
     data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){
@@ -1273,7 +1274,8 @@ d.t.transform <- function(data, ZvalL = F, PercZ = 1, RepZeroL = T, Log2L = T) {
       if(PercZ >= ZvalS){return(NULL)} else {x}
     }), .SDcols=-1])
   }
-  if(RepZeroL){data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){x[x == 0 | is.na(x)] <- min(x[x!=0], na.rm = T)/2 ; x}), .SDcols=-1])}
+  if(RepZeroL){data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){x[x == 0] <- min(x[x!=0], na.rm = T)/2 ; x}), .SDcols=-1])}
+  if(RepNAL){data <- data.table(data[,1,with = F], data[,lapply(.SD, function(x){x[is.na(x)] <- min(x[x!=0], na.rm = T)/2 ; x}), .SDcols=-1])}
   if(Log2L){data <- data.table(data[,1,with = F], data[,lapply(.SD, log2), .SDcols=-1])}
   return(data)
 }
