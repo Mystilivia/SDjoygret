@@ -4,7 +4,7 @@
 \alias{scale_pareto}
 \title{Pareto scaling}
 \usage{
-scale_pareto(data)
+scale_pareto(data, centeringL = F)
 }
 \arguments{
 \item{data}{a dataframe}

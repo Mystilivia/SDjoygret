@@ -1794,7 +1794,7 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
 #' @export
 #' @examples
 #' scale_pareto()
-scale_pareto <- function(data) {
+scale_pareto <- function(data, centeringL = F) {
   require(data.table)
   if (centeringL) {data <- scale(data, center = T, scale = F)}
   data <- data.table::as.data.table(data)
