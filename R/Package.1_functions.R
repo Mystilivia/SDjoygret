@@ -1785,6 +1785,28 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
   )
 }
 
+#' Pareto scaling
+#'
+#' Apply Pareto scaling on a data.table
+#' @param data a dataframe
+#' @keywords scaling
+#' @return a dataframe of same dimensions as input
+#' @export
+#' @examples
+#' scale_pareto()
+scale_pareto <- function(data) {
+  require(data.table)
+  data <- data.table::as.data.table(data)
+  data[,tempID := 1:.N]
+  data.L <- melt(data, id.vars = "tempID")
+  data.L.merged <- data.L[, .(N = .N, AVG = mean(value), SD = sd(value)), by = variable] %>%
+    merge(data.L, by = "variable")
+  data.L.merged[, value_pareto := (value-AVG)/sqrt(SD)]
+  return(dcast(data.L.merged[, .(tempID, variable, value = value_pareto)], tempID~variable)[,-1])
+}
+
+
+
 
 #' TITLE
 #'
