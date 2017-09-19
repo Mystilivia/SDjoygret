@@ -1796,15 +1796,30 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
 #' scale_pareto()
 scale_pareto <- function(data) {
   require(data.table)
+  if (centeringL) {data <- scale(data, center = T, scale = F)}
   data <- data.table::as.data.table(data)
   data[,tempID := 1:.N]
   data.L <- melt(data, id.vars = "tempID")
-  data.L.merged <- data.L[, .(N = .N, AVG = mean(value), SD = sd(value)), by = variable] %>%
+  data.L.merged <- data.L[, .(N = .N, AVG = mean(value, na.rm = T), SD = sd(value, na.rm = T)), by = variable] %>%
     merge(data.L, by = "variable")
   data.L.merged[, value_pareto := (value-AVG)/sqrt(SD)]
-  return(dcast(data.L.merged[, .(tempID, variable, value = value_pareto)], tempID~variable)[,-1])
+  data.result <- dcast(data.L.merged[, .(tempID, variable, value = value_pareto)], tempID~variable)[,-1]
+  return(data.result)
 }
 
+#' glog transformation
+#'
+#' Apply glog transformation, which behave better than log transformation with zero values
+#' @param data a dataframe
+#' @param a scaling factor
+#' @keywords transform
+#' @return a dataframe of same dimensions as input
+#' @export
+#' @examples
+#' transf_glog()
+transf_glog <- function(data, a = 1) {
+  return(log2((data + sqrt(data^2 + a^2))/2))
+}
 
 
 
