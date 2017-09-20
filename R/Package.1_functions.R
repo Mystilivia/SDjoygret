@@ -1801,21 +1801,25 @@ dlist_stat_table1 <- function(data, formula, group.by = NULL, ..., debug = F) {
 #' @export
 #' @examples
 #' dlist_stat_table()
-dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
+dlist_stat_table <- function(data, factor, group.by = NULL, ..., debug = F) {
   # data <- temp.data.sub ; formula <- value~N ; method = "t.test" ; group.by = c('Stade', 'varID')
   warning("For old version, use dlist_stat_table1")
   if(debug) {message("Loading packages: ", appendLF = F)}
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Checking input: ", appendLF = F)}
-  formula <- as.formula(formula)
-  form.fact <- labels(terms(formula))
+  form.fact <- factor
   SDjoygret::check.list.format(data)
-
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Melting data: ", appendLF = F)}
   t.data <- SDjoygret::dlist.plot.table(data)
-
+  if(debug) {message("OK", appendLF = T)}
+  if(debug) {message("Checking comparison_factor: ", appendLF = F)}
+  if(!form.fact %in% names(t.data)) {
+    message(paste0("comparison_factor (", form.fact,") doesn't exist, check column names :"), appendLF = T)
+    stop(paste(names(t.data), collapse = " | "))
+    }
+  if(debug) {message("OK", appendLF = T)}
   if(debug) {message(paste(names(t.data), collapse=" | "), appendLF = T)}
   if(debug) {message("Checking replicates: ", appendLF = F)}
   t.data.na <- t.data[!is.na(value)]
