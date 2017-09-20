@@ -4,12 +4,14 @@
 \alias{check.list.format}
 \title{Check format of dlist}
 \usage{
-check.list.format(dlist, rownamesL = F, data.tableL = F)
+check.list.format(dlist, rownamesL = F, data.tableL = F, debugL = F)
 }
 \arguments{
 \item{dlist}{Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.}
 
 \item{rownamesL}{Does data.frame store Rows ID as rownames ?}
+
+\item{debugL}{Logical to show debugging messsages}
 
 \item{tibbleL}{Logical to convert data.frame and data.table dlist to tibbles.}
 }

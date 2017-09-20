@@ -627,13 +627,14 @@ get_sign = function(model) {
 #' @param dlist Three levels list with [[1]] Datamatrix, [[2]] SamplesMetadata, [[3]] VariableMetadata.
 #' @param rownamesL Does data.frame store Rows ID as rownames ?
 #' @param tibbleL Logical to convert data.frame and data.table dlist to tibbles.
+#' @param debugL Logical to show debugging messsages
 #' @return Print result of check as character and return the dlist (or converted dlist) if format is ok
 #' @keywords list, check
 #' @import tidyverse
 #' @export
 #' @examples
 #' check.list.format()
-check.list.format <- function (dlist, rownamesL = F, data.tableL = F) {
+check.list.format <- function (dlist, rownamesL = F, data.tableL = F, debugL = F) {
   require("tibble") ; require("tidyverse")
   if(!is.list(dlist)){stop("Data should be a list with (1) Datamatrix (2) Sample.Metadata (3) Variable.Metadata")}
   temp.data.str <- dlist.class(dlist)
@@ -641,19 +642,19 @@ check.list.format <- function (dlist, rownamesL = F, data.tableL = F) {
 
   ## transform data to data.table and add a column for rownames if duplicates are found in the first column
   temp.data <- lapply(dlist, function(x) {
-    if(any(duplicated(x[,1]))){message(paste0('First column has duplicates (see below), a new column "rn" contains rownames./n', which(duplicated(x[,1])))) ; return(data.table(x, keep.rownames = T))}
-    else {message('First column has no duplicates and is used as row IDs') ; return(data.table(x, keep.rownames = F))}
+    if(any(duplicated(x[,1]))){warning(paste0('First column has duplicates (see below), a new column "rn" contains rownames./n', which(duplicated(x[,1])))) ; return(data.table(x, keep.rownames = T))}
+    else { if(debugL) {message('First column has no duplicates and is used as row IDs') ; return(data.table(x, keep.rownames = F))}}
   })
   if(!dim(dlist[[1]])[1] == dim(dlist[[2]])[1]) {stop("Datamatrix and Sample.Metadata must have the same number of rows.")}
   if(!dim(dlist[[1]])[2]-1 == dim(dlist[[3]])[1]) {stop("Variables number should be the same between datamatrix column and VariableMetadata rows.")}
   if(!identical(dlist[[1]][[1]], dlist[[2]][[1]])) {stop("Datamatrix and Sample.Metadata first column must be identical (same names and order)")}
   if(!identical(names(dlist[[1]])[-1], dlist[[3]][[1]])) {stop("Datamatrix column names and Variable.Metadata rows ID must be identical (same names and order)")}
   if(all(temp.data.str[,"class.t"] == T)) {
-    message("Data are stored as tibble. SDjoygret function better with data.table (use data.table::as.data.table to convert).")
+    if(debugL) {message("Data are stored as tibble. SDjoygret function better with data.table (use data.table::as.data.table to convert).")}
   } else if(all(temp.data.str[,"class.d.t"] == T)) { ## all are data.table
-    message("Data are stored as data.table, well done !")
+    if(debugL) {message("Data are stored as data.table, well done !")}
   } else if(all(temp.data.str[,"class.d.f"] == T)) { ## all are data.frame
-    message("Data are stored as data.frame. SDjoygret function better with data.table (use data.table::as.data.table to convert).")
+    if(debugL) {message("Data are stored as data.frame. SDjoygret function better with data.table (use data.table::as.data.table to convert).")}
   } else {stop("Data class isn't recognized as data.frame, tibble or data.table.")}
   if(isTRUE(data.tableL)){return(temp.data)}
 }
@@ -1733,9 +1734,10 @@ g_legend <- function(a.gplot){
 #' @return result of the function
 #' @export
 #' @examples
-#' dlist_stat_table()
-dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
+#' dlist_stat_table1()
+dlist_stat_table1 <- function(data, formula, group.by = NULL, ..., debug = F) {
   # data <- temp.data.sub ; formula <- value~N ; method = "t.test" ; group.by = c('Stade', 'varID')
+  warning("Deprecated, use dlist_stat_table")
   if(debug) {message("Loading packages: ", appendLF = F)}
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
   if(debug) {message("OK", appendLF = T)}
@@ -1753,7 +1755,7 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
   t.data.na <- t.data[!is.na(value)]
   t.data.na <- t.data.na[, group := do.call(paste0, .SD), .SDcols = group.by]
   t.data.comb <- dcast(t.data.na, group~get(form.fact), value.var = 'value', fun.aggregate = length)
-  t.data.less2 <- t.data.comb[, .(Log = any(.SD <= 2)), .SDcols = -1, by = group][Log == T, group]
+  t.data.less2 <- t.data.comb[, .(Log = length(.SD) - length(which(.SD <= 2))<2), .SDcols = -1, by = group][Log == T, group]
   t.data <- t.data.na[!group %in% t.data.less2]
   if(debug) {
     if(length(t.data.less2) >= 1) {
@@ -1764,7 +1766,7 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
     }
   }
   if(debug) {message("Compare means: ", appendLF = F)}
-  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = formula, data = as.data.frame(t.data), group.by = group.by, ...))
+  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = as.formula(paste0("value~",form.fact)), data = as.data.frame(t.data), group.by = group.by, ...))
 
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Adding letters: ", appendLF = F)}
@@ -1784,6 +1786,72 @@ dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
               excluded_table = t.data.na[group %in% t.data.less2])
   )
 }
+
+#' Do pairwise statistical tests on dlist
+#'
+#' These function take a dlist as entry and perform pairwise statistical test using ggpubr::compare_means for
+#' tests and multcompView::multcompLetters to annotate test results. It returns a table
+#' @param data A dlist
+#' @param group.by Grouping variable for ggpubr::compare_means
+#' @param formula The formula to use with ggpubr::compare_means
+#' @param ... Parameters to pass to ggpubr::compare_means
+#' @param debug Logical to show debugging messages
+#' @keywords statistical test, significance letters, dlist
+#' @return result of the function
+#' @export
+#' @examples
+#' dlist_stat_table()
+dlist_stat_table <- function(data, formula, group.by = NULL, ..., debug = F) {
+  # data <- temp.data.sub ; formula <- value~N ; method = "t.test" ; group.by = c('Stade', 'varID')
+  warning("For old version, use dlist_stat_table1")
+  if(debug) {message("Loading packages: ", appendLF = F)}
+  pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
+  if(debug) {message("OK", appendLF = T)}
+  if(debug) {message("Checking input: ", appendLF = F)}
+  formula <- as.formula(formula)
+  form.fact <- labels(terms(formula))
+  SDjoygret::check.list.format(data)
+
+  if(debug) {message("OK", appendLF = T)}
+  if(debug) {message("Melting data: ", appendLF = F)}
+  t.data <- SDjoygret::dlist.plot.table(data)
+
+  if(debug) {message(paste(names(t.data), collapse=" | "), appendLF = T)}
+  if(debug) {message("Checking replicates: ", appendLF = F)}
+  t.data.na <- t.data[!is.na(value)]
+  t.data.na <- t.data.na[, group := do.call(paste0, .SD), .SDcols = group.by]
+  t.data.comb <- dcast(t.data.na, group~get(form.fact), value.var = 'value', fun.aggregate = length)
+  t.data.less2 <- t.data.comb[, .(Log = length(.SD) - length(which(.SD <= 2))<2), .SDcols = -1, by = group][Log == T, group]
+  t.data <- t.data.na[!group %in% t.data.less2]
+  if(debug) {
+    if(length(t.data.less2) >= 1) {
+      message("Found combinations with not enough replicate:", appendLF = T)
+      message(paste(t.data.less2, collapse=" | "), appendLF = T)
+    } else {
+      message("Data is sufficient", appendLF = T)
+    }
+  }
+  if(debug) {message("Compare means: ", appendLF = F)}
+  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = as.formula(paste0("value~",form.fact)), data = as.data.frame(t.data), group.by = group.by, ...))
+
+  if(debug) {message("OK", appendLF = T)}
+  if(debug) {message("Adding letters: ", appendLF = F)}
+  t.letters <- t.stat[!is.na(p), .(
+    Factor = names(multcompView::multcompLetters(setNames(as.numeric(p), as.factor(paste0(group1, "-", group2))))[[1]]),
+    Letters = multcompView::multcompLetters(setNames(as.numeric(p), as.factor(paste0(group1, "-", group2))))[[1]]
+  ), by = group.by]
+  setnames(t.letters, "Factor", form.fact)
+
+  if(debug) {message(paste0(names(t.letters), collapse = " | "), appendLF = T)}
+  if(debug) {message("Formatting output: ", appendLF = F)}
+  t.letters[, (form.fact) := as.factor(get(form.fact))]
+  t.data[, (form.fact) := as.factor(get(form.fact))]
+
+  if(debug) {message("OK", appendLF = T)}
+  temp.result <- list(result_table = merge(as.data.table(t.data), as.data.table(t.letters)[, c(group.by, form.fact, "Letters"), with = F], by = c(group.by, form.fact), all = T), excluded_table = t.data.na[group %in% t.data.less2])
+  return(data.table::rbindlist(temp.result, fill = T))
+}
+
 
 #' Pareto scaling
 #'
