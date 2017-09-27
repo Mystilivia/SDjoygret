@@ -4,7 +4,8 @@
 \alias{dlist_stat_table}
 \title{Do pairwise statistical tests on dlist}
 \usage{
-dlist_stat_table(data, factor, group.by = NULL, ..., debug = F)
+dlist_stat_table(data, factor, group.by = NULL, ..., Output = c("simple",
+  "complete"), debug = F)
 }
 \arguments{
 \item{data}{A dlist}
@@ -16,6 +17,8 @@ dlist_stat_table(data, factor, group.by = NULL, ..., debug = F)
 \item{debug}{Logical to show debugging messages}
 
 \item{formula}{The formula to use with ggpubr::compare_means}
+
+\item{Ouptut}{Output mode, simple for letters list or complete for letters and p-value}
 }
 \value{
 result of the function

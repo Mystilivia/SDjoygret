@@ -1824,12 +1824,13 @@ dlist_stat_table1 <- function(data, formula, group.by = NULL, ..., debug = F) {
 #' @param formula The formula to use with ggpubr::compare_means
 #' @param ... Parameters to pass to ggpubr::compare_means
 #' @param debug Logical to show debugging messages
+#' @param Ouptut Output mode, simple for letters list or complete for letters and p-value
 #' @keywords statistical test, significance letters, dlist
 #' @return result of the function
 #' @export
 #' @examples
 #' dlist_stat_table()
-dlist_stat_table <- function(data, factor, group.by = NULL, ..., debug = F) {
+dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("simple", "complete"), debug = F) {
   # data <- temp.data.sub ; formula <- value~N ; method = "t.test" ; group.by = c('Stade', 'varID')
   warning("For old version, use dlist_stat_table1")
   if(debug) {message("Loading packages: ", appendLF = F)}
@@ -1881,7 +1882,10 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., debug = F) {
 
   if(debug) {message("OK", appendLF = T)}
   temp.result <- list(result_table = merge(as.data.table(t.data), as.data.table(t.letters)[, c(group.by, form.fact, "Letters"), with = F], by = c(group.by, form.fact), all = T), excluded_table = t.data.na[group %in% t.data.less2])
-  return(data.table::rbindlist(temp.result, fill = T))
+  if(Output == "simple") {return(data.table::rbindlist(temp.result, fill = T))}
+  if(Output == "complete") {return(list(Letters = data.table::rbindlist(temp.result, fill = T),
+                                        Stat_result = t.stat))}
+
 }
 
 
