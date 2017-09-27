@@ -1840,6 +1840,9 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("sim
   form.fact <- factor
   SDjoygret::check.list.format(data)
   if(debug) {message("OK", appendLF = T)}
+  if(debug) {message("Replacing - : ", appendLF = F)}
+  data[[2]][, eval(factor) := gsub("-", "", get(factor))]
+  if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Melting data: ", appendLF = F)}
   t.data <- SDjoygret::dlist.plot.table(data)
   if(debug) {message("OK", appendLF = T)}
