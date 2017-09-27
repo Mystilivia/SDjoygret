@@ -1571,7 +1571,14 @@ dlist.ropls.data <- function(dlist, ropls.result) {
     y <- "p2"
   } else if (ropls.result[[1]]@typeC %in% c("OPLS", "OPLS-DA")) {
     temp.scores <- data.table(dlist[[2]], ropls.result[[1]]@scoreMN, ropls.result[[1]]@orthoScoreMN)
-    temp.loadings <- data.table(merge(dlist[[3]], as.data.table(ropls.result[[1]]@loadingMN, keep.rownames = T), by.x = names(dlist[[3]])[1], by.y = "rn"), ropls.result[[1]]@orthoLoadingMN, OrthoVIP = ropls.result[[1]]@orthoVipVn, VIP = ropls.result[[1]]@vipVn)
+    merge.list <- list(
+      dlist[[3]],
+      as.data.table(ropls.result[[1]]@loadingMN, keep.rownames = names(dlist[[3]])[1]),
+      as.data.table(ropls.result[[1]]@orthoLoadingMN, keep.rownames = names(dlist[[3]])[1]),
+      as.data.table(data.frame(OrthoVIP = ropls.result[[1]]@orthoVipVn), keep.rownames = names(dlist[[3]])[1]),
+      as.data.table(data.frame(VIP = ropls.result[[1]]@vipVn), keep.rownames = names(dlist[[3]])[1]))
+    temp.loadings <- Reduce(function(x, y) {merge(x, y, by = names(dlist[[3]])[1])}, merge.list)
+    #temp.loadings <- data.table(merge(dlist[[3]], as.data.table(ropls.result[[1]]@loadingMN, keep.rownames = T), by.x = names(dlist[[3]])[1], by.y = "rn"), ropls.result[[1]]@orthoLoadingMN, OrthoVIP = ropls.result[[1]]@orthoVipVn, VIP = ropls.result[[1]]@vipVn)
     x <- "p1"
     y <- "o1"
   } else { stop("TypeC not recognized, please use the ropls package or dlist.opls.min to perform the multivariate analysis.
