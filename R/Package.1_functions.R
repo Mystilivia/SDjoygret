@@ -1628,6 +1628,32 @@ dlist.ropls.min <- function(dlist, opls.y = NULL, plotL = F, ...) {
 }
 
 
+#' Plot VIPs from opls object
+#'
+#' Plot the n top Vips in regard to there correlation (positive or negative) along p1.
+#' @param data opls object returned by ropls::opls()
+#' @param n number of VIPs from top to show (all if NULL)
+#' @keywords opls, vips, ggplot
+#' @return The resulting list of opls function (subsetted if min = TRUE).
+#' @export
+#' @examples
+#' dlist.ropls.min()
+ropls_plot_vips <- function(data, n = NULL) {
+  # data <- temp.opls.list[[1]]$opls.result$Results
+  require(ggplot2) ; require(data.table)
+  if(!class(data) == "opls") {stop('data should be of "opls" class (ropls::opls() ouptut)')}
+  if(any(c("loadingMN", "vipVn") %in% slotNames(data) == F)) {stop("loadingMN and/or vipVn slot were/was not found in data. Maybe ropls package has changed it's output, try to update ropls")}
+  temp.data <- merge(data.table(data@loadingMN, keep.rownames = "rn")[,.(rn, p1)], data.table(as.matrix(data@vipVn), keep.rownames = "rn")[, .(rn, VIP = V1)], by = "rn")
+  temp.data[, VIP_sign := ifelse(p1<0, -VIP, VIP)]
+  if(is.null(n)) {temp.plot <- temp.data[order(-VIP)]} else {temp.plot <- temp.data[order(-VIP)][1:n]}
+  ggplot2::ggplot(temp.plot, aes(reorder(rn, VIP_sign), VIP_sign, color = p1>0)) +
+    ggplot2::geom_hline(yintercept = 0, linetype = 2, alpha = 0.5) +
+    ggplot2::geom_pointrange(aes(ymin = 0, ymax = VIP_sign)) +
+    ggplot2::coord_flip() +
+    ggplot2::labs(title = "Predictive VIPs", x = "", y = "", color = "")
+}
+
+
 #' Plot ropls results
 #'
 #' Plot ropls results using ggplot2
