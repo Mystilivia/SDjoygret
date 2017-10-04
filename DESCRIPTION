@@ -1,7 +1,7 @@
 Package: SDjoygret
 Type: Package
 Title: Testing R Package
-Version: 0.5.1
+Version: 0.6.0
 Date: 2016-03-08
 Author: person("Sylvain", "Dechaumet", role=c("aut", "cre"), email="sylvain.dechaumet@gmail.com")
 Maintainer: S. Dechaumet <sylvain.dechaumet@gmail.com>
@@ -9,4 +9,4 @@ Description: Testing R packaging
 License: none
 LazyData: TRUE
 RoxygenNote: 6.0.1
-Imports: tidyverse, readxl, ropls, gridExtra, readxl, grDevices, data.table, ggpubr, multcompView 
+Imports: tidyverse, ropls, gridExtra, grDevices, data.table, ggpubr, multcompView 

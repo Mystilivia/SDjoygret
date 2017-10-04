@@ -1627,6 +1627,41 @@ dlist.ropls.min <- function(dlist, opls.y = NULL, plotL = F, ...) {
               "opls.y" = opls.y))
 }
 
+#' Formula to return mz +- ppm
+#'
+#' output a vector with lowest and highest values from an mz and ppm
+#' @param mz mz to search
+#' @param database database to search into (must have 'mz' column)
+#' @param ppm tolerance in ppm
+#' @keywords mz, ppm, deviation
+#' @return a vector with mz range given a ppm tolerance
+#' @export
+#' @examples
+#' ppm(125.0000, 5)
+mz.ppm <- function(mass, ppm) {
+  dppm <- ppm * 1e-06
+  return(c(mass * (1 - dppm), mass * (1 + dppm)))
+}
+
+
+#' Search mz values in a database
+#'
+#' Return all entry of database with mz between mz +- ppm
+#' @param mass mz to search
+#' @param database database to search into (must have 'mz' column)
+#' @param ppm tolerance in ppm
+#' @keywords opls, vips, ggplot
+#' @return The resulting list of opls function (subsetted if min = TRUE).
+#' @export
+#' @examples
+#' mz.database(mz = 188.2500, database = data.table(ID = paste0(ID, 1:100), mz = seq(100.000, 800.000, length.out = 100)), ppm = 100)
+mz.database <- function(mass, database, ppm = 5) {
+  # mass <- 188.247 ; database <- temp.aracyc.online[,.(Compound_id, mz = Molecular_weight)] ; ppm <- 5
+  mass <- as.numeric(mass)
+  temp.data <- data.table(database)[mz %between% SDjoygret::mz.ppm(mass, dppm = ppm, l = T)][, massquery := mass][, dppm := round(abs(massquery-mz)*1e-6/massquery, 2)]
+  return(temp.data)
+}
+
 
 #' Plot VIPs from opls object
 #'
