@@ -1660,7 +1660,7 @@ mz.database <- function(mass, database, ppm = 5) {
   require(data.table)
   mass <- as.numeric(mass)
   limits <- SDjoygret::mz.ppm(mass, ppm)
-  temp.data <- data.table::as.data.table(database)[mz %between% limits][, massquery := mass][, dppm := round(abs(massquery-mz)*1e-6/massquery, 2)]
+  temp.data <- data.table::as.data.table(database)[mz %between% limits][, massquery := mass][, dppm := round(abs(massquery-mass)*1e-6/massquery, 2)]
   return(temp.data)
 }
 
