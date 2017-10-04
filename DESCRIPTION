@@ -10,3 +10,4 @@ License: none
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Imports: tidyverse, ropls, gridExtra, grDevices, data.table, ggpubr, multcompView 
+Suggests: testthat

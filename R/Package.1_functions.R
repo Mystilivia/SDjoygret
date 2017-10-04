@@ -1657,8 +1657,10 @@ mz.ppm <- function(mass, ppm) {
 #' mz.database(mz = 188.2500, database = data.table(ID = paste0(ID, 1:100), mz = seq(100.000, 800.000, length.out = 100)), ppm = 100)
 mz.database <- function(mass, database, ppm = 5) {
   # mass <- 188.247 ; database <- temp.aracyc.online[,.(Compound_id, mz = Molecular_weight)] ; ppm <- 5
+  require(data.table)
   mass <- as.numeric(mass)
-  temp.data <- data.table(database)[mz %between% SDjoygret::mz.ppm(mass, dppm = ppm, l = T)][, massquery := mass][, dppm := round(abs(massquery-mz)*1e-6/massquery, 2)]
+  limits <- SDjoygret::mz.ppm(mass, ppm)
+  temp.data <- data.table::as.data.table(database)[mz %between% limits][, massquery := mass][, dppm := round(abs(massquery-mz)*1e-6/massquery, 2)]
   return(temp.data)
 }
 
