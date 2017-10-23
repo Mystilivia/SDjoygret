@@ -2022,7 +2022,7 @@ waters_txt <- function(file) {
   # Récupère le nombre de ligne de chaque sous-tableau
   table_size <- diff(c(0, which(c(diff(grep("^[[:digit:]]", temp_txt)), 5) != 1)))-1
   # Aggrège tous les sous-tableaux en ajoutant une colonne avec le nom de l'échantillon
-  parsed_data <- rbindlist(mapply(function(x, y, z) {data.table("ID" = rep(z, y), read.table(file, skip=x, nrows=y, header = F, sep="\t"))}, headers, table_size, names, SIMPLIFY = F))
+  parsed_data <- data.table::rbindlist(mapply(function(x, y, z) {data.table::data.table("ID" = rep(z, y), read.table(file, skip=x, nrows=y, header = F, sep="\t"))}, headers, table_size, names, SIMPLIFY = F))
   # Ajoute les noms de colonnes
   names(parsed_data)[-1] <- col_names
   # Retourne le résultat
