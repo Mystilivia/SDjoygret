@@ -1999,6 +1999,36 @@ transf_glog <- function(data, a = 1) {
 }
 
 
+#' Read and format MassLynx text file
+#'
+#' Read summary exported from MassLynx as txt files and format the content to output one table
+#' with an ID column.
+#' @param file Path to the txt file
+#' @keywords Read, Format
+#' @return a data.table with
+#' @export
+#' @examples
+#' waters_txt()
+waters_txt <- function(file) {
+  # Charge les packages
+  require(data.table)
+  # Lecture du fichier au format brute
+  temp_txt <- readLines(file)
+  # Recherche les lignes correspondants aux titres sur la base des charactère du début de ligne "^\t"
+  headers <- grep('^\t', temp_txt)
+  # Supprime tous les caractères avant les ":" ainsi que les espaces qui suivent
+  names <- sub("^ ", "", sub(".*?: ", "", temp_txt[headers-2]))
+  col_names <- strsplit(temp_txt[headers[1]], split = '\t')[[1]]
+  # Récupère le nombre de ligne de chaque sous-tableau
+  table_size <- diff(c(0, which(c(diff(grep("^[[:digit:]]", temp_txt)), 5) != 1)))-1
+  # Aggrège tous les sous-tableaux en ajoutant une colonne avec le nom de l'échantillon
+  parsed_data <- rbindlist(mapply(function(x, y, z) {data.table("ID" = rep(z, y), read.table(file, skip=x, nrows=y, header = F, sep="\t"))}, headers, table_size, names, SIMPLIFY = F))
+  # Ajoute les noms de colonnes
+  names(parsed_data)[-1] <- col_names
+  # Retourne le résultat
+  return(parsed_data)
+}
+
 
 #' TITLE
 #'
