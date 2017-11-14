@@ -1962,6 +1962,62 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("sim
 }
 
 
+
+
+#' Do pairwise statistical tests on dlist
+#'
+#' These function take a table as entry and perform pairwise statistical test using ggpubr::compare_means for
+#' tests and multcompView::multcompLetters to annotate test results. It returns a data.table.
+#' @param data A dlist
+#' @param factor The column name with comparison
+#' @param value The column name with values
+#' @param group.by Grouping variable for ggpubr::compare_means
+#' @param ... Parameters to pass to ggpubr::compare_means
+#' @param Ouptut Output mode, simple for letters list or complete for letters and p-value
+#' @keywords statistical test, significance letters, dlist
+#' @return result of the function
+#' @export
+#' @examples
+#' stat_table()
+stat_table <- function (data, factor, value, group.by = NULL, ..., Output = c("simple", "complete"), debug = F) {
+  # data <- result.6.subset ; factor = "plante_feuille" ; value = "Quantite" ; group.by = c("Compose", "plante_age") ; Output = "simple"
+  pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
+  data.sub <- as.data.table(data)[, c(group.by, factor, value), with = F]
+  data.sub[, `:=`(eval(factor), gsub("-", "", get(factor)))]
+  t.data <- melt(data.sub, id.vars = c(group.by, factor))
+  t.data.na <- t.data[!is.na(value)]
+  t.data.na[, `:=`(group, do.call(paste0, .SD)), .SDcols = group.by]
+
+  t.data.comb <- dcast(t.data.na, group ~ get(factor),
+                       value.var = "value", fun.aggregate = length)
+  t.data.less2 <- t.data.comb[, .(Log = length(.SD) - length(which(.SD <=
+                                                                     2)) < 2), .SDcols = -1, by = group][Log == T, group]
+  t.data <- t.data.na[!group %in% t.data.less2]
+  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = as.formula(paste0("value~",
+                                                                                        factor)), data = as.data.frame(t.data), group.by = group.by,
+                                                            ...))
+  t.letters <- t.stat[!is.na(p), .(Factor = names(multcompView::multcompLetters(setNames(as.numeric(p),
+                                                                                         as.factor(paste0(group1, "-", group2))))[[1]]), Letters = multcompView::multcompLetters(setNames(as.numeric(p),
+                                                                                                                                                                                          as.factor(paste0(group1, "-", group2))))[[1]]), by = group.by]
+  setnames(t.letters, "Factor", factor)
+
+  t.letters[, `:=`((factor), as.factor(get(factor)))]
+  t.data[, `:=`((factor), as.factor(get(factor)))]
+  temp.result <- list(result_table = merge(as.data.table(t.data),
+                                           as.data.table(t.letters)[, c(group.by, factor, "Letters"),
+                                                                    with = F], by = c(group.by, factor), all = T),
+                      excluded_table = t.data.na[group %in% t.data.less2])
+  if (Output == "simple") {
+    return(data.table::rbindlist(temp.result, fill = T))
+  }
+  if (Output == "complete") {
+    return(list(Letters = data.table::rbindlist(temp.result,
+                                                fill = T), Stat_result = t.stat))
+  }
+}
+
+
+
 #' Pareto scaling
 #'
 #' Apply Pareto scaling on a data.table
