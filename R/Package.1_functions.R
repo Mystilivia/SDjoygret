@@ -1981,8 +1981,10 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("sim
 #' stat_table()
 stat_table <- function (data, factor, value, group.by = NULL, ..., Output = c("simple", "complete"), debug = F) {
   # data <- result.6.subset ; factor = "plante_feuille" ; value = "Quantite" ; group.by = c("Compose", "plante_age") ; Output = "simple"
+
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
   data.sub <- as.data.table(data)[, c(group.by, factor, value), with = F]
+  rm(data)
   data.sub[, `:=`(eval(factor), gsub("-", "", get(factor)))]
   t.data <- melt(data.sub, id.vars = c(group.by, factor))
   t.data.na <- t.data[!is.na(value)]
