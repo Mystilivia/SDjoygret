@@ -2071,7 +2071,9 @@ waters_txt <- function(file) {
   # Charge les packages
   require(data.table)
   # Lecture du fichier au format brute
-  temp_txt <- readLines(file)
+  con <- file(file)
+  temp_txt <- readLines(con)
+  close(con)
   # Recherche les lignes correspondants aux titres sur la base des charactère du début de ligne "^\t"
   headers <- grep('^\t', temp_txt)
   # Supprime tous les caractères avant les ":" ainsi que les espaces qui suivent
