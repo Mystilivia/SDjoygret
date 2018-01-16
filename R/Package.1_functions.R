@@ -1962,7 +1962,40 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("sim
 }
 
 
+#' Summary on table
+#'
+#' Perform classic statistical indices on a table
+#' @param data A dlist
+#' @param val.name Column name of value to summarize
+#' @param group.by Column(s) name(s) of grouping factors
+#' @keywords summary
+#' @return Return a data.table with summary
+#' @export
+#' @examples
+#' stat_table()
 
+table_summary <- function(data, val.name, group.by) {
+  require(data.table) ; require(e1071)
+  if(!is.data.table(data)) {data <- as.data.table(data)}
+  temp.summary <- data[, .(
+    "N"               = round(length(get(val.name)), 3),
+    "NA"              = round(length(which(is.na(get(val.name)))), 3),
+    "Zero"            = round(length(which(get(val.name) == 0)), 3),
+    "Perc_NA"         = round(length(which(is.na(get(val.name)))) * 100 / length(get(val.name)), 3),
+    "Perc_Zero"       = round(length(which(get(val.name) == 0)) * 100 / length(get(val.name)), 3),
+    "Avg"             = round(mean(get(val.name), na.rm = T), 3),
+    "Median"          = round(median(get(val.name), na.rm = T), 3),
+    "Sum"             = round(sum(get(val.name), na.rm = T), 3),
+    "Min"             = round(min(get(val.name), na.rm = T), 3),
+    "Max"             = round(max(get(val.name), na.rm = T), 3),
+    "SD"              = round(sd(get(val.name), na.rm = T), 3),
+    "CV"              = round(sd(get(val.name), na.rm = T)*100/mean(get(val.name), na.rm = T), 3),
+    "IC95_min_manual" = round(mean(get(val.name), na.rm = T)-2*(sd(get(val.name), na.rm = T)/length(get(val.name))), 3),
+    "IC95_max_manual" = round(mean(get(val.name), na.rm = T)+2*(sd(get(val.name), na.rm = T)/length(get(val.name))), 3),
+    "Skew"            = round(e1071::skewness(get(val.name), na.rm = T), 3)
+  ), by = c(group.by)]
+  return(temp.summary)
+}
 
 #' Do pairwise statistical tests on dlist
 #'
