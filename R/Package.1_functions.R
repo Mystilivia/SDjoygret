@@ -2013,12 +2013,13 @@ table_summary <- function(data, val.name, group.by) {
 #' @examples
 #' stat_table()
 stat_table <- function (data, factor, value, group.by = NULL, ..., Output = c("simple", "complete"), debug = F) {
-  # data <- result.6.subset ; factor = "plante_feuille" ; value = "Quantite" ; group.by = c("Compose", "plante_age") ; Output = "simple"
+  # data <- dev.data.L[, .(leaf_desc, meas, value)] ; factor = "leaf_desc" ; value = "value" ; group.by = c('meas') ; Output = "complete"
 
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
-  data.sub <- as.data.table(data)[, c(group.by, factor, value), with = F]
+  if (!is.data.table(data)) {data <- data.table(data)}
+  data.sub <- data[, c(group.by, factor, value), with = F]
   rm(data)
-  data.sub[, `:=`(eval(factor), gsub("-", "", get(factor)))]
+  if(data.sub[, length(grep("-", get(factor)))] > 0) {stop('character "-" is forbidden in factor levels')}
   t.data <- melt(data.sub, id.vars = c(group.by, factor))
   t.data.na <- t.data[!is.na(value)]
   t.data.na[, `:=`(group, do.call(paste0, .SD)), .SDcols = group.by]
@@ -2028,9 +2029,8 @@ stat_table <- function (data, factor, value, group.by = NULL, ..., Output = c("s
   t.data.less2 <- t.data.comb[, .(Log = length(.SD) - length(which(.SD <=
                                                                      2)) < 2), .SDcols = -1, by = group][Log == T, group]
   t.data <- t.data.na[!group %in% t.data.less2]
-  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = as.formula(paste0("value~",
-                                                                                        factor)), data = as.data.frame(t.data), group.by = group.by,
-                                                            ...))
+  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = as.formula(paste0("value~",factor)),
+                                                            data = as.data.frame(t.data), group.by = group.by, ...))
   t.letters <- t.stat[!is.na(p), .(Factor = names(multcompView::multcompLetters(setNames(as.numeric(p),
                                                                                          as.factor(paste0(group1, "-", group2))))[[1]]), Letters = multcompView::multcompLetters(setNames(as.numeric(p),
                                                                                                                                                                                           as.factor(paste0(group1, "-", group2))))[[1]]), by = group.by]
