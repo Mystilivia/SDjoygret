@@ -1019,6 +1019,7 @@ dlist.summary <- function(dlist, var2names = NULL, val.name = "value", var.name 
     "Perc_Zero"       = round(length(which(get(val.name) == 0)) * 100 / length(get(val.name)), 3),
     "Avg"             = round(mean(get(val.name), na.rm = T), 3),
     "Median"          = round(median(get(val.name), na.rm = T), 3),
+    "Var"             = round(var(get(val.name), na.rm = T), 3),
     "Sum"             = round(sum(get(val.name), na.rm = T), 3),
     "Min"             = round(min(get(val.name), na.rm = T), 3),
     "Max"             = round(max(get(val.name), na.rm = T), 3),
@@ -1910,8 +1911,8 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("sim
   form.fact <- factor
   SDjoygret::check.list.format(data)
   if(debug) {message("OK", appendLF = T)}
-  if(debug) {message("Replacing - : ", appendLF = F)}
-  data[[2]][, eval(factor) := gsub("-", "", get(factor))]
+  if(debug) {message("Checking - : ", appendLF = F)}
+  if(data[[2]][, length(grep("-", get(factor)))] > 0) {stop('character "-" is forbidden in factor levels')}
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Melting data: ", appendLF = F)}
   t.data <- SDjoygret::dlist.plot.table(data)
