@@ -1891,8 +1891,8 @@ dlist_stat_table1 <- function(data, formula, group.by = NULL, ..., debug = F) {
 #' These function take a dlist as entry and perform pairwise statistical test using ggpubr::compare_means for
 #' tests and multcompView::multcompLetters to annotate test results. It returns a table
 #' @param data A dlist
+#' @param factor Grouping factor to compare
 #' @param group.by Grouping variable for ggpubr::compare_means
-#' @param formula The formula to use with ggpubr::compare_means
 #' @param ... Parameters to pass to ggpubr::compare_means
 #' @param debug Logical to show debugging messages
 #' @param Ouptut Output mode, simple for letters list or complete for letters and p-value
@@ -1902,7 +1902,7 @@ dlist_stat_table1 <- function(data, formula, group.by = NULL, ..., debug = F) {
 #' @examples
 #' dlist_stat_table()
 dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("simple", "complete"), debug = F) {
-  # data <- temp.data.sub ; formula <- value~N ; method = "t.test" ; group.by = c('Stade', 'varID')
+  # data <- temp.data ; factor <- "Feuille" ; method = "t.test" ; group.by = c('Variable', 'Age') ; debug = F
   warning("For old version, use dlist_stat_table1")
   if(debug) {message("Loading packages: ", appendLF = F)}
   pacman::p_load(data.table, ggpubr, SDjoygret, multcompView)
@@ -1921,15 +1921,18 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("sim
   if(!form.fact %in% names(t.data)) {
     message(paste0("comparison_factor (", form.fact,") doesn't exist, check column names :"), appendLF = T)
     stop(paste(names(t.data), collapse = " | "))
-    }
+  }
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message(paste(names(t.data), collapse=" | "), appendLF = T)}
   if(debug) {message("Checking replicates: ", appendLF = F)}
-  t.data.na <- t.data[!is.na(value)]
-  t.data.na <- t.data.na[, group := do.call(paste0, .SD), .SDcols = group.by]
-  t.data.comb <- dcast(t.data.na, group~get(form.fact), value.var = 'value', fun.aggregate = length)
-  t.data.less2 <- t.data.comb[, .(Log = length(.SD) - length(which(.SD <= 2))<2), .SDcols = -1, by = group][Log == T, group]
-  t.data <- t.data.na[!group %in% t.data.less2]
+  t.data[, temp_group := do.call(paste0, (mget(c(group.by, form.fact))))]
+  t.data[, temp_group_2 := do.call(paste0, mget(group.by))]
+  t.data.na <-  t.data[!is.na(value)]
+  t.data.n <- t.data.na[, .N, by = c(group.by, form.fact, "temp_group")]
+  t.data.less2 <- t.data.n[N < 2, temp_group]
+  temp.var.less2 <- t.data.n[N >= 2][, .N, by = group.by][N < 2]
+  temp.var.less2[, temp_group_2 := do.call(paste0, mget(group.by))]
+  t.data.sub <- t.data.na[!temp_group %in% t.data.less2][!temp_group_2 %in% temp.var.less2[, temp_group_2]]
   if(debug) {
     if(length(t.data.less2) >= 1) {
       message("Found combinations with not enough replicate:", appendLF = T)
@@ -1939,7 +1942,7 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("sim
     }
   }
   if(debug) {message("Compare means: ", appendLF = F)}
-  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = as.formula(paste0("value~",form.fact)), data = as.data.frame(t.data), group.by = group.by, ...))
+  t.stat <- data.table::as.data.table(ggpubr::compare_means(formula = as.formula(paste0("value~", form.fact)), data = as.data.frame(t.data.sub[!is.na(value)]), group.by = group.by, ...))
 
   if(debug) {message("OK", appendLF = T)}
   if(debug) {message("Adding letters: ", appendLF = F)}
@@ -1952,10 +1955,11 @@ dlist_stat_table <- function(data, factor, group.by = NULL, ..., Output = c("sim
   if(debug) {message(paste0(names(t.letters), collapse = " | "), appendLF = T)}
   if(debug) {message("Formatting output: ", appendLF = F)}
   t.letters[, (form.fact) := as.factor(get(form.fact))]
-  t.data[, (form.fact) := as.factor(get(form.fact))]
+  t.data.sub[, (form.fact) := as.factor(get(form.fact))]
 
   if(debug) {message("OK", appendLF = T)}
-  temp.result <- list(result_table = merge(as.data.table(t.data), as.data.table(t.letters)[, c(group.by, form.fact, "Letters"), with = F], by = c(group.by, form.fact), all = T), excluded_table = t.data.na[group %in% t.data.less2])
+  temp.result <- list(result_table = merge(as.data.table(t.data.sub), as.data.table(t.letters)[, c(group.by, form.fact, "Letters"), with = F], by = c(group.by, form.fact), all = T),
+                      excluded_table = t.data.na[temp_group %in% t.data.less2])
   if(Output == "simple") {return(data.table::rbindlist(temp.result, fill = T))}
   if(Output == "complete") {return(list(Letters = data.table::rbindlist(temp.result, fill = T),
                                         Stat_result = t.stat))}

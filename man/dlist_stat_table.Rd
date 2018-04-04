@@ -10,13 +10,13 @@ dlist_stat_table(data, factor, group.by = NULL, ..., Output = c("simple",
 \arguments{
 \item{data}{A dlist}
 
+\item{factor}{Grouping factor to compare}
+
 \item{group.by}{Grouping variable for ggpubr::compare_means}
 
 \item{...}{Parameters to pass to ggpubr::compare_means}
 
 \item{debug}{Logical to show debugging messages}
-
-\item{formula}{The formula to use with ggpubr::compare_means}
 
 \item{Ouptut}{Output mode, simple for letters list or complete for letters and p-value}
 }
